@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.auth.models import User
 
 
 class Atividade(models.Model):
@@ -70,7 +71,7 @@ class Post(models.Model):
     conteudo = models.TextField()
     data = models.DateField(auto_now_add=True)
     usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, related_name='posts')  # Field name made lowercase.
-    classificacao = models.ForeignKey(Classificacao, on_delete=models.CASCADE, related_name='classificacao')  # Field name made lowercase.
+    classificacao = models.ForeignKey(Classificacao, on_delete=models.CASCADE)  # Field name made lowercase.
 
 
 class Profissao(models.Model):
@@ -82,33 +83,21 @@ class Profissao(models.Model):
 
 class Recomendacao(models.Model):
     data = models.DateField(auto_now_add=True)  # Field name made lowercase.
-    classificacao = models.ForeignKey(Classificacao, on_delete=models.CASCADE, related_name='classificacao')  # Field name made lowercase.
+    classificacao = models.ForeignKey(Classificacao, on_delete=models.CASCADE)  # Field name made lowercase.
     usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, related_name='recomendacoes')  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'Recomendacao'
-        unique_together = (('regra_idregra', 'usuario_login'),)
 
 
 class Regra(models.Model):
-    idregra = models.IntegerField(db_column='idRegra', primary_key=True)  # Field name made lowercase.
-    pontuacao = models.IntegerField(blank=True, null=True)
-    restricao = models.ForeignKey(Caracteristica, models.DO_NOTHING, db_column='restricao', blank=True, null=True)
-    beneficios = models.ForeignKey(Caracteristica, models.DO_NOTHING, db_column='beneficios', blank=True, null=True)
-    maleficios = models.ForeignKey(Caracteristica, models.DO_NOTHING, db_column='maleficios', blank=True, null=True)
-    datacriacao = models.DateField(db_column='dataCriacao', blank=True, null=True)  # Field name made lowercase.
-    atividade_idatividade = models.ForeignKey(Atividade, models.DO_NOTHING, db_column='Atividade_idAtividade')  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'Regra'
-
+    pontuacao = models.IntegerField()
+    restricao = models.ForeignKey(Caracteristica, on_delete=models.CASCADE)
+    beneficios = models.ForeignKey(Caracteristica, on_delete=models.CASCADE)
+    maleficios = models.ForeignKey(Caracteristica, on_delete=models.CASCADE)
+    datacriacao = models.DateField(auto_now_add=True)  # Field name made lowercase.
+    atividade = models.ForeignKey(Atividade, on_delete=models.CASCADE)  # Field name made lowercase.
 
 class Sugestao(models.Model):
-    idsugestao = models.IntegerField(db_column='idSugestao', primary_key=True)  # Field name made lowercase.
-    conteudo = models.CharField(max_length=45, blank=True, null=True)
-    data = models.DateField(blank=True, null=True)
+    conteudo = models.TextField()
+    data = models.DateField(auto_now_add)
 
     class Meta:
         managed = False
@@ -116,18 +105,13 @@ class Sugestao(models.Model):
 
 
 class Usuario(models.Model):
-    login = models.CharField(primary_key=True, max_length=45)
-    tipousuario = models.IntegerField(db_column='tipoUsuario')  # Field name made lowercase.
-    senha = models.CharField(max_length=45)
-    nome = models.CharField(max_length=45)
-    email = models.CharField(max_length=45)
-    datanascimento = models.DateField(db_column='dataNascimento')  # Field name made lowercase.
-    telefone = models.CharField(max_length=45, blank=True, null=True)
-    classificacaopessoa_idclassificacao = models.ForeignKey(Classificacaopessoa, models.DO_NOTHING, db_column='ClassificacaoPessoa_idClassificacao')  # Field name made lowercase.
-    cpf = models.CharField(max_length=45)
-    identificacao = models.CharField(max_length=45, blank=True, null=True)
-    profissao_idprofissao1 = models.ForeignKey(Profissao, models.DO_NOTHING, db_column='Profissao_idProfissao1')  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'Usuario'
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    login = models.CharField(max_length=45)
+    tipo_usuario = models.IntegerField()  # Field name made lowercase.
+    email = models.EmailField(max_length=100)
+    datanascimento = models.DateField()  # Field name made lowercase.
+    telefone = models.CharField(max_length=20)
+    classificacao = models.ForeignKey(Classificacao, on_delete=models.CASCADE)  # Field name made lowercase.
+    cpf = models.CharField(max_length=20)
+    identificacao = models.CharField(max_length=45)
+    profissao = models.ForeignKey(Profissao, on_delete=models.CASCADE)  # Field name made lowercase.
