@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'usuario',
     'instrutor',
-    'aluno',
+    'aluno'
 ]
 
 MIDDLEWARE = [
@@ -77,12 +78,8 @@ WSGI_APPLICATION = 'HiFit.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'mydb',
-        'PASSWORD': '123456',
-        'PORT': '3306',
-        'USER': 'root',
-        'HOST': 'localhost',
     }
 }
 
