@@ -8,12 +8,12 @@
     <title>HiFit</title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
     {% block css %}
     {% endblock css %}
 </head>
 <body class="hold-transition skin-black layout-top-nav">
-    {include 'header.html'}
+    {% include 'header.html' %} 
     <div class="wrapper">
         <div class="content-wrapper">
             <div class="container">
@@ -29,8 +29,10 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-2.2.4.js"></script>
-    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    {% include 'footer.html' %} 
+    
+    <script src={% static 'js/jquery-3.2.1.min.js' %}></script>
+    <script src={% static 'bootstrap/js/bootstrap.min.js' %}></script>
    
     {% block js %}
     {% endblock js %}
