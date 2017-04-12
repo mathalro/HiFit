@@ -26,7 +26,7 @@ class Usuario(models.Model):
     cpf = models.CharField(max_length=20)
     identificacao = models.CharField(max_length=45)
     profissao = models.ForeignKey('instrutor.Profissao', on_delete=models.CASCADE, related_name='usuarios')  # Field name made lowercase.
-    caracteristicas = models.ManyToManyField('aluno.Caracteristica', null=True,blank=True)
+    caracteristicas = models.ManyToManyField('aluno.Caracteristica',blank=True)
 
 class Post(models.Model):
     conteudo = models.TextField(max_length=500)
@@ -57,8 +57,8 @@ class Denuncia(models.Model):
 class Mensagem(models.Model):
     conteudo = models.TextField(max_length=140)
     data = models.DateField(auto_now_add=True)
-    remetente = models.ForeignKey(Usuario, related_name='mensagens')  # Field name made lowercase.
-    destinatario = models.ForeignKey(Usuario, related_name='mensagens')  # Field name made lowercase.    
+    remetente = models.ForeignKey(Usuario, related_name='remetente')  # Field name made lowercase.
+    destinatario = models.ForeignKey(Usuario, related_name='destinatario')  # Field name made lowercase.    
 
 
 class Sugestao(models.Model):
