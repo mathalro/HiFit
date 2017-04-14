@@ -1,0 +1,87 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>HiFit</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    {% block css %}
+    {% endblock css %}
+</head>
+<body class="hold-transition skin-black layout-top-nav">
+    {% include 'headerInstrutor.html' %}
+    <div class="wrapper">
+        <div class="content-wrapper">
+            <div class="container">
+                <section class="content-header">
+                    <h1>Regras</h1>
+                </section>
+                <section class="content">
+                    {% block content %}
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#menuCadastro">Cadastro</a></li>
+                        <li><a data-toggle="tab" href="#menuEdicao">Edição</a></li>
+                        <li><a data-toggle="tab" href="#menuExclusao">Exclusão</a></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div id="menuCadastro" class="tab-pane fade in active">
+                            <div class="form-group">
+                                <br><label for="selAtividade">Atividade:</label>
+                                <select class="form-control" id="selAtividade">
+                                    {% for atividade in atividades %}
+                                    <option>{{atividade.nome}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <br><label for="selRestricao">Restrição:</label>
+                                <select class="form-control" id="selRestricao">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="selBeneficio">Benefício:</label>
+                                <select class="form-control" id="selBeneficio" >
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="selMaleficio">Malefício:</label>
+                                <select class="form-control" id="selMaleficio">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="menuEdicao" class="tab-pane fade">
+                            <p>Edição da massa.</p>
+                        </div>
+                        <div id="menuExclusao" class="tab-pane fade">
+                            <p>Exclusão da massa</p>
+                        </div>
+                    </div>
+                    {% endblock content %}
+                </section>
+            </div>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+    
+    <script src={% static 'js/jquery-3.2.1.min.js' %}></script>
+    <script src={% static 'bootstrap/js/bootstrap.min.js' %}></script>
+   
+    {% block js %}
+    {% endblock js %}
+</body>
+</html>
