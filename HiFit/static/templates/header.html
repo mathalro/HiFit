@@ -1,5 +1,5 @@
 <header class="main-header">
-    <nav class="navbar navbar-light" style="background-color: #e3f2fd;"">
+    <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
         <div class="container">
             <div class="navbar-header">
                 <a href="/" class="navbar-brand">HiFit</a>
@@ -9,9 +9,13 @@
             </div>
             <div class="navbar-custom-menu pull-right">
                 <ul class="nav navbar-nav">
-                      <li><a href="/login">Login</a></li>
-                      <li><a href="/cadastrar">Cadastrar</a></li>
-                     <li><a href="/sobre">Sobre</a></li>
+                    {% if not request.user.is_authenticated %}
+                        <li><a href="#">Sobre</a></li>  
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="#">Cadastrar</a></li>
+                    {% else %}
+                        <li><a href="/logout">Logout</a></li>
+                    {% endif %}
                 </ul>   
             </div>
         </div>

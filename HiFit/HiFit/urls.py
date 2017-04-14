@@ -18,5 +18,7 @@ from django.contrib import admin
 from usuario.views import * 
 urlpatterns = [
     url(r'^$', home),
+    url(r'^login', login),
+    url(r'^logout', logout),
     url(r'^admin/', admin.site.urls),
 ]
