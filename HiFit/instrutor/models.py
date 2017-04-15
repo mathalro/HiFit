@@ -9,8 +9,8 @@ from django.contrib.auth.models import User
 class Profissao(models.Model):
     nome = models.CharField(max_length=40)
 
-    def __unicode__(self):
-        return nome
+    def __str__(self):
+        return self.nome
 
 
 class Regra(models.Model):

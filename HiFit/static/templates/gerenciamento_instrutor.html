@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+ <link rel="stylesheet" href="{% static 'css/gerenciamento_instrutor.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container">
+	 <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#menuGeral">Geral</a></li>
+        <li><a data-toggle="tab" href="#menuDadosTecnicos">Dados Técnicos</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="menuGeral" class="tab-pane fade in active">
+            <h3>Geral</h3>
+            <form method="POST">{% csrf_token %}
+				{% for field in cadastroUser %}
+					<div class="bottomSpace">
+						{{field}}
+					</div>
+				{% endfor %}
+				{% for field in cadastroInstrutor %}
+					<div class="bottomSpace">
+						{{field}}
+					</div>
+				{% endfor %}
+				<input type="submit" value="Pronto" />
+			</form>
+        </div>
+        <div id="menuDadosTecnicos" class="tab-pane fade">
+            <h3>Dados Técnicos</h3>
+            <p>Edição da massa.</p>
+        </div>
+</div>
+{% endblock %}

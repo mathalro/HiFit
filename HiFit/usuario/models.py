@@ -20,13 +20,17 @@ class Classificacao(models.Model):
 class Usuario(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tipo_usuario = models.IntegerField()  # Field name made lowercase.
+    nome = models.CharField(max_length=100)
     datanascimento = models.DateField()  # Field name made lowercase.
     telefone = models.CharField(max_length=20)
-    classificacao = models.ForeignKey(Classificacao, on_delete=models.CASCADE)  # Field name made lowercase.
+    classificacao = models.ForeignKey(Classificacao, on_delete=models.CASCADE,blank=True,null=True)  # Field name made lowercase.
     cpf = models.CharField(max_length=20)
     identificacao = models.CharField(max_length=45)
     profissao = models.ForeignKey('instrutor.Profissao', on_delete=models.CASCADE, related_name='usuarios')  # Field name made lowercase.
     caracteristicas = models.ManyToManyField('aluno.Caracteristica',blank=True)
+
+    def __str__(self):
+        return self.nome
 
 class Post(models.Model):
     conteudo = models.TextField(max_length=500)
