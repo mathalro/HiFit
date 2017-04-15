@@ -64,5 +64,6 @@ class Mensagem(models.Model):
 class Sugestao(models.Model):
     conteudo = models.TextField(max_length=500)
     data = models.DateField(auto_now_add=True)
+    tipo = models.IntegerField()
 
 
