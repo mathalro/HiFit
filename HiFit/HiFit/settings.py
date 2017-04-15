@@ -126,3 +126,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")
 ]
+<<<<<<< HEAD
+
+# E-mail settings
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
