@@ -11,7 +11,7 @@ def fale_conosco(request):
 	if request.method == 'POST':
 		form = FaleConoscoForm(request.POST)
 		if form.is_valid():
-			send_mail(form.cleaned_data['tipo'] + ' - HiFit', form.cleaned_data['conteudo'],
+			send_mail(form.cleaned_data['tipo'] + ' - ' + form.cleaned_data['assunto'], form.cleaned_data['conteudo'],
 			'hifites@gmail.com', ['hifites@gmail.com'])
 			return redirect('/')
 	else:
