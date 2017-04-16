@@ -9,9 +9,9 @@ from django.contrib.auth.models import User
 class Atividade(models.Model):
     nome = models.CharField(max_length=45)
 
-    def __unicode__(self):
+    def _str_(self):
         return self.nome
-    
+
 
 class Classificacao(models.Model):
     somanota = models.IntegerField()  # Field name made lowercase.
@@ -40,7 +40,7 @@ class Comentario(models.Model):
     data = models.DateField(auto_now=False, auto_now_add=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)  # Field name made lowercase.
 
-    def __unicode__(self):
+    def _str_(self):
         return self.data + ': ' +self.conteudo
 
 
@@ -50,7 +50,7 @@ class Denuncia(models.Model):
     data = models.DateField(auto_now_add=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='denuncias')  # Field name made lowercase.
 
-    def __unicode__(self):
+    def _str_(self):
         return self.titulo
 
 

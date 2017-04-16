@@ -11,7 +11,7 @@ class Caracteristica(models.Model):
     valor = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     tipo = models.IntegerField()
 
-    def __unicode__(self):
+    def _str_(self):
         return self.descricao
     
 
