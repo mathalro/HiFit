@@ -17,11 +17,11 @@ def login(request):
 			return redirect("/")
 		else:
 			messages.warning(request, "Usuário e/ou senha incorretos. ")
-			return redirect('/login')
+			return redirect('/usuario/login')
 
 	return render(request, 'login.html',{})
 
 
 def logout(request):
 	auth_logout(request)
-	return redirect('/login')
+	return redirect('/usuario/login')
