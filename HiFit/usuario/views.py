@@ -15,7 +15,7 @@ def home(request):
 
 def login(request):
 	if request.method == 'POST':
-		username = request.POST['user.name']
+		username = request.POST['username']
 		password = request.POST['password']
 		user = authenticate(username=username, password=password)
 		
