@@ -26,8 +26,9 @@ class Usuario(models.Model):
     classificacao = models.ForeignKey(Classificacao, on_delete=models.CASCADE,blank=True,null=True)  # Field name made lowercase.
     cpf = models.CharField(max_length=20)
     identificacao = models.CharField(max_length=45)
-    profissao = models.ForeignKey('instrutor.Profissao', on_delete=models.CASCADE, related_name='usuarios')  # Field name made lowercase.
+    profissao = models.ForeignKey('instrutor.Profissao', on_delete=models.CASCADE, related_name='usuarios',null=True)  # Field name made lowercase.
     caracteristicas = models.ManyToManyField('aluno.Caracteristica',blank=True)
+    descricao = models.TextField(null=True)
 
     def __str__(self):
         return self.nome

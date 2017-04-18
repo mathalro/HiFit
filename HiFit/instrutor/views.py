@@ -1,28 +1,27 @@
 from django.shortcuts import render,redirect
 from .forms import *
 from utils.tipos import TIPO
+
 # Create your views here.
-def gerenciamentoInstrutor(request):
+def cadastroInstrutor(request):
 	if request.method == 'POST':
-		cadastroUser = FormularioCadastroUsuario(request.POST)
-		cadastroInstrutor = FormularioCadastroInstrutor(request.POST)
-		if cadastroInstrutor.is_valid() and cadastroUser.is_valid():
-			instrutor = cadastroInstrutor.save(commit=False)
-			user = cadastroUser.save()
-			instrutor.user = user
-			instrutor.tipo_usuario = TIPO['INSTRUTOR']
-			instrutor.save()
-			return redirect("/instrutor")
+		cadastroDadosTecnicos = FormularioDadosTecnicos(request.POST)
+		if cadastroDadosTecnicos.is_valid():
+			usernameLogado = request.user.username
+			user = User.objects.get(username=usernameLogado)
+			instrutorLogado = Usuario.objects.get(user=user)
+			instrutorLogado.profissao = cadastroDadosTecnicos.cleaned_data.get('profissao')
+			instrutorLogado.descricao = cadastroDadosTecnicos.cleaned_data.get('dadosTecnicos')
+			instrutorLogado.save()
+			return redirect("/instrutor/cadastro")
 		else:
-			return redirect("/instrutor")
+			return redirect("/instrutor/cadastro")
 	else:
-		cadastroUser = FormularioCadastroUsuario()
-		cadastroInstrutor = FormularioCadastroInstrutor()
+		cadastroDadosTecnicos = FormularioDadosTecnicos()
 	
 	context = {
-		'titulo' 		 	: 'Cadastro',
-		'cadastroUser'   	: cadastroUser,
-		'cadastroInstrutor' : cadastroInstrutor,
+		'titulo' 		 	: 'Cadastro - Instrutor',
+		'cadastroDadosTecnicos' : cadastroDadosTecnicos,
 	}
 	
 	return render(request,'gerenciamento_instrutor.html',context)

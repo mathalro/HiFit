@@ -3,8 +3,6 @@ from django.db import models
 
 
 from django.contrib.auth.models import User
-# from usuario.models import *
-# from aluno.models import *
 
 class Profissao(models.Model):
     nome = models.CharField(max_length=40)
