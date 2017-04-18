@@ -3,8 +3,11 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib import messages
 from django.contrib.auth.models import User
 from utils.tipos import TIPO
+from django.core.mail import send_mail
+from usuario.forms import FaleConoscoForm
 
 MIN_SIZE_PASS = 5
+
 
 def home(request):
 	return render(request, 'base.html',{})
@@ -75,5 +78,17 @@ def cadastro(request):
 		else:
 			messages.warning(request, "Pagina das outras bixas  (Renanzin e Pedrao). ")
 			return render(request, 'login.html', {'user': username})
-
 	return render(request, 'cadastro.html',{})
+
+
+def fale_conosco(request):
+	if request.method == 'POST':
+		form = FaleConoscoForm(request.POST)
+		if form.is_valid():
+			send_mail(form.cleaned_data['tipo'] + ' - ' + form.cleaned_data['assunto'], form.cleaned_data['conteudo'],
+			'hifites@gmail.com', ['hifites@gmail.com'])
+			return redirect('/')
+	else:
+		form = FaleConoscoForm()
+
+	return render(request, 'fale_conosco.html', {'form': form})
