@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
+from django.contrib.auth.models import User
+from utils.tipos import TIPO
 
+MIN_SIZE_PASS = 5
 
 def home(request):
 	return render(request, 'base.html',{})
@@ -9,9 +12,10 @@ def home(request):
 
 def login(request):
 	if request.method == 'POST':
-		username = request.POST['username']
+		username = request.POST['user.name']
 		password = request.POST['password']
 		user = authenticate(username=username, password=password)
+		
 		if user is not None:
 			auth_login(request, user)
 			return redirect("/")
@@ -25,3 +29,51 @@ def login(request):
 def logout(request):
 	auth_logout(request)
 	return redirect('/usuario/login')
+
+
+def cadastro(request):
+	if request.method == 'POST':
+		user_type = request.POST['user_type']
+		name = request.POST['name']
+		email = request.POST['email']
+		username = request.POST['username']
+		password = request.POST['password']
+		phone = request.POST['phone']
+		#Verificar formato
+		date = request.POST['date']
+		#Verificar formato e entre 1900 e dia atual
+		allright = True
+
+		#Testa existencia de usuario com mesmo username
+		try:
+			user = User.objects.get(username=username)
+		except User.DoesNotExist:
+			user = None
+		if user is not None:
+			messages.warning(request, "Usuário já cadastrado. ")
+			allright = False
+		
+		#Testa existencia de usuario com mesmo email
+		try:
+			user = User.objects.get(email=email)
+		except User.DoesNotExist:
+			user = None
+		if user is not None:
+			messages.warning(request, "Email já cadastrado. ")
+			allright = False
+		
+		#Testa se a senha possui tamanho minimo
+		if len(password) < MIN_SIZE_PASS:
+			messages.warning(request, "Senha muito pequena. ")
+			allright = False	
+		if not allright:
+			return redirect('/usuario/cadastro')
+		print(user_type + " user tipo " + str(TIPO['INSTRUTOR']))
+		if user_type == str(TIPO['INSTRUTOR']):
+			messages.warning(request, "Pagina das bixas  (Higuete e Caminha). ")
+			return render(request, 'login.html', {'user': username})
+		else:
+			messages.warning(request, "Pagina das outras bixas  (Renanzin e Pedrao). ")
+			return render(request, 'login.html', {'user': username})
+
+	return render(request, 'cadastro.html',{})
