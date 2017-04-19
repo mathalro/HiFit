@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+<<<<<<< HEAD
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -8,8 +9,14 @@ from usuario.forms import FaleConoscoForm
 
 MIN_SIZE_PASS = 5
 
+=======
+from django.core.mail import send_mail
+
+from usuario.forms import FaleConoscoForm
+>>>>>>> 7028e602b168ceca040cdf40889bb6e4dfc79915
 
 def home(request):
+<<<<<<< HEAD
 	return render(request, 'base.html',{})
 
 
@@ -80,6 +87,9 @@ def cadastro(request):
 			return render(request, 'login.html', {'user': username})
 	return render(request, 'cadastro.html',{})
 
+=======
+	return render(request, 'index.html', {})
+>>>>>>> 7028e602b168ceca040cdf40889bb6e4dfc79915
 
 def fale_conosco(request):
 	if request.method == 'POST':

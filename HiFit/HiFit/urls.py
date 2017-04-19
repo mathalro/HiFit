@@ -20,6 +20,7 @@ from usuario.views import *
 urlpatterns = [
     url(r'^$', home),
     url(r'^usuario/', include('usuario.urls')),
-    url(r'^fale_conosco$', fale_conosco),
+    url(r'^fale-conosco$', fale_conosco),
+    url(r'^aluno/', include('aluno.urls')),
     url(r'^admin/', admin.site.urls),
 ]
