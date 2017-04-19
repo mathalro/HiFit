@@ -14,6 +14,9 @@ def home(request):
 
 
 def login(request):
+	if request.user.is_authenticated:
+		return redirect("/")
+		
 	if request.method == 'POST':
 		username = request.POST['username']
 		password = request.POST['password']
@@ -35,6 +38,9 @@ def logout(request):
 
 
 def cadastro(request):
+	if request.user.is_authenticated:
+		return redirect("/")
+
 	if request.method == 'POST':
 		user_type = request.POST['user_type']
 		name = request.POST['name']
