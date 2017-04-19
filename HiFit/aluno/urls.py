@@ -17,5 +17,5 @@ from django.conf.urls import url
 from .views import *
 
 urlpatterns = [
-    url(r'^gerenciamento-aluno$', gerenciamento_aluno),
+    url(r'^gerenciar/', gerenciamento_aluno),
 ]
