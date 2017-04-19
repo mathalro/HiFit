@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 class Profissao(models.Model):
     nome = models.CharField(max_length=40)
 
-    def _str_(self):
+    def __str__(self):
         return self.nome
 
 

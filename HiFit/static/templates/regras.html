@@ -5,7 +5,6 @@
 {% endblock header %}
 
 {% block content %}
-
 <section class="content-header">
     <h1>Regras</h1>
 </section>
@@ -17,11 +16,45 @@
     </ul>
     <div class="tab-content">
         <div id="menu-cadastro" class="tab-pane fade in active">
+            <h3>Cadastro</h3>
             <div class="form-group">
                 <form method="POST">
                     {% csrf_token %}
-                    {{ form }}
-                    <hr/><button type="submit" name="salvarRegra" class="btn btn-default pull-right">Salvar</button>
+                    <label for="sel1_cad_atividade">Atividade:</label>
+                    <select class="form-control" id="sel1_cad_atividade" name="sel1_cad_atividade">
+                        <option hidden disabled selected value> -- Selecione uma opção -- </option>
+                        {% for atividade in atividades %}
+                        <option>{{ atividade }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="sel1_cad_restricao">Restrição:</label>
+                    <select class="form-control" id="sel1_cad_restricao" name="sel1_cad_restricao">
+                        <option disabled selected value> -- Selecione uma opção -- </option>
+                        {% for restricao in restricoes %}
+                        <option>{{ restricao }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <label for="sel1_cad_beneficio">Benefício:</label>
+                    <select class="form-control" id="sel1_cad_beneficio" name="sel1_cad_beneficio">
+                        <option disabled selected value> -- Selecione uma opção -- </option>
+                        {% for beneficio in beneficios %}
+                        <option>{{ beneficio }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <label for="sel1_cad_maleficio">Malefício:</label>
+                    <select class="form-control" id="sel1_cad_maleficio" name="sel1_cad_maleficio">
+                        <option disabled selected value> -- Selecione uma opção -- </option>
+                        {% for maleficio in maleficios %}
+                        <option>{{ maleficio }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="in_cad_pontuacao">Pontuação:</label>
+                    <input type="text" class="form-control" id="in_cad_pontuacao" name="in_cad_pontuacao">
+                    <button type="submit" name="salvarRegra" class="btn btn-default pull-right">Salvar</button>
                 </form>
             </div>
         </div>
@@ -40,10 +73,10 @@
                 <tbody>
                 {% for regra in minhas_regras %}
                 <tr>
-                    <td>{{ regra.atividade.nome }}</td>
-                    <td>{{ regra.restricao.descricao }}</td>
-                    <td>{{ regra.beneficios.descricao }}</td>
-                    <td>{{ regra.maleficios.descricao }}</td>
+                    <td>{{ regra.atividade }}</td>
+                    <td>{{ regra.restricao }}</td>
+                    <td>{{ regra.beneficios }}</td>
+                    <td>{{ regra.maleficios }}</td>
                     <td>
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao">Editar</button>
                         <button type="button" class="btn btn-link">Excluir</button>
@@ -68,10 +101,10 @@
                 <tbody>
                 {% for regra in outras_regras %}
                 <tr>
-                    <td>{{ regra.atividade.nome }}</td>
-                    <td>{{ regra.restricao.descricao }}</td>
-                    <td>{{ regra.beneficios.descricao }}</td>
-                    <td>{{ regra.maleficios.descricao }}</td>
+                    <td>{{ regra.atividade }}</td>
+                    <td>{{ regra.restricao }}</td>
+                    <td>{{ regra.beneficios }}</td>
+                    <td>{{ regra.maleficios }}</td>
                     <td>
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao">Solicitar Edição</button>
                         <button type="button" class="btn btn-link">Solicitar Exclusão</button>
