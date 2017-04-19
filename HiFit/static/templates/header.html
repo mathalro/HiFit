@@ -11,10 +11,10 @@
                 <ul class="nav navbar-nav">
                     {% if not request.user.is_authenticated %}
                         <li><a href="#">Sobre</a></li>  
-                        <li><a href="/usuario/login">Login</a></li>
+                        <li><a href="/usuario/login">Entrar</a></li>
                         <li><a href="/usuario/cadastro">Cadastrar</a></li>
                     {% else %}
-                        <li><a href="/usuario/logout">Logout</a></li>
+                        <li><a href="/usuario/logout">Sair</a></li>
                     {% endif %}
                 </ul>   
             </div>
