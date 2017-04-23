@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load replace_space %}
+
 {% block header %}
     {% include 'headerAluno.html' %}
 {% endblock header %}
@@ -11,22 +13,205 @@
     <h1>Configurações</h1>
 </section>
 <section class="content">
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#menuGeral">Geral</a></li>
-        <li><a data-toggle="tab" href="#menuPreferencias">Preferências</a></li>
-        <li><a data-toggle="tab" href="#menuCaracteristicasFiscas">Características Físicas</a></li>
-        <li><a data-toggle="tab" href="#menuCaracteristicasFisiologicas">Características Fisiológicas</a></li>
+    <ul class="nav nav-tabs" id="tab">
+        <li class="active"><a data-toggle="tab" href="#menu-preferencias">Preferências</a></li>
+        <li><a data-toggle="tab" href="#menu-caracteristicas-fisicas">Características Físicas</a></li>
+        <li><a data-toggle="tab" href="#menu-caracteristicas-fisiologicas">Características Fisiológicas</a></li>
     </ul>
+
+    <br>
+
     <div class="tab-content">
-        <div id="menuGeral" class="tab-pane fade in active">
-            <div class="form-group">
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form }}
-                    <input value="Salvar" class="default pull-right" name="salvar_geral" type="submit">
-                </form>
-            </div>
+
+        <div id="menu-preferencias" class="tab-pane fade in active">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="container">
+                    <div class="form-group col-md-6">
+                        <label for="select_field_doenca">Preferência:</label>
+                        <select class="form-control" id="select_field_preferencia" name="select_field_preferencia">
+                            <option disabled selected value> -- Selecione uma opção -- </option>
+                            <option>Correção da postura</option>
+                            <option>Ganho de massa muscular</option>
+                            <option>Melhor condicionamento físico</option>
+                            <option>Melhor flexibilidade</option>
+                            <option>Melhor respiração</option>
+                            <option>Perda de peso</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Preferências já cadastradas</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if lista_preferencias %}
+                                {% for l in lista_preferencias %}
+                                    <tr>
+                                        <td>
+                                            {{ l.descricao }}
+                                            <button type="submit" name="excluir" class="btn btn-default btn-xs btn-danger pull-right" value={{ l.descricao|replace_space }}>
+                                                <span class="glyphicon glyphicon-remove"></span> Excluir
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td>Você ainda não possui preferência cadastrada</td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="col-md-6">
+                        <button type="submit" name="salvar" class="btn btn-default pull-left" value="salvar">Salvar</button>
+                    </div>
+                </div>
+
+            </form>
+
         </div>
+
+        <div id="menu-caracteristicas-fisicas" class="tab-pane fade">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="container">
+                    <div class="col-md-2">{{ form }}</div>
+                </div>
+                <br>
+                <div class="container">
+                    <div class="col-md-6">
+                        <button type="submit" name="salvar_caracteristica_fisica" class="btn btn-default pull-left" value="salvar_caracteristica_fisica">Salvar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="menu-caracteristicas-fisiologicas" class="tab-pane fade">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="container">
+                    <div class="form-group col-md-6">
+                        <label for="select_field_doenca">Doença:</label>
+                        <select class="form-control" id="select_field_doenca" name="select_field_doenca">
+                            <option disabled selected value> -- Selecione uma opção -- </option>
+                            <option>Asma</option>
+                            <option>Diabetes</option>
+                            <option>Pressão alta</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Doenças já cadastradas</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if lista_doenca %}
+                                {% for l in lista_doenca %}
+                                    <tr>
+                                        <td>
+                                            {{ l.descricao }}
+                                            <button type="submit" name="excluir" class="btn btn-default btn-xs btn-danger pull-right" value={{ l.descricao|replace_space }}>
+                                                <span class="glyphicon glyphicon-remove"></span> Excluir
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td>Você ainda não possui característica cadastrada</td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="form-group col-md-6">
+                        <label for="select_field_dificuldade_motora">Dificuldade motora:</label>
+                        <select class="form-control" id="select_field_dificuldade_motora" name="select_field_dificuldade_motora">
+                            <option disabled selected value> -- Selecione uma opção -- </option>
+                            <option>Dor no joelho</option>
+                            <option>Hérnia de disco</option>
+                            <option>Mobilidade braço</option>
+                            <option>Mobilidade perna</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Dificuldades motoras já cadastradas</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if lista_dificuldade_motora %}
+                                {% for l in lista_dificuldade_motora %}
+                                    <tr>
+                                        <td>
+                                            {{ l.descricao }}
+                                            <button type="submit" name="excluir" class="btn btn-default btn-xs btn-danger pull-right" value={{ l.descricao|replace_space }}>
+                                                <span class="glyphicon glyphicon-remove"></span> Excluir
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td>Você ainda não possui característica cadastrada</td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="col-md-6">
+                        <button type="submit" name="salvar" class="btn btn-default pull-left" value="salvar">Salvar</button>
+                    </div>
+                </div>
+
+            </form>
+
+
+        </div>
+
     </div>
 </section>
 {% endblock content %}
+
+{% block js %}
+    <script>
+        $('#tab a').click(function(e) {
+          e.preventDefault();
+          $(this).tab('show');
+        });
+
+        // store the currently selected tab in the hash value
+        $("ul.nav-tabs > li > a").on("shown.bs.tab", function(e) {
+          var id = $(e.target).attr("href").substr(1);
+          window.location.hash = id;
+        });
+
+        // on load of the page: switch to the currently selected tab
+        var hash = window.location.hash;
+        $('#tab a[href="' + hash + '"]').tab('show');
+    </script>
+{% endblock js %}

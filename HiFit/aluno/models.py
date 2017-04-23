@@ -6,14 +6,49 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+import enum
+
+
+class ValorCaracteristica(enum.Enum):
+    PREFERENCIA = 0
+    ALTURA = 1
+    PESO = 3
+    DOENCA = 5
+    DIFICULDADE_MOTORA = 5
+
+
+class CaracteristicaQualitativa():
+    PREFERENCIA = ['Correção da postura', 'Ganho de massa muscular', 'Melhor condicionamento físico',
+                   'Melhor flexibilidade', 'Melhor respiração', 'Perda de peso']
+    DOENCA = ['Asma', 'Diabetes', 'Pressão alta']
+    DIFICULDADE_MOTORA = ['Dor no joelho', 'Hérnia de disco', 'Mobilidade braço', 'Mobilidade perna']
+
+
+class TipoCaracteristica(enum.Enum):
+    PREFERENCIA = 0
+    ALTURA = 1
+    PESO = 2
+    DOENCA = 3
+    DIFICULDADE_MOTORA = 4
+
+
 class Caracteristica(models.Model):
     descricao = models.CharField(max_length=90)
     valor = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     tipo = models.IntegerField()
 
-    def __str__(self):
-        return self.descricao
-    
+    def __init__(self, *args, **kwargs):
+        super(Caracteristica, self).__init__(*args, **kwargs)
+        if self.descricao in CaracteristicaQualitativa.DOENCA:
+            self.valor = ValorCaracteristica.DOENCA.value
+            self.tipo = TipoCaracteristica.DOENCA.value
+        elif self.descricao in CaracteristicaQualitativa.DIFICULDADE_MOTORA:
+            self.valor = ValorCaracteristica.DIFICULDADE_MOTORA.value
+            self.tipo = TipoCaracteristica.DIFICULDADE_MOTORA.value
+        elif self.descricao in CaracteristicaQualitativa.PREFERENCIA:
+            self.valor = ValorCaracteristica.PREFERENCIA.value
+            self.tipo = TipoCaracteristica.PREFERENCIA.value
+
 
 class Recomendacao(models.Model):
     data = models.DateField(auto_now_add=True)  # Field name made lowercase.
