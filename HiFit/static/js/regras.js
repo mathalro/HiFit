@@ -14,7 +14,6 @@ function  setModalCampos(element) {
             campos[i] = "";
         else
             campos[i] = linha[i].innerHTML;
-        console.log(campos[i]);
     }
     // Seta o valor dos selects do modal
 	document.getElementById('sel_edit_atividade').value = campos[NOME_CAMPOS.ATIVIDADE];
@@ -23,4 +22,18 @@ function  setModalCampos(element) {
 	document.getElementById('sel_edit_maleficio').value = campos[NOME_CAMPOS.MALEFICIO];
 	document.getElementById('in_edit_pontuacao').value = campos[NOME_CAMPOS.PONTUACAO];
 	document.getElementById('in_edit_id').value = campos[NOME_CAMPOS.ID];
+}
+
+
+function atualizarRegra() {
+    $('body').showLoading();
+    $.ajax({
+        type: 'POST',
+        data: $("#form-edit").serialize(),
+        cache: false,
+        success: function(data) {
+            console.log("------------\nsucessoooo");
+        }
+    });
+return $ret;
 }

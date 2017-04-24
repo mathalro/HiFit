@@ -23,7 +23,7 @@
         <div id="menu-cadastro" class="tab-pane fade in active">
             <h3>Cadastro</h3>
             <div class="form-group">
-                <form method="POST">
+                <form method="POST" id="form-cad" name="form-cad">
                     {% csrf_token %}
                     <label for="sel_cad_atividade">Atividade: *</label>
                     <select class="form-control" id="sel_cad_atividade" name="sel_cad_atividade" required>
@@ -85,7 +85,7 @@
                     <td>{{ regra.pontuacao }}</td>
                     <td style="display:none;">{{ regra.id }}</td>
                     <td>
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao" id="btn-edit-regra" onclick="setModalCampos(this)">Editar</button>
+                        <button method='POST' type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao" id="btn-edit-regra" onclick="setModalCampos(this)">Editar</button>
                         <button type="button" class="btn btn-link">Excluir</button>
                     </td>
                 </tr>
@@ -137,7 +137,7 @@
                 <h4 class="modal-title">Edição de Regra</h4>
             </div>
             <div class="modal-body">
-                <form method="PATCH">
+                <form method="POST" id="form-edit">
                     {% csrf_token %}
                     <label for="sel_edit_atividade">Atividade: *</label>
                     <select class="form-control" id="sel_edit_atividade" name="sel_edit_atividade" required>
@@ -173,11 +173,9 @@
                     <label for="in_edit_pontuacao">Pontuação: *</label>
                     <input type="text" class="form-control" id="in_edit_pontuacao" name="in_edit_pontuacao" required>
                     <input disabled="disabled"  type="hidden"  type="text" class="form-control" id="in_edit_id" name="in_edit_id">
+                    <hr><button type="button" name="atualizarRegra" class="btn btn-default">Salvar</button>
+                    <button type="submit" class="btn btn-default" data-dismiss="modal" onclick="atualizarRegra()">Close</button>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" name="atualizarRegra" class="btn btn-default">Salvar</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
