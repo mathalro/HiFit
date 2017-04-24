@@ -69,4 +69,5 @@ def regras(request):
                                            'beneficios': beneficios,
                                            'maleficios': maleficios,
                                            'minhas_regras': minhas_regras,
-                                           'outras_regras': outras_regras})
+                                           'outras_regras': outras_regras,
+                                           'title' : 'Regras'})
