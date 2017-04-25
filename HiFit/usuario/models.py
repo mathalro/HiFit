@@ -17,6 +17,7 @@ class Classificacao(models.Model):
     somanota = models.IntegerField()  # Field name made lowercase.
     somapessoas = models.IntegerField()  # Field name made lowercase.
 
+
 class Usuario(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tipo_usuario = models.IntegerField()  # Field name made lowercase.
@@ -32,6 +33,7 @@ class Usuario(models.Model):
 
     def __str__(self):
         return self.nome
+
 
 class Post(models.Model):
     conteudo = models.TextField(max_length=500)
@@ -69,5 +71,3 @@ class Mensagem(models.Model):
 class Sugestao(models.Model):
     conteudo = models.TextField(max_length=500)
     data = models.DateField(auto_now_add=True)
-
-

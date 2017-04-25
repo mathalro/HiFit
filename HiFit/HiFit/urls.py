@@ -19,7 +19,10 @@ from usuario.views import *
 
 urlpatterns = [
     url(r'^$', home),
-    url(r'^instrutor/',include('instrutor.urls')),
+    url(r'^usuario/', include('usuario.urls')),
+    url(r'^fale-conosco/', fale_conosco),
+    url(r'^aluno/', include('aluno.urls')),
+    url(r'^instrutor/', include('instrutor.urls')),
     url(r'^admin/', admin.site.urls),
 ]
 

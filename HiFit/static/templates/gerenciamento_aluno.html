@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    {% include 'headerAluno.html' %}
+{% endblock header %}
+
+{% block title %}Configurações{% endblock %}
+
+{% block content %}
+<section class="content-header">
+    <h1>Configurações</h1>
+</section>
+<section class="content">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#menuGeral">Geral</a></li>
+        <li><a data-toggle="tab" href="#menuPreferencias">Preferências</a></li>
+        <li><a data-toggle="tab" href="#menuCaracteristicasFiscas">Características Físicas</a></li>
+        <li><a data-toggle="tab" href="#menuCaracteristicasFisiologicas">Características Fisiológicas</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="menuGeral" class="tab-pane fade in active">
+            <div class="form-group">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form }}
+                    <input value="Salvar" class="default pull-right" name="salvar_geral" type="submit">
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

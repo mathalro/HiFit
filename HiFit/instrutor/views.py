@@ -3,15 +3,22 @@ from django.contrib.auth.decorators import login_required
 from .forms import *
 from utils.tipos import TIPO
 from django.http import JsonResponse
-
-
 from usuario.models import Usuario
 from .models import Regra
 from usuario.models import Atividade
 from aluno.models import Caracteristica
 from utils.tipos import tipoCaracteristica
 from django.db.models import Q      # Para fazer WHERE x=a and x=b
-from django.contrib.auth import get_user
+from django.contrib import messages
+
+msg_regra_salva = 'Regra salva com sucesso.'
+msg_regra_existente = 'Regra já existe.'
+msg_regra_nao_existe = 'Regra não existe.'
+msg_regra_atualizada = 'Regra atualizada com sucesso.'
+msg_regra_excluida = 'Regra excluída com sucesso.'
+msg_regra_nao_alterada = 'Não houve alterações na regra.'
+msg_permissao_concedida = 'Permissão concedida'
+msg_solicitante_nao_existe = 'Usuário solicitante não existe'
 
 
 # Create your views here.
@@ -41,45 +48,149 @@ def cadastroInstrutor(request):
 
 # Tela de Regras
 def regras(request):
+    if (not request.user.is_authenticated):
+        return redirect("/usuario/login")
+    usuario_logado = Usuario.objects.get(user=request.user)
     atividades = Atividade.objects.all()
     restricoes = Caracteristica.objects.filter(tipo=tipoCaracteristica.FISIOLOGICA)
     beneficios = Caracteristica.objects.filter(Q(tipo=tipoCaracteristica.FISIOLOGICA) | Q(tipo=tipoCaracteristica.PREFERENCIA))
     maleficios = Caracteristica.objects.filter(Q(tipo=tipoCaracteristica.FISIOLOGICA) | Q(tipo=tipoCaracteristica.PREFERENCIA))
-    usuario_logado = Usuario.objects.get(user=get_user(request))
+    # Reaproveitando algumas partes do codigo para cadastro e edicao
+    if (request.method == 'POST'):
+        # ----- Salvar regra
+        if ("salvarRegra" in request.POST):
+            # Le os campos
+            atividade = request.POST['sel_cad_atividade']
+            restricao = request.POST['sel_cad_restricao']
+            beneficio = request.POST['sel_cad_beneficio']
+            maleficio = request.POST['sel_cad_maleficio']
+            pontuacao = request.POST['in_cad_pontuacao']
 
-    if request.method == 'POST':  # if the form has been filled
-        atividade = request.POST['sel1_cad_atividade']
-        restricao = request.POST['sel1_cad_restricao']
-        beneficio = request.POST['sel1_cad_beneficio']
-        maleficio = request.POST['sel1_cad_maleficio']
-        pontuacao = request.POST['in_cad_pontuacao']
-        # creating an user object containing all the data
-        regra_obj = Regra(atividade=Atividade.objects.get(nome=atividade),
-                          restricao=Caracteristica.objects.get(descricao=restricao),
-                          beneficios=Caracteristica.objects.get(descricao=beneficio),
-                          maleficios=Caracteristica.objects.get(descricao=maleficio),
-                          pontuacao=pontuacao,
-                          dono=Usuario.objects.get(user=usuario_logado.user))
-        # saving all the data in the current object into the database
-        regra_obj.save()
-    else:
-      #tratando a solicitação de alteração, comunicando com o ajax
-      if request.GET.get('click',0):
-        instrutorLogado = Usuario.objects.get(user=User.objects.get(username=request.user.username))
-        regra = Regra.objects.get(id=request.GET.get('regra_solicitada'))
-        regra.solicitante = instrutorLogado
-        regra.save()
-        data = {
-          'value' : str(request.GET.get('regra_solicitada'))
-        }
-        return JsonResponse(data)
+            # Pega os objetos referentes a cada campo
+            atividade = Atividade.objects.get(nome=atividade)
+            if (restricao == ""):
+                restricao = None
+            else:
+                restricao = Caracteristica.objects.get(descricao=restricao)
+            if (beneficio == ""):
+                beneficio = None
+            else:
+                beneficio = Caracteristica.objects.get(descricao=beneficio)
+            if (maleficio == ""):
+                maleficio = None
+            else:
+                maleficio = Caracteristica.objects.get(descricao=maleficio)
 
+            # Verifica se a regra ja existe
+            if (existeRegra(atividade, restricao, beneficio, maleficio)):
+                messages.warning(request, msg_regra_existente)
+            else:
+                # Cria um obj
+                regra_obj = Regra(atividade=atividade,
+                                  restricao=restricao,
+                                  beneficio=beneficio,
+                                  maleficio=maleficio,
+                                  pontuacao=pontuacao,
+                                  dono=Usuario.objects.get(user=usuario_logado.user))
+                # Salva o obj no banco de dados
+                regra_obj.save()
+                messages.success(request, msg_regra_salva)
+
+        # ---------- Atualizar regra
+        elif ("atualizarRegra" in request.POST):
+            # Le os campos
+            atividade = request.POST['sel_edit_atividade']
+            restricao = request.POST['sel_edit_restricao']
+            beneficio = request.POST['sel_edit_beneficio']
+            maleficio = request.POST['sel_edit_maleficio']
+            pontuacao = request.POST['in_edit_pontuacao']
+            regra_id  = request.POST['in_edit_id']
+
+            # Pega os objetos referentes a cada campo
+            atividade = Atividade.objects.get(nome=atividade)
+            if (restricao == ""):
+                restricao = None
+            else:
+                restricao = Caracteristica.objects.get(descricao=restricao)
+            if (beneficio == ""):
+                beneficio = None
+            else:
+                beneficio = Caracteristica.objects.get(descricao=beneficio)
+            if (maleficio == ""):
+                maleficio = None
+            else:
+                maleficio = Caracteristica.objects.get(descricao=maleficio)
+            # Verifica se a regra ja existe
+            if (existeRegra(atividade, restricao, beneficio, maleficio)):
+                messages.warning(request, msg_regra_existente)
+            else:
+                regra_anterior = Regra.objects.get(id=regra_id)
+                if (atividade == regra_anterior.atividade and restricao==regra_anterior.restricao and
+                             beneficio==regra_anterior.beneficio and maleficio==regra_anterior.maleficio):
+                    messages.warning(request, msg_regra_nao_alterada)
+                else:
+                    regra_anterior.atividade=atividade
+                    regra_anterior.restricao=restricao
+                    regra_anterior.beneficio=beneficio
+                    regra_anterior.maleficio=maleficio
+                    regra_anterior.pontuacao=pontuacao
+                    regra_anterior.save(update_fields=['atividade', 'restricao', 'beneficio', 'maleficio', 'pontuacao'])
+                    messages.success(request, msg_regra_atualizada)
+    # ---------- Excluir regra
+    if (request.method == "GET"):
+        if ("excluirRegra" in request.GET):
+            regra_id = request.GET['regra_del_id']
+            regra = Regra.objects.get(id=regra_id)
+            if (regra):
+                regra.delete()
+                messages.success(request, msg_regra_excluida)
+            else:
+                messages.warning(request, msg_regra_nao_existe)
+        elif ("aceitarSolicitacao" in request.GET):
+            regra_id = request.GET['regra_sol_id']
+            user_solicitante_id = request.GET['solicitante_id']
+            usuario_solicitante = Usuario.objects.get(user=user_solicitante_id)
+            if (usuario_solicitante):
+                regra = Regra.objects.get(id=regra_id)
+                if (regra):
+                    regra.dono = usuario_solicitante
+                    regra.solicitante = None
+                    regra.save(update_fields=['dono', 'solicitante'])
+                    messages.success(request, msg_permissao_concedida)
+                else:
+                    messages.warning(request, msg_regra_nao_existe)
+            else:
+                messages.warning(request, msg_solicitante_nao_existe)
+        elif request.GET.get('click',0):
+            instrutorLogado = Usuario.objects.get(user=User.objects.get(username=request.user.username))
+            regra = Regra.objects.get(id=request.GET.get('regra_solicitada'))
+            regra.solicitante = instrutorLogado
+            regra.save()
+            data = {
+              'value' : str(request.GET.get('regra_solicitada'))
+            }
+            return JsonResponse(data)
+
+
+    # Salva regras do usuário e de outros usuários, e solicitacoes de perimissao no context
     minhas_regras = Regra.objects.filter(dono=usuario_logado)
     outras_regras = Regra.objects.exclude(dono=usuario_logado)
+    solicitacoes = Regra.objects.filter(Q(solicitante__isnull=False) & Q(dono=usuario_logado))
     return render(request, 'regras.html', {'atividades': atividades,
                                            'restricoes': restricoes,
                                            'beneficios': beneficios,
                                            'maleficios': maleficios,
                                            'minhas_regras': minhas_regras,
                                            'outras_regras': outras_regras,
-                                           'title' : 'Regras'})
+                                           'solicitacoes': solicitacoes})
+
+
+# -----------------------------------------------
+# Retorna se a regra ja esta cadastrada no banco
+def existeRegra(atividade, restricao, beneficio, maleficio):
+    existe = list(Regra.objects.filter(Q(atividade=atividade) &
+                                       Q(restricao=restricao) &
+                                       Q(beneficio=beneficio) &
+                                       Q(maleficio=maleficio)))
+    return existe
+
