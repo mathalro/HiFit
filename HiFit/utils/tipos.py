@@ -6,6 +6,10 @@ TIPO = {
 }
 
 class tipoCaracteristica(IntEnum):
-    PREFERENCIA = 1
-    FISICA = 2
-    FISIOLOGICA = 3
+    PREFERENCIA = 0
+    ALTURA = 1
+    PESO = 2
+    DOENCA = 3
+    DIFICULDADE_MOTORA = 4
+    BENEFICIO = 5
+    MALEFICIO = 6
