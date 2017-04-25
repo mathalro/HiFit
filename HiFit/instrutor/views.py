@@ -137,7 +137,8 @@ def regras(request):
                     regra_anterior.save(update_fields=['atividade', 'restricao', 'beneficio', 'maleficio', 'pontuacao'])
                     messages.success(request, msg_regra_atualizada)
     # ---------- Excluir regra
-    if (request.method == "GET"):
+    elif (request.method == "GET"):
+        print(request.GET)
         if ("excluirRegra" in request.GET):
             regra_id = request.GET['regra_del_id']
             regra = Regra.objects.get(id=regra_id)

@@ -1,5 +1,6 @@
 //Tratamento do botão para quando o usuário solicita uma alteração de regra
-$('.botaoSolicitacao').click(function() {    
+
+function solicitarAlteracao(element) {    
     $.ajax({
         url: '/instrutor/regras/',
         method: 'GET', // or another (GET), whatever you need        
@@ -14,7 +15,8 @@ $('.botaoSolicitacao').click(function() {
             $("#"+ data.value).attr('disabled',true);         
         }
     });
-});
+}
+
 
 var NOME_CAMPOS = {
     ATIVIDADE: 0, RESTRICAO: 1, BENEFICIO: 2, MALEFICIO: 3, PONTUACAO: 4, ID: 5, SOLICITANTE: 7
@@ -84,4 +86,3 @@ function aceitarSolicitacao(element) {
     }
     });
 }
->>>>>>> origin/caminho
