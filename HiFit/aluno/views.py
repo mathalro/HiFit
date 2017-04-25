@@ -6,6 +6,7 @@ from .models import *
 from usuario.models import Usuario
 from .forms import *
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 import re
 
@@ -44,11 +45,11 @@ def gerenciamento_aluno(request):
 
     if request.method == 'POST':
 
-         ##############################################
-        #                                              #
-        # Menus: Preferencia & Caracteristicas Físicas #
-        #                                              #
-         ##############################################
+         ###################################################
+        #                                                   #
+        # Menus: Preferencia & Caracteristicas Fisiológicas #
+        #                                                   #
+         ###################################################
 
         # Salvar
         if 'salvar' in request.POST:
@@ -67,6 +68,7 @@ def gerenciamento_aluno(request):
                         caracteristica.save()
                         # Salva a caracteristica do aluno
                         aluno_logado.caracteristicas.add(caracteristica)
+                        messages.success(request, 'Característica \'' + request.POST[select] + '\' cadastrada com sucesso.')
 
                     # Checa se o usuario nao possui a caracteristica
                     # caso nao possua apenas associa a caracteristica a ele
@@ -75,6 +77,7 @@ def gerenciamento_aluno(request):
 
                         # Salva a caracteristica do aluno
                         aluno_logado.caracteristicas.add(Caracteristica.objects.get(descricao=request.POST[select]))
+                        messages.success(request, 'Característica \'' + request.POST[select] + '\' cadastrada com sucesso.')
 
             return redirect("/aluno/gerenciar")
 
@@ -88,16 +91,21 @@ def gerenciamento_aluno(request):
             if carac_del in lista_descricao:
 
                 aluno_logado.caracteristicas.remove(Caracteristica.objects.get(descricao=carac_del))
+                messages.success(request, 'Característica \'' + carac_del + '\' excluída com sucesso.')
 
             return redirect("/aluno/gerenciar")
 
-         ####################################
-        #                                    #
-        # Menu: Caracteristicas Fisiologicas #
-        #                                    #
-         ####################################
+         ##############################
+        #                              #
+        # Menu: Caracteristicas Física #
+        #                              #
+         ##############################
 
-        form = gerenciamentoAlunoForm(request.POST)
+        # Coloca virgula pro usuario
+        post = request.POST.copy()
+        post['altura'] = post['altura'].replace('.', ',')
+        print(post)
+        form = gerenciamentoAlunoForm(post)
 
         # Caso o form esteja valido
         if form.is_valid():
@@ -126,6 +134,7 @@ def gerenciamento_aluno(request):
             else:
                 aluno_logado.caracteristicas.filter(tipo=TipoCaracteristica.PESO.value).update(descricao=str(form.cleaned_data.get('peso')))
 
+            messages.success(request, 'Característica cadastrada com sucesso.')
             return redirect("/aluno/gerenciar")
 
     return render(request, 'gerenciamento_aluno.html', {'form': form,
