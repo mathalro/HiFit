@@ -2,6 +2,8 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from .forms import *
 from utils.tipos import TIPO
+from django.http import JsonResponse
+
 
 from usuario.models import Usuario
 from .models import Regra
@@ -19,9 +21,7 @@ def cadastroInstrutor(request):
 	if request.method == 'POST':
 		cadastroDadosTecnicos = FormularioDadosTecnicos(request.POST)
 		if cadastroDadosTecnicos.is_valid():
-			usernameLogado = request.user.username
-			user = User.objects.get(username=usernameLogado)
-			instrutorLogado = Usuario.objects.get(user=user)
+			instrutorLogado = Usuario.objects.get(user=User.objects.get(username=request.user.username))
 			instrutorLogado.profissao = cadastroDadosTecnicos.cleaned_data.get('profissao')
 			instrutorLogado.descricao = cadastroDadosTecnicos.cleaned_data.get('dadosTecnicos')
 			instrutorLogado.save()
@@ -37,6 +37,7 @@ def cadastroInstrutor(request):
 	}
 	
 	return render(request,'gerenciamento_instrutor.html',context)
+
 
 # Tela de Regras
 def regras(request):
@@ -61,6 +62,17 @@ def regras(request):
                           dono=Usuario.objects.get(user=usuario_logado.user))
         # saving all the data in the current object into the database
         regra_obj.save()
+    else:
+      #tratando a solicitação de alteração, comunicando com o ajax
+      if request.GET.get('click',0):
+        instrutorLogado = Usuario.objects.get(user=User.objects.get(username=request.user.username))
+        regra = Regra.objects.get(id=request.GET.get('regra_solicitada'))
+        regra.solicitante = instrutorLogado
+        regra.save()
+        data = {
+          'value' : str(request.GET.get('regra_solicitada'))
+        }
+        return JsonResponse(data)
 
     minhas_regras = Regra.objects.filter(dono=usuario_logado)
     outras_regras = Regra.objects.exclude(dono=usuario_logado)

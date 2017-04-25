@@ -12,7 +12,8 @@ class Profissao(models.Model):
 
 
 class Regra(models.Model):
-    dono = models.ForeignKey('usuario.Usuario', on_delete=models.CASCADE)
+    dono = models.ForeignKey('usuario.Usuario', on_delete=models.CASCADE, related_name="minhas_regras")
+    solicitante = models.ForeignKey('usuario.Usuario', on_delete=models.CASCADE, null=True, blank=True, related_name="regras_solicitadas")
     pontuacao = models.IntegerField()
     restricao = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="restricoes")
     beneficios = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="beneficios")
@@ -20,3 +21,5 @@ class Regra(models.Model):
     datacriacao = models.DateField(auto_now_add=True)  # Field name made lowercase.
     atividade = models.ForeignKey('usuario.Atividade', on_delete=models.CASCADE)  # Field name made lowercase.
 
+    def __str__(self):
+        return str(self.atividade) + ", data de criacao: " + str(self.datacriacao)
