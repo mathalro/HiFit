@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'usuario',
     'instrutor',
-    'aluno'
+    'aluno',
+    'django_forms_bootstrap',
 ]
 
 MIDDLEWARE = [

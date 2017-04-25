@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load bootstrap_tags %}
+
 {% block title %}Fale Conosco{% endblock %}
 
 {% block titulo %}Fale Conosco{% endblock %}
@@ -9,20 +11,21 @@
         <section class="row">
             <h3>Envie sugestões, dúvidas e bugs encontrados para nós!</h3>
         </section>        
-        <section class="row">
-            <form action="/fale_conosco" method="post">
+        <section class="row">            
+            <form action="/fale-conosco/" method="post">
             {% csrf_token %}
-            {% for field in form %}
+            {{ form|as_bootstrap }}
+            <!--{% for field in form %}
                 <section class="form-group">
                     <label class="control-label" for="id_{{field.name}}">{{field.label}}</label>
                     <section class="controls">
                         {{field}}
                     </section>
                 </section>
-            {% endfor %}
-            <button type="submit">Enviar</button>
-            </form>
-        </section>        
+            {% endfor %}-->
+            <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>            
+        </section>
     </section>
     
 {% endblock %}
