@@ -2,6 +2,8 @@ var NOME_CAMPOS = {
     ATIVIDADE: 0, RESTRICAO: 1, BENEFICIO: 2, MALEFICIO: 3, PONTUACAO: 4, ID: 5
 };
 
+
+
 // Seta os campos do modal de edicao de acordo com a regra a ser editada
 function  setModalCampos(element) {
     var campos = [];
@@ -25,15 +27,23 @@ function  setModalCampos(element) {
 }
 
 
-function atualizarRegra() {
-    $('body').showLoading();
-    $.ajax({
-        type: 'POST',
-        data: $("#form-edit").serialize(),
-        cache: false,
-        success: function(data) {
-            console.log("------------\nsucessoooo");
-        }
+
+
+function  excluiRegra(element) {
+    var campos = [];
+    // Pega o número da linha da tabela a qual o botão pertence
+    var n_linha = element.parentNode.parentNode.rowIndex;
+    // Pega a linha da tabela
+	var linha = document.getElementById("table-edit-minhas").rows[n_linha].cells;
+    regra_id = linha[NOME_CAMPOS.ID].innerHTML
+    dados = {regra_del_id: regra_id, excluirRegra: "excluirRegra"}
+
+    $.ajax({ // create an AJAX call...
+    data: dados,
+    type: $(this).attr('GET'), // GET or POST
+    url: $(this).attr('/instrutor/regras/'), // the file to call
+    success: function(response) { // on success..
+        //$('#DIV_CONTAINING_FORM).html(response); // update the DIV
+    }
     });
-return $ret;
 }
