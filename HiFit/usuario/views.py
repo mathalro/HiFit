@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
 from django.contrib.auth.models import User
+from .models import Usuario, Classificacao
 from utils.tipos import TIPO
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
@@ -48,7 +49,6 @@ def cadastro(request):
 		username = request.POST['username']
 		password = request.POST['password']
 		phone = request.POST['phone']
-		#Verificar formato
 		date = request.POST['date']
 		#Verificar formato e entre 1900 e dia atual
 		allright = True
@@ -60,8 +60,8 @@ def cadastro(request):
 			user = None
 		if user is not None:
 			messages.warning(request, "Usuário já cadastrado. ")
-			allright = False
-		
+			allright = Falses
+
 		#Testa existencia de usuario com mesmo email
 		try:
 			user = User.objects.get(email=email)
@@ -77,14 +77,63 @@ def cadastro(request):
 			allright = False	
 		if not allright:
 			return redirect('/usuario/cadastro')
-		print(user_type + " user tipo " + str(TIPO['INSTRUTOR']))
-		if user_type == str(TIPO['INSTRUTOR']):
-			messages.warning(request, "Pagina das bixas  (Higuete e Caminha). ")
-			return render(request, 'login.html', {'user': username})
-		else:
-			messages.warning(request, "Pagina das outras bixas  (Renanzin e Pedrao). ")
-			return render(request, 'login.html', {'user': username})
+		
+		user = User.objects.create_user(username, email, password)
+		new_user = Usuario(user=user, tipo_usuario=int(user_type), datanascimento=date, telefone=phone, nome=name)
+		new_user.save()
+		messages.success(request, "Cadastro realizado com sucesso. Logue no sistema.")
+		
+		return redirect('/usuario/login')
+
 	return render(request, 'cadastro.html',{})
+
+
+def gerenciar(request):
+
+	current_user = Usuario.objects.get(user=request.user)
+	name = current_user.nome
+	username = current_user.user.username
+	phone = current_user.telefone
+	date = current_user.datanascimento
+
+	print(request.POST)
+
+	if 'excluir' in request.POST:
+		auth_logout(request)
+		user = User.objects.get(username=username)
+		user.delete()
+		current_user.delete()
+		return redirect('/usuario/login')	
+
+	if request.method == 'POST':
+		name = name if request.POST['name'] is None else request.POST['name'] 
+		new_username = username if request.POST['username'] is None == "" else request.POST['username']
+		phone = phone if request.POST['phone'] is None else request.POST['phone']
+		date = date if request.POST['date'] is None else request.POST['date']
+		allright = True
+
+		if new_username != username:
+			try: #Testa existencia de usuario com mesmo username
+				user = User.objects.get(username=new_username)
+			except User.DoesNotExist:
+				user = None
+			
+			if user is not None:
+				messages.warning(request, "Nome de usuário já existe. ")
+				allright = False
+		
+		current_user.user.username = new_username
+		current_user.user.save()
+		current_user.nome = name
+		current_user.telefone = phone
+		current_user.datanascimento = date
+		current_user.save(update_fields=['nome', 'user', 'telefone', 'datanascimento'])
+		messages.success(request, "Edição realizado com sucesso. Logue no sistema.")
+		
+		return redirect('/usuario/gerenciar')
+
+	return render(request, 'gerenciar.html',{'user': current_user})
+
 
 def fale_conosco(request):
 	if request.method == 'POST':

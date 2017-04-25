@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    {% include 'headerAluno.html' %}
+{% endblock header %}
+
+{% block title %}Configurações{% endblock %}
+
+{% block content %}
+<section class="content-header">
+    <h1>Configurações de Usuário</h1>
+</section>
+<section class="content">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#menuGeral">Geral</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="menuGeral" class="tab-pane fade in active">
+            <div class="form-group">
+                <form method="post" action="/usuario/gerenciar/">
+                    {% csrf_token %}
+                    <div class="col-md-4">
+                        <label>Nome</label>
+                        <input type="text" name="name" class="form-control" placeholder="Nome Completo" value="{{ user.nome }}" required>
+                        <label>Nome de usuário</label>
+                        <input type="text" name="username" class="form-control" placeholder="Nome de usuário" value="{{ user.user.username }}" required>
+                        <label>Telefone</label>
+                        <input type="text" name="phone" class="form-control" placeholder="(99)99999-9999" value="{{ user.telefone }}">
+                        <label>Data de nascimento</label>
+                        <input type="text" name="date" class="form-control" placeholder="DD/MM/AAAA" value="{{ user.datanascimento }}" required>
+                        <label></label>
+                        <input type="submit" class="form-control btn btn-primary" value="Salvar">   
+                    </div>
+                    <div class="pull-right"><input type="submit" name="excluir" class="form-control btn btn-danger" value="Excluir Conta"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %} 

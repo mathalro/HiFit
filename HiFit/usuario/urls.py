@@ -19,5 +19,6 @@ from .views import *
 urlpatterns = [
 	url(r'^login/', login),
 	url(r'^logout/', logout),
-	url(r'^cadastro/', cadastro)
+	url(r'^cadastro/', cadastro),
+    url(r'^gerenciar/', gerenciar)
 ]
