@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from utils.tipos import TIPO
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
+from django.contrib.auth.decorators import login_required
+from usuario.models import Usuario
 
 MIN_SIZE_PASS = 5
 
@@ -86,14 +88,27 @@ def cadastro(request):
 			return render(request, 'login.html', {'user': username})
 	return render(request, 'cadastro.html',{})
 
+@login_required(login_url="/usuario/login/")
 def fale_conosco(request):
 	if request.method == 'POST':
 		form = FaleConoscoForm(request.POST)
 		if form.is_valid():
 			send_mail(form.cleaned_data['tipo'] + ' - ' + form.cleaned_data['assunto'], form.cleaned_data['conteudo'],
 			'hifites@gmail.com', ['hifites@gmail.com'])
-			return redirect('/')
+			messages.success(request, "Sua mensagem foi enviada com sucesso.")
+			return redirect('/fale-conosco')
 	else:
 		form = FaleConoscoForm()
 
-	return render(request, 'fale_conosco.html', {'form': form})
+	# Pega informacoes do usuario logado
+	username = request.user.username
+	usuario = User.objects.get(username=username)
+	usuario_logado = Usuario.objects.get(user=usuario)
+
+	# Define a url
+	if usuario_logado.tipo_usuario == TIPO['ALUNO']:
+		url = 'fale_conosco_aluno.html'
+	else:
+		url = 'fale_conosco_instrutor.html'
+
+	return render(request, url, {'form': form})
