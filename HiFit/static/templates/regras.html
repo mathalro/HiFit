@@ -18,6 +18,7 @@
         <li class="active"><a data-toggle="tab" href="#menu-cadastro">Cadastro</a></li>
         <li><a data-toggle="tab" href="#menu-minhas">Minhas Regras</a></li>
         <li><a data-toggle="tab" href="#menu-outras">Outras Regras</a></li>
+        <li><a data-toggle="tab" href="#menu-solicitacoes">Minhas Solicitações</a></li>
     </ul>
     <div class="tab-content">
         <div id="menu-cadastro" class="tab-pane fade in active">
@@ -85,7 +86,7 @@
                     <td>{{ regra.pontuacao }}</td>
                     <td style="display:none;">{{ regra.id }}</td>
                     <td>
-                        <button method='POST' type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao" id="btn-edit-regra" onclick="setModalCampos(this)">Editar</button>
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao" id="btn-edit-regra" onclick="setModalCampos(this)">Editar</button>
                         <button type="button" class="btn btn-link" id="btn-excl-regra" onclick="excluiRegra(this)">Excluir</button>
                     </td>
                 </tr>
@@ -96,7 +97,7 @@
 
         <div id="menu-outras" class="tab-pane fade">
             <h3>Outras Regras</h3>
-            <table class="table">
+            <table class="table" id="table-edit-outras">
                 <thead>
                 <tr>
                     <th>Atividade</th>
@@ -118,6 +119,40 @@
                     <td>
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao">Solicitar Edição</button>
                         <button type="button" class="btn btn-link">Solicitar Exclusão</button>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="menu-solicitacoes" class="tab-pane fade">
+            <h3>Minhas Solicitações</h3>
+            <table class="table" id="table-minhas_solicitacoes">
+                <thead>
+                <tr>
+                    <th>Solicitante</th>
+                    <th>Atividade</th>
+                    <th>Restrição</th>
+                    <th>Benefício</th>
+                    <th>Malefício</th>
+                    <th>Pontuação</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for solicitacao in solicitacoes %}
+                <tr>
+                    <td>{{ solicitacao.atividade }}</td>
+                    <td>{{ solicitacao.restricao }}</td>
+                    <td>{{ solicitacao.beneficio }}</td>
+                    <td>{{ solicitacao.maleficio }}</td>
+                    <td>{{ solicitacao.pontuacao }}</td>
+                    <td style="display:none;">{{ solicitacao.id }}</td>
+                    <td>{{ solicitacao.solicitante }}</td>
+                    <td style="display:none;">{{ solicitacao.solicitante.user.id }}</td>
+                    <td>
+                        <button type="button" class="btn btn-link" id="aceitarSolicitacao" name="aceitarSolicitacao" onclick="aceitarSolicitacao(this)">Aceitar</button>
+                        <button type="button" class="btn btn-link" id="recusarSolicitacao" name="recusarSolicitacao">Recusar</button>
                     </td>
                 </tr>
                 {% endfor %}

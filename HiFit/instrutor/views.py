@@ -9,16 +9,18 @@ from django.contrib import messages
 
 msg_regra_salva = 'Regra salva com sucesso.'
 msg_regra_existente = 'Regra já existe.'
-msg_regra_nao_existente = 'Regra não existe.'
+msg_regra_nao_existe = 'Regra não existe.'
 msg_regra_atualizada = 'Regra atualizada com sucesso.'
 msg_regra_excluida = 'Regra excluída com sucesso.'
 msg_regra_nao_alterada = 'Não houve alterações na regra.'
+msg_permissao_concedida = 'Permissão concedida'
+msg_solicitante_nao_existe = 'Usuário solicitante não existe'
 
 
 # Create your views here.
 # Tela de Regras
 def regras(request):
-    if not request.user.is_authenticated:
+    if (not request.user.is_authenticated):
         return redirect("/usuario/login")
     usuario_logado = Usuario.objects.get(user=request.user)
     atividades = Atividade.objects.all()
@@ -26,9 +28,9 @@ def regras(request):
     beneficios = Caracteristica.objects.filter(Q(tipo=tipoCaracteristica.FISIOLOGICA) | Q(tipo=tipoCaracteristica.PREFERENCIA))
     maleficios = Caracteristica.objects.filter(Q(tipo=tipoCaracteristica.FISIOLOGICA) | Q(tipo=tipoCaracteristica.PREFERENCIA))
     # Reaproveitando algumas partes do codigo para cadastro e edicao
-    if request.method == 'POST':
+    if (request.method == 'POST'):
         # ----- Salvar regra
-        if "salvarRegra" in request.POST:
+        if ("salvarRegra" in request.POST):
             # Le os campos
             atividade = request.POST['sel_cad_atividade']
             restricao = request.POST['sel_cad_restricao']
@@ -67,14 +69,14 @@ def regras(request):
                 messages.success(request, msg_regra_salva)
 
         # ---------- Atualizar regra
-        elif "atualizarRegra" in request.POST:
+        elif ("atualizarRegra" in request.POST):
             # Le os campos
             atividade = request.POST['sel_edit_atividade']
             restricao = request.POST['sel_edit_restricao']
             beneficio = request.POST['sel_edit_beneficio']
             maleficio = request.POST['sel_edit_maleficio']
             pontuacao = request.POST['in_edit_pontuacao']
-            id_regra  = request.POST['in_edit_id']
+            regra_id  = request.POST['in_edit_id']
 
             # Pega os objetos referentes a cada campo
             atividade = Atividade.objects.get(nome=atividade)
@@ -95,7 +97,7 @@ def regras(request):
             if (existeRegra(atividade, restricao, beneficio, maleficio)):
                 messages.warning(request, msg_regra_existente)
             else:
-                regra_anterior = Regra.objects.get(id=id_regra)
+                regra_anterior = Regra.objects.get(id=regra_id)
                 if (atividade == regra_anterior.atividade and restricao==regra_anterior.restricao and
                              beneficio==regra_anterior.beneficio and maleficio==regra_anterior.maleficio):
                     messages.warning(request, msg_regra_nao_alterada)
@@ -107,26 +109,45 @@ def regras(request):
                     regra_anterior.pontuacao=pontuacao
                     regra_anterior.save(update_fields=['atividade', 'restricao', 'beneficio', 'maleficio', 'pontuacao'])
                     messages.success(request, msg_regra_atualizada)
-
+    # ---------- Excluir regra
     if (request.method == "GET"):
-        if "excluirRegra" in request.GET:
-            id_regra = request.GET['regra_del_id']
-            regra = Regra.objects.get(id=id_regra)
+        if ("excluirRegra" in request.GET):
+            regra_id = request.GET['regra_del_id']
+            regra = Regra.objects.get(id=regra_id)
             if (regra):
                 regra.delete()
                 messages.success(request, msg_regra_excluida)
             else:
-                messages.warning(request, msg_regra_nao_existente)
+                messages.warning(request, msg_regra_nao_existe)
 
-    # Salva regras do usuário e de outros usuários no context
+        if ("aceitarSolicitacao" in request.GET):
+            regra_id = request.GET['regra_sol_id']
+            user_solicitante_id = request.GET['solicitante_id']
+            usuario_solicitante = Usuario.objects.get(user=user_solicitante_id)
+            if (usuario_solicitante):
+                regra = Regra.objects.get(id=regra_id)
+                if (regra):
+                    regra.dono = usuario_solicitante
+                    regra.solicitante = None
+                    regra.save(update_fields=['dono', 'solicitante'])
+                    messages.success(request, msg_permissao_concedida)
+                else:
+                    messages.warning(request, msg_regra_nao_existe)
+            else:
+                messages.warning(request, msg_solicitante_nao_existe)
+
+
+    # Salva regras do usuário e de outros usuários, e solicitacoes de perimissao no context
     minhas_regras = Regra.objects.filter(dono=usuario_logado)
     outras_regras = Regra.objects.exclude(dono=usuario_logado)
+    solicitacoes = Regra.objects.filter(Q(solicitante__isnull=False) & Q(dono=usuario_logado))
     return render(request, 'regras.html', {'atividades': atividades,
                                            'restricoes': restricoes,
                                            'beneficios': beneficios,
                                            'maleficios': maleficios,
                                            'minhas_regras': minhas_regras,
-                                           'outras_regras': outras_regras})
+                                           'outras_regras': outras_regras,
+                                           'solicitacoes': solicitacoes})
 
 
 # -----------------------------------------------
