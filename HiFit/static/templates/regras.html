@@ -10,11 +10,27 @@
 
 {% block js %}
     <script src='/static/js/regras.js'></script>
+    <script>
+        /*
+        $('#tab a').click(function(e) {
+          e.preventDefault();
+          $(this).tab('show');
+        });
+        // store the currently selected tab in the hash value
+        $("ul.nav-tabs > li > a").on("shown.bs.tab", function(e) {
+          var id = $(e.target).attr("href").substr(1);
+          window.location.hash = id;
+        });
+        // on load of the page: switch to the currently selected tab
+        var hash = window.location.hash;
+        $('#tab a[href="' + hash + '"]').tab('show');
+        */
+    </script>
 {% endblock js %}
 
 {% block content %}
 <section class="content">
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs" id="tab">
         <li class="active"><a data-toggle="tab" href="#menu-cadastro">Cadastro</a></li>
         <li><a data-toggle="tab" href="#menu-minhas">Minhas Regras</a></li>
         <li><a data-toggle="tab" href="#menu-outras">Outras Regras</a></li>
@@ -66,33 +82,36 @@
 
         <div id="menu-minhas" class="tab-pane fade">
             <h3>Minhas Regras</h3>
-            <table class="table" id="table-edit-minhas">
-                <thead>
-                <tr>
-                    <th>Atividade</th>
-                    <th>Restrição</th>
-                    <th>Benefício</th>
-                    <th>Malefício</th>
-                    <th>Pontuação</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for regra in minhas_regras %}
-                <tr>
-                    <td>{{ regra.atividade }}</td>
-                    <td>{{ regra.restricao }}</td>
-                    <td>{{ regra.beneficio }}</td>
-                    <td>{{ regra.maleficio }}</td>
-                    <td>{{ regra.pontuacao }}</td>
-                    <td style="display:none;">{{ regra.id }}</td>
-                    <td>
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao" id="btn-edit-regra" onclick="setModalCampos(this)">Editar</button>
-                        <button type="button" class="btn btn-link" id="btn-excl-regra" onclick="excluiRegra(this)">Excluir</button>
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            <form method="POST" id="form-minhas">
+                {% csrf_token %}
+                <table class="table" id="table-edit-minhas">
+                    <thead>
+                    <tr>
+                        <th>Atividade</th>
+                        <th>Restrição</th>
+                        <th>Benefício</th>
+                        <th>Malefício</th>
+                        <th>Pontuação</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for regra in minhas_regras %}
+                    <tr>
+                        <td>{{ regra.atividade }}</td>
+                        <td>{{ regra.restricao }}</td>
+                        <td>{{ regra.beneficio }}</td>
+                        <td>{{ regra.maleficio }}</td>
+                        <td>{{ regra.pontuacao }}</td>
+                        <td style="display:none;">{{ regra.id }}</td>
+                        <td>
+                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao" id="btn-edit-regra" onclick="setModalCampos(this)">Editar</button>
+                            <button type="submit" class="btn btn-link" name="excluirRegra" id="excluirRegra" value={{ regra.id }}>Excluir</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </form>
         </div>
 
         <div id="menu-outras" class="tab-pane fade">
@@ -131,36 +150,38 @@
 
         <div id="menu-solicitacoes" class="tab-pane fade">
             <h3>Minhas Solicitações</h3>
-            <table class="table" id="table-minhas_solicitacoes">
-                <thead>
-                <tr>
-                    <th>Solicitante</th>
-                    <th>Atividade</th>
-                    <th>Restrição</th>
-                    <th>Benefício</th>
-                    <th>Malefício</th>
-                    <th>Pontuação</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for solicitacao in solicitacoes %}
-                <tr>
-                    <td>{{ solicitacao.atividade }}</td>
-                    <td>{{ solicitacao.restricao }}</td>
-                    <td>{{ solicitacao.beneficio }}</td>
-                    <td>{{ solicitacao.maleficio }}</td>
-                    <td>{{ solicitacao.pontuacao }}</td>
-                    <td style="display:none;">{{ solicitacao.id }}</td>
-                    <td>{{ solicitacao.solicitante }}</td>
-                    <td style="display:none;">{{ solicitacao.solicitante.user.id }}</td>
-                    <td>
-                        <button type="button" class="btn btn-link" id="aceitarSolicitacao" name="aceitarSolicitacao" onclick="aceitarSolicitacao(this)">Aceitar</button>
-                        <button type="button" class="btn btn-link" id="recusarSolicitacao" name="recusarSolicitacao">Recusar</button>
-                    </td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            <form method="POST" id="form-solicitacoes">
+                {% csrf_token %}
+                <table class="table" id="table-minhas_solicitacoes">
+                    <thead>
+                    <tr>
+                        <th>Atividade</th>
+                        <th>Restrição</th>
+                        <th>Benefício</th>
+                        <th>Malefício</th>
+                        <th>Pontuação</th>
+                        <th>Solicitante</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for solicitacao in solicitacoes %}
+                    <tr>
+                        <td>{{ solicitacao.atividade }}</td>
+                        <td>{{ solicitacao.restricao }}</td>
+                        <td>{{ solicitacao.beneficio }}</td>
+                        <td>{{ solicitacao.maleficio }}</td>
+                        <td>{{ solicitacao.pontuacao }}</td>
+                        <td style="display:none;">{{ solicitacao.id }}</td>
+                        <td>{{ solicitacao.solicitante }}</td>
+                        <td>
+                            <button type="submit" class="btn btn-link" id="aceitarSolicitacao" name="aceitarSolicitacao" value="{{solicitacao.id}}">Aceitar</button>
+                            <button type="submit" class="btn btn-link" id="recusarSolicitacao" name="recusarSolicitacao" value="{{solicitacao.id}}">Recusar</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </form>
         </div>
     </div>
 </section>

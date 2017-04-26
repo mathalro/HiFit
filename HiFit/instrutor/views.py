@@ -20,7 +20,7 @@ msg_regra_excluida = 'Regra excluída com sucesso.'
 msg_regra_nao_alterada = 'Não houve alterações na regra.'
 msg_permissao_concedida = 'Permissão concedida'
 msg_solicitante_nao_existe = 'Usuário solicitante não existe'
-
+msg_permissao_nao_concedida = 'Permissão não concedida'
 
 # Create your views here.
 
@@ -89,9 +89,9 @@ def regras(request):
         return redirect("/usuario/login")
     usuario_logado = Usuario.objects.get(user=request.user)
     atividades = Atividade.objects.all()
-    restricoes = Caracteristica.objects.filter(tipo=tipoCaracteristica.FISIOLOGICA)
-    beneficios = Caracteristica.objects.filter(Q(tipo=tipoCaracteristica.FISIOLOGICA) | Q(tipo=tipoCaracteristica.PREFERENCIA))
-    maleficios = Caracteristica.objects.filter(Q(tipo=tipoCaracteristica.FISIOLOGICA) | Q(tipo=tipoCaracteristica.PREFERENCIA))
+    restricoes = Caracteristica.objects.filter(Q(tipo=tipoCaracteristica.DOENCA) | Q(tipo=tipoCaracteristica.DIFICULDADE_MOTORA))
+    beneficios = Caracteristica.objects.filter(tipo=tipoCaracteristica.BENEFICIO)
+    maleficios = Caracteristica.objects.filter(tipo=tipoCaracteristica.MALEFICIO)
     # Reaproveitando algumas partes do codigo para cadastro e edicao
     if (request.method == 'POST'):
         # ----- Salvar regra
@@ -173,18 +173,44 @@ def regras(request):
                     regra_anterior.pontuacao=pontuacao
                     regra_anterior.save(update_fields=['atividade', 'restricao', 'beneficio', 'maleficio', 'pontuacao'])
                     messages.success(request, msg_regra_atualizada)
-    # ---------- Excluir regra
-    elif (request.method == "GET"):
-        print(request.GET)
-        if ("excluirRegra" in request.GET):
-            regra_id = request.GET['regra_del_id']
+        elif("excluirRegra" in request.POST):
+            regra_id = request.POST['excluirRegra']
             regra = Regra.objects.get(id=regra_id)
             if (regra):
                 regra.delete()
                 messages.success(request, msg_regra_excluida)
             else:
                 messages.warning(request, msg_regra_nao_existe)
-        elif ("aceitarSolicitacao" in request.GET):
+        elif ("aceitarSolicitacao" in request.POST):
+            regra_id = request.POST['aceitarSolicitacao']
+            regra = Regra.objects.get(id=regra_id)
+            if (regra):
+                usuario_solicitante = Usuario.objects.get(user=regra.solicitante.user)
+                if (usuario_solicitante):
+                    regra.dono = usuario_solicitante
+                    regra.solicitante = None
+                    regra.save(update_fields=['dono', 'solicitante'])
+                    messages.success(request, msg_permissao_concedida)
+                else:
+                    messages.warning(request, msg_solicitante_nao_existe)
+            else:
+                messages.warning(request, msg_regra_nao_existe)
+
+        elif ("recusarSolicitacao" in request.POST):
+            regra_id = request.POST['recusarSolicitacao']
+            regra = Regra.objects.get(id=regra_id)
+            if (regra):
+                regra.solicitante = None
+                regra.save(update_fields=['solicitante'])
+                messages.success(request, msg_permissao_nao_concedida)
+            else:
+                messages.warning(request, msg_regra_nao_existe)
+                    # return redirect('/instrutor/regras')
+        #return redirect('/instrutor/regras')
+
+    # ---------- Excluir regra
+    elif (request.method == "GET"):
+        if ("aceitarSolicitacao" in request.GET):
             regra_id = request.GET['regra_sol_id']
             user_solicitante_id = request.GET['solicitante_id']
             usuario_solicitante = Usuario.objects.get(user=user_solicitante_id)
@@ -208,7 +234,7 @@ def regras(request):
               'value' : str(request.GET.get('regra_solicitada'))
             }
             return JsonResponse(data)
-
+        #return redirect('/instrutor/regras')
 
     # Salva regras do usuário e de outros usuários, e solicitacoes de perimissao no context
     minhas_regras = Regra.objects.filter(dono=usuario_logado)
