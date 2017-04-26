@@ -104,8 +104,9 @@
                         <td>{{ regra.pontuacao }}</td>
                         <td style="display:none;">{{ regra.id }}</td>
                         <td>
-                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao" id="btn-edit-regra" onclick="setModalCampos(this)">Editar</button>
-                            <button type="submit" class="btn btn-link" name="excluirRegra" id="excluirRegra" value={{ regra.id }}>Excluir</button>
+                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao" id="btn-edit-regra" onclick="setModalEditar(this)">Editar</button>
+
+                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-confirma-exclusao" id="btn-excl-regra" onclick="setModalExcluir({{regra.id}})">Excluir</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -233,13 +234,15 @@
                     <input type="text" class="form-control" id="in_edit_pontuacao" name="in_edit_pontuacao" required>
                     <input type="hidden"  type="text" class="form-control" id="in_edit_id" name="in_edit_id">
                     <hr><button type="submit" name="atualizarRegra" id="atualizarRegra" class="btn btn-default">Salvar</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
+
+<!-- Modal informacoes de solicitacao -->
 <div id="modal-info-solicitacao" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -253,8 +256,41 @@
                 </p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
             </div>
+        </div>
+    </div>
+</div>        
+
+
+
+
+
+
+
+<!-- Modal confirmar exclusao -->
+<div id="modal-confirma-exclusao" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Informações de solicitação de alteração</h4>
+            </div>
+
+            <form action="/instrutor/regras/" method="POST" id="form-edit">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>Deseja realmente excluir esta regra?</p>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-left">
+                        <button type="submit" name="excluirRegra" id="excluirRegra" class="btn btn-success" value="">Confirmar</button>
+                    </div>
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>        
