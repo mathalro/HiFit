@@ -1,29 +1,71 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block header %}
     {% include 'headerInstrutor.html' %}
 {% endblock %}
+
+{% block titulo %}
+{% if cadastro %}
+    Cadastro
+{% else %}
+    Alteração de dados
+{% endif %}
+{% endblock %}
+
 {% block css %}
  <link rel="stylesheet" href="{% static 'css/gerenciamento_instrutor.css' %}">
 {% endblock %}
+
+{% block js %}
+    <script src='/static/js/gerenciamento_instrutor.js'></script>
+{% endblock js %}
+
 {% block content %}
+{% if not cadastro %}
+    <div style="margin-bottom: 20px;">
+        <input id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao" class="btn btn-danger" type="submit" value="Excluir meu cadastro" />
+    </div>
+{% endif %}
 <div class="container">
 	 <ul class="nav nav-tabs">
-        <li><a data-toggle="tab" href="#menuGeral">Geral</a></li>
         <li class="active"><a data-toggle="tab" href="#menuDadosTecnicos">Dados Técnicos</a></li>
     </ul>
 
     <div class="tab-content">
-        <div id="menuGeral" class="tab-pane fade in fade">
-            <h3>Geral</h3>
-        </div>
         <div id="menuDadosTecnicos" class="tab-pane active">
-            <h3>Dados Técnicos</h3>
              <form method="POST">{% csrf_token %}
-				{{cadastroDadosTecnicos}}
+                {% if cadastro %}
+                    <h3>Dados Técnicos</h3>
+                    {{cadastroDadosTecnicos}}
+                {% else %}
+                    {{edicaoDadosTecnicos}}
+                {% endif %}
 				<br>
-				<input class="btn btn-primary" type="submit" value="Pronto" />
+				<input class="btn btn-primary" type="submit" value="Submeter Edição" />
 			</form>
         </div>
 </div>
+
+<div id="modal-confirma-exclusao" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Confirmação de exclusão de cadastro</h4>
+            </div>
+            <div class="modal-body">
+                <p>Deseja realmente excluir o seu cadastro?</p>
+            </div>
+            <div class="modal-footer">
+                <div class="pull-left">
+                    <button type="button" onclick="excluirCadastro()" class="btn btn-success" data-dismiss="modal">Confirmar</button>
+                </div>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>      
 {% endblock %}

@@ -10,6 +10,7 @@ from aluno.models import Caracteristica
 from utils.tipos import tipoCaracteristica
 from django.db.models import Q      # Para fazer WHERE x=a and x=b
 from django.contrib import messages
+from django.contrib.auth import logout
 
 msg_regra_salva = 'Regra salva com sucesso.'
 msg_regra_existente = 'Regra já existe.'
@@ -28,21 +29,52 @@ def cadastroInstrutor(request):
 	if request.method == 'POST':
 		cadastroDadosTecnicos = FormularioDadosTecnicos(request.POST)
 		if cadastroDadosTecnicos.is_valid():
-			instrutorLogado = Usuario.objects.get(user=User.objects.get(username=request.user.username))
+			instrutorLogado = Usuario.objects.get(user=request.user)
 			instrutorLogado.profissao = cadastroDadosTecnicos.cleaned_data.get('profissao')
 			instrutorLogado.descricao = cadastroDadosTecnicos.cleaned_data.get('dadosTecnicos')
+			instrutorLogado.identificacao = cadastroDadosTecnicos.cleaned_data.get('identificacao')
 			instrutorLogado.save()
-			return redirect("/instrutor/cadastro")
+			messages.success(request,"Cadastro realizado com sucesso")
+			return redirect("/instrutor/regras")
 		else:
 			return redirect("/instrutor/cadastro")
 	else:
 		cadastroDadosTecnicos = FormularioDadosTecnicos()
 	
 	context = {
-		'titulo' 		 	: 'Cadastro - Instrutor',
+		'cadastro'				: True,
 		'cadastroDadosTecnicos' : cadastroDadosTecnicos,
 	}
 	
+	return render(request,'gerenciamento_instrutor.html',context)
+
+
+@login_required
+def editarCadastro(request):
+	instrutorLogado = Usuario.objects.get(user=request.user)
+	if request.method == 'POST':
+		edicaoDadosTecnicos = FormularioEdicaoDadosTecnicos(request.POST, instance=instrutorLogado)
+		if edicaoDadosTecnicos.has_changed():
+			if edicaoDadosTecnicos.is_valid():
+				edicaoDadosTecnicos.save()
+				messages.success(request,"Alteração de dados realizada com sucesso")
+		else:
+			messages.info(request,"Alteração sem mudanças, formulário idêntico ao exibido")	
+		return redirect("/instrutor/meu_cadastro")
+	else:
+		if request.GET.get('click',0):
+			logout(request)
+			Usuario.objects.get(user=request.user).delete()
+			User.objects.get(username=request.user.username).delete()
+			return redirect("/usuario/login")
+			
+		edicaoDadosTecnicos = FormularioEdicaoDadosTecnicos(instance=instrutorLogado)
+	
+	context = {
+		'cadastro'				: False,
+		'edicaoDadosTecnicos' : edicaoDadosTecnicos,
+	}
+
 	return render(request,'gerenciamento_instrutor.html',context)
 
 
