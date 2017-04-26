@@ -50,21 +50,23 @@
 <div id="modal-confirma-exclusao" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Confirmação de exclusão de cadastro</h4>
-            </div>
-            <div class="modal-body">
-                <p>Deseja realmente excluir o seu cadastro?</p>
-            </div>
-            <div class="modal-footer">
-                <div class="pull-left">
-                    <button type="button" onclick="excluirCadastro()" class="btn btn-success" data-dismiss="modal">Confirmar</button>
+            <form action="/instrutor/meu_cadastro/" method="POST">{% csrf_token %}
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirmação de exclusão de cadastro</h4>
                 </div>
-                <div class="pull-right">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <div class="modal-body">
+                    <p>Deseja realmente excluir o seu cadastro?</p>
                 </div>
-            </div>
+                <div class="modal-footer">
+                    <div class="pull-left">
+                        <button type="submit" name="excluirCadastro" class="btn btn-success">Confirmar</button>
+                    </div>
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>      

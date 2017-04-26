@@ -52,7 +52,18 @@ def cadastroInstrutor(request):
 @login_required
 def editarCadastro(request):
 	instrutorLogado = Usuario.objects.get(user=request.user)
+
+	print()
+
 	if request.method == 'POST':
+		if "excluirCadastro" in request.POST:
+			user = request.user
+			logout(request)
+			Usuario.objects.get(user=user).delete()
+			User.objects.get(username=user.username).delete()
+			return redirect("/usuario/login/")
+
+
 		edicaoDadosTecnicos = FormularioEdicaoDadosTecnicos(request.POST, instance=instrutorLogado)
 		if edicaoDadosTecnicos.has_changed():
 			if edicaoDadosTecnicos.is_valid():
@@ -61,13 +72,7 @@ def editarCadastro(request):
 		else:
 			messages.info(request,"Alteração sem mudanças, formulário idêntico ao exibido")	
 		return redirect("/instrutor/meu_cadastro")
-	else:
-		if request.GET.get('click',0):
-			logout(request)
-			Usuario.objects.get(user=request.user).delete()
-			User.objects.get(username=request.user.username).delete()
-			return redirect("/usuario/login")
-			
+	else:	
 		edicaoDadosTecnicos = FormularioEdicaoDadosTecnicos(instance=instrutorLogado)
 	
 	context = {
