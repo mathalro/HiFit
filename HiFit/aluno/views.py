@@ -101,11 +101,7 @@ def gerenciamento_aluno(request):
         #                              #
          ##############################
 
-        # Coloca virgula pro usuario
-        post = request.POST.copy()
-        post['altura'] = post['altura'].replace('.', ',')
-        print(post)
-        form = gerenciamentoAlunoForm(post)
+        form = gerenciamentoAlunoForm(request.POST)
 
         # Caso o form esteja valido
         if form.is_valid():
