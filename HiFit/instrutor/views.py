@@ -210,22 +210,7 @@ def regras(request):
 
     # ---------- Excluir regra
     elif (request.method == "GET"):
-        if ("aceitarSolicitacao" in request.GET):
-            regra_id = request.GET['regra_sol_id']
-            user_solicitante_id = request.GET['solicitante_id']
-            usuario_solicitante = Usuario.objects.get(user=user_solicitante_id)
-            if (usuario_solicitante):
-                regra = Regra.objects.get(id=regra_id)
-                if (regra):
-                    regra.dono = usuario_solicitante
-                    regra.solicitante = None
-                    regra.save(update_fields=['dono', 'solicitante'])
-                    messages.success(request, msg_permissao_concedida)
-                else:
-                    messages.warning(request, msg_regra_nao_existe)
-            else:
-                messages.warning(request, msg_solicitante_nao_existe)
-        elif request.GET.get('click',0):
+        if request.GET.get('click',0):
             instrutorLogado = Usuario.objects.get(user=User.objects.get(username=request.user.username))
             regra = Regra.objects.get(id=request.GET.get('regra_solicitada'))
             regra.solicitante = instrutorLogado

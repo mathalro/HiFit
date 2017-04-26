@@ -10,7 +10,7 @@ function solicitarAlteracao(element) {
         url: '/instrutor/regras/',
         method: 'GET', // or another (GET), whatever you need        
         data: {
-            regra_solicitada: $('.botaoSolicitacao').val(), // data you need to pass to your function
+            regra_solicitada: $("#"+element).val(), // data you need to pass to your function
             click: 1
         },
         dataType: 'json',
