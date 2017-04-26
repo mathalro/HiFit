@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
 from django.contrib.auth.models import User
-from utils.tipos import TIPO
+from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
 from django.contrib.auth.decorators import login_required
@@ -10,6 +10,7 @@ from usuario.models import Usuario
 
 MIN_SIZE_PASS = 5
 
+import re
 
 def home(request):
 	return render(request, 'base.html',{})
@@ -93,9 +94,15 @@ def fale_conosco(request):
 	if request.method == 'POST':
 		form = FaleConoscoForm(request.POST)
 		if form.is_valid():
+			# Verifica existencia de palavras de baixo calao no texo
+			for palavra in PALAVRAS_BAIXO_CALAO:
+				if re.search(palavra, form.cleaned_data['assunto'].lower()) or re.search(palavra, form.cleaned_data['conteudo'].lower()):
+					messages.warning(request, 'Não se pode enviar mensagem contendo palavra(s) de baixo calão.')
+					return redirect('/fale-conosco')
 			send_mail(form.cleaned_data['tipo'] + ' - ' + form.cleaned_data['assunto'], form.cleaned_data['conteudo'],
 			'hifites@gmail.com', ['hifites@gmail.com'])
 			messages.success(request, "Sua mensagem foi enviada com sucesso.")
+
 			return redirect('/fale-conosco')
 	else:
 		form = FaleConoscoForm()
