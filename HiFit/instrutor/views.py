@@ -174,6 +174,8 @@ def regras(request):
                     regra_anterior.save(update_fields=['atividade', 'restricao', 'beneficio', 'maleficio', 'pontuacao'])
                     messages.success(request, msg_regra_atualizada)
         elif("excluirRegra" in request.POST):
+            print ("------------------")
+            print("Entra no excluir")
             regra_id = request.POST['excluirRegra']
             regra = Regra.objects.get(id=regra_id)
             if (regra):
