@@ -3,8 +3,6 @@ from django.db import models
 
 
 from django.contrib.auth.models import User
-# from usuario.models import *
-# from aluno.models import *
 
 class Profissao(models.Model):
     nome = models.CharField(max_length=40)
@@ -14,11 +12,14 @@ class Profissao(models.Model):
 
 
 class Regra(models.Model):
-    dono = models.ForeignKey('usuario.Usuario', on_delete=models.CASCADE)
+    dono = models.ForeignKey('usuario.Usuario', on_delete=models.CASCADE, related_name="minhas_regras")
+    solicitante = models.ForeignKey('usuario.Usuario', on_delete=models.CASCADE, null=True, blank=True, related_name="regras_solicitadas")
     pontuacao = models.IntegerField()
-    restricao = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="restricoes")
-    beneficios = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="beneficios")
-    maleficios = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="maleficios")
+    restricao = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="restricao", null=True, blank=True)
+    beneficio = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="beneficio", null=True, blank=True)
+    maleficio = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="maleficio", null=True, blank=True)
     datacriacao = models.DateField(auto_now_add=True)  # Field name made lowercase.
     atividade = models.ForeignKey('usuario.Atividade', on_delete=models.CASCADE)  # Field name made lowercase.
 
+    def __str__(self):
+        return str(self.atividade) + ", data de criacao: " + str(self.datacriacao)

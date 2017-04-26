@@ -12,6 +12,12 @@
     {% block css %}
     {% endblock css %}
 </head>
+
+{% block js %}
+{% endblock js %}
+<script src={% static 'js/jquery-3.2.1.min.js' %}></script>
+<script src={% static 'bootstrap/js/bootstrap.min.js' %}></script>
+
 <body class="hold-transition skin-black layout-top-nav">
     {% block header %}
         {% include 'header.html' %}
@@ -23,9 +29,7 @@
         <div class="content-wrapper">
             <div class="container">
                 <section class="content-header">
-
-                <h1>{% block titulo %}{% endblock %}</h1>
-
+                    <h1>{% block titulo %}{% endblock %}</h1>
                 </section>
                 <section class="content">
                     {% block content %}
@@ -35,12 +39,6 @@
         </div>
     </div>
 
-    {% include 'footer.html' %} 
-    
-    <script src={% static 'js/jquery-3.2.1.min.js' %}></script>
-    <script src={% static 'bootstrap/js/bootstrap.min.js' %}></script>
-   
-    {% block js %}
-    {% endblock %}
+    {% include 'footer.html' %}
 </body>
 </html>

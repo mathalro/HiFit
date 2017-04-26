@@ -14,7 +14,11 @@ MIN_SIZE_PASS = 5
 import re
 
 def home(request):
-	return render(request, 'base.html',{})
+	usuario = Usuario.objects.get(user=request.user)
+	context = {
+		'aluno' : usuario.isAluno()
+	}
+	return render(request, 'base.html',context)
 
 
 def login(request):
@@ -63,7 +67,7 @@ def cadastro(request):
 			user = None
 		if user is not None:
 			messages.warning(request, "Usuário já cadastrado. ")
-			allright = Falses
+			allright = False
 
 		#Testa existencia de usuario com mesmo email
 		try:

@@ -1,5 +1,5 @@
 from django.db import models
-
+from utils.tipos import TIPO
 # from instrutor.models import *
 # from aluno.models import *
 
@@ -17,6 +17,7 @@ class Classificacao(models.Model):
     somanota = models.IntegerField()  # Field name made lowercase.
     somapessoas = models.IntegerField()  # Field name made lowercase.
 
+
 class Usuario(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tipo_usuario = models.IntegerField()  # Field name made lowercase.
@@ -28,6 +29,15 @@ class Usuario(models.Model):
     profissao = models.ForeignKey('instrutor.Profissao', on_delete=models.CASCADE, related_name='usuarios', null=True)  # Field name made lowercase.
     caracteristicas = models.ManyToManyField('aluno.Caracteristica',blank=True, null=True)
     nome = models.CharField(max_length=100, null=True)
+    descricao = models.TextField(null=True)
+
+    def isAluno(self):
+        return self.tipo_usuario == TIPO['ALUNO']
+
+
+
+    def __str__(self):
+        return self.nome
 
 class Post(models.Model):
     conteudo = models.TextField(max_length=500)

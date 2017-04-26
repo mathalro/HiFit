@@ -49,6 +49,9 @@ class Caracteristica(models.Model):
             self.valor = ValorCaracteristica.PREFERENCIA.value
             self.tipo = TipoCaracteristica.PREFERENCIA.value
 
+    def __str__(self):
+        return self.descricao
+
 
 class Recomendacao(models.Model):
     data = models.DateField(auto_now_add=True)  # Field name made lowercase.

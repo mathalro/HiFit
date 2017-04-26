@@ -7,17 +7,35 @@
                     <i class="fa fa-bars"></i>
                 </button>
             </div>
-            <div class="navbar-custom-menu pull-right">
-                <ul class="nav navbar-nav">
-                    {% if not request.user.is_authenticated %}
-                        <li><a href="#">Sobre</a></li>  
-                        <li><a href="/usuario/login">Entrar</a></li>
-                        <li><a href="/usuario/cadastro">Cadastrar</a></li>
-                    {% else %}
-                        <li><a href="/usuario/logout">Sair</a></li>
-                    {% endif %}
-                </ul>   
-            </div>
+            {% if not request.user.is_authenticated %}
+                <div class="navbar-custom-menu pull-right">
+                    <ul class="nav navbar-nav">
+                            <li><a href="#">Sobre</a></li>  
+                            <li><a href="/usuario/login">Entrar</a></li>
+                            <li><a href="/usuario/cadastro">Cadastrar</a></li>
+                            <li><a href="/usuario/logout">Sair</a></li>
+                    </ul>   
+                </div>
+            {% else %}
+                <div class="navbar-custom-menu pull-left">
+                    <ul class="nav navbar-nav">
+                        {% if aluno %}
+
+                        {% else %}
+                            <li><a href="/instrutor/meu_cadastro">Meu Cadastro</a></li>  
+                            <li><a href="/instrutor/regras">Regras</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="navbar-custom-menu pull-right">
+                    <ul class="nav navbar-nav">
+                            <li><a href="/usuario/gerenciar">Conta</a></li>
+                            <li><a href="/sobre">Sobre</a></li>
+                            <li><a href="/fale-conosco">Fale Conosco</a></li>
+                            <li><a href="/usuario/logout">Sair</a></li>
+                    </ul>   
+                </div>
+            {% endif %}
         </div>
     </nav>
 </header>

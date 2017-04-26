@@ -1,6 +1,7 @@
 from django.conf.urls import url
-from . import views
-
+from .views import *
 urlpatterns = [
-    url(r'^regras', views.regras, name='regras'),
+	url(r'^cadastro/',cadastroInstrutor),
+	url(r'^regras/', regras, name='regras'),
+	url(r'^meu_cadastro/',editarCadastro)
 ]
