@@ -14,12 +14,13 @@ MIN_SIZE_PASS = 5
 import re
 
 def home(request):
-	usuario = Usuario.objects.get(user=request.user)
-	context = {
-		'aluno' : usuario.isAluno()
-	}
-	return render(request, 'base.html',context)
-
+	if request.user.is_authenticated:
+		usuario = Usuario.objects.get(user=request.user)
+		context = {
+			'aluno' : usuario.isAluno()
+		}
+		return render(request, 'base.html',context)
+	return render(request, 'base.html',{"aluno": False})
 
 def login(request):
 	if request.user.is_authenticated:
