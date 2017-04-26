@@ -24,4 +24,8 @@ class FormularioEdicaoDadosTecnicos(ModelForm):
 			'identificacao'		: forms.TextInput(attrs={'class' : 'form-control'}),
 			'descricao'			: forms.Textarea(attrs={'class' : 'form-control'})
 		}	
-
+		labels = {
+			'profissao' 	: 'Profissão',
+			'identificacao' : 'Digite sua identificação (CRM, CREF ou CREFITO)',
+			'descricao' 	: 'Descreva-se abaixo para melhorar seu perfil'
+		}
