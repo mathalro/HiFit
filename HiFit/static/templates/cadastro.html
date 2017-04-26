@@ -23,13 +23,10 @@
 				<input type="text" name="username" class="form-control" placeholder="Nome de usuário" required>
 				<label>Senha</label>
 				<input type="password" name="password" class="form-control" placeholder="********" required>
-				<label>Telefone</label>
-				<input type="text" name="phone" class="form-control" placeholder="(99)99999-9999">
-				<label>Data de nascimento</label>
-				<input type="text" name="date" class="form-control" placeholder="DD/MM/AAAA" required>
+				{{ cadastroDados }}
 				<label></label>
 				<input type="submit" class="form-control btn btn-primary" value="Próximo">
-			</div>
+			</div>	
 		</form>
 	</div>
 {% endblock %}

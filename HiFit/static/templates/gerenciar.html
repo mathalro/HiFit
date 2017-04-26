@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block header %}
-    {% include 'headerAluno.html' %}
+{% if aluno %}
+        {% include 'headerAluno.html' %}
+    {% else %}
+        {% include 'headerInstrutor.html' %}
+    {% endif %}
 {% endblock header %}
 
 {% block title %}Configurações{% endblock %}
@@ -10,6 +14,9 @@
 <section class="content-header">
     <h1>Configurações de Usuário</h1>
 </section>
+<div style="margin-bottom: 20px;">
+    <input id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao" class="btn btn-danger" type="submit" value="Excluir Conta" />
+</div>
 <section class="content">
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#menuGeral">Geral</a></li>
@@ -22,19 +29,49 @@
                     <div class="col-md-4">
                         <label>Nome</label>
                         <input type="text" name="name" class="form-control" placeholder="Nome Completo" value="{{ user.nome }}" required>
-                        <label>Nome de usuário</label>
-                        <input type="text" name="username" class="form-control" placeholder="Nome de usuário" value="{{ user.user.username }}" required>
-                        <label>Telefone</label>
-                        <input type="text" name="phone" class="form-control" placeholder="(99)99999-9999" value="{{ user.telefone }}">
-                        <label>Data de nascimento</label>
-                        <input type="text" name="date" class="form-control" placeholder="DD/MM/AAAA" value="{{ user.datanascimento }}" required>
+                        <label>Usuário</label>
+                        <input type="text" name="username" class="form-control" value="{{ user.user.username }}" readonly="">
+                        <label>Data:</label>
+                        <input type="text" name="data" class="form-control" value="{{ user.datanascimento }}" readonly="">
+                        <label>Telefone:</label>
+                        <input type="text" name="telefone" class="form-control" value="{{ user.telefone }}" readonly="">
+                        {{ editarDados }}
                         <label></label>
+                        <label>Digite a senha para confirmar alterações:</label>
+                        <input type="password" name="password" class="form-control" placeholder="******">
                         <input type="submit" class="form-control btn btn-primary" value="Salvar">   
                     </div>
-                    <div class="pull-right"><input type="submit" name="excluir" class="form-control btn btn-danger" value="Excluir Conta"></div>
+                    <div class="pull-right"><input type="submit" name="alterar-senha" class="form-control btn btn-primary" value="Alterar Senha"></div>
                 </form>
             </div>
         </div>
     </div>
 </section>
+
+
+
+<div id="modal-confirma-exclusao" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/usuario/gerenciar/" method="POST">{% csrf_token %}
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirmação de exclusão de cadastro</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Deseja realmente excluir o seu cadastro?</p>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-left">
+                        <button type="submit" name="excluir" class="btn btn-success">Confirmar</button>
+                    </div>
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>  
+
 {% endblock content %} 

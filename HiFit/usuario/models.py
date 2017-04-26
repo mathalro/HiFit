@@ -12,7 +12,6 @@ class Atividade(models.Model):
     def __str__(self):
         return self.nome
 
-
 class Classificacao(models.Model):
     somanota = models.IntegerField()  # Field name made lowercase.
     somapessoas = models.IntegerField()  # Field name made lowercase.
@@ -30,6 +29,8 @@ class Usuario(models.Model):
     caracteristicas = models.ManyToManyField('aluno.Caracteristica',blank=True, null=True)
     nome = models.CharField(max_length=100, null=True)
     descricao = models.TextField(null=True)
+    auth_id = models.CharField(max_length=32, null=True)
+    situacao = models.IntegerField(null=True)
 
     def isAluno(self):
         return self.tipo_usuario == TIPO['ALUNO']
