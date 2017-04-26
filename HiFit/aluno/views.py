@@ -44,7 +44,6 @@ def gerenciamento_aluno(request):
             form.fields['peso'].initial = aluno_logado_peso[0].descricao
 
     if request.method == 'POST':
-
          ###################################################
         #                                                   #
         # Menus: Preferencia & Caracteristicas Fisiológicas #

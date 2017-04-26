@@ -44,3 +44,8 @@ function  setModalCampos(element) {
 	document.getElementById('in_edit_pontuacao').value = campos[NOME_CAMPOS.PONTUACAO];
 	document.getElementById('in_edit_id').value = campos[NOME_CAMPOS.ID];
 }
+
+
+function setModalExcluir(id) {
+    document.getElementById("excluir").value = id;
+}

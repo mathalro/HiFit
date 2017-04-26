@@ -12,6 +12,10 @@
 <section class="content-header">
     <h1>Configurações</h1>
 </section>
+
+<form method="POST">
+{% csrf_token %}
+
 <section class="content">
     <ul class="nav nav-tabs" id="tab">
         <li class="active"><a data-toggle="tab" href="#menu-preferencias">Preferências</a></li>
@@ -24,9 +28,6 @@
     <div class="tab-content">
 
         <div id="menu-preferencias" class="tab-pane fade in active">
-
-            <form method="POST">
-                {% csrf_token %}
 
                 <div class="container">
                     <div class="form-group col-md-6">
@@ -55,7 +56,7 @@
                                     <tr>
                                         <td>
                                             {{ l.descricao }}
-                                            <button type="submit" name="excluir" class="btn btn-default btn-xs btn-danger pull-right" value={{ l.descricao|replace_space }}>
+                                            <button type="button" name="excluir" class="btn btn-default btn-xs btn-danger pull-right" data-toggle="modal" data-target="#modal-confirma-exclusao" onclick="setModalExcluir('{{ l.descricao |replace_space }}')">
                                                 <span class="glyphicon glyphicon-remove"></span> Excluir
                                             </button>
                                         </td>
@@ -125,7 +126,7 @@
                                     <tr>
                                         <td>
                                             {{ l.descricao }}
-                                            <button type="submit" name="excluir" class="btn btn-default btn-xs btn-danger pull-right" value={{ l.descricao|replace_space }}>
+                                            <button type="button" name="excluir" class="btn btn-default btn-xs btn-danger pull-right" data-toggle="modal" data-target="#modal-confirma-exclusao" onclick="setModalExcluir('{{ l.descricao |replace_space }}')">
                                                 <span class="glyphicon glyphicon-remove"></span> Excluir
                                             </button>
                                         </td>
@@ -166,7 +167,7 @@
                                     <tr>
                                         <td>
                                             {{ l.descricao }}
-                                            <button type="submit" name="excluir" class="btn btn-default btn-xs btn-danger pull-right" value={{ l.descricao|replace_space }}>
+                                            <button type="button" name="excluir" class="btn btn-default btn-xs btn-danger pull-right" data-toggle="modal" data-target="#modal-confirma-exclusao" onclick="setModalExcluir('{{ l.descricao |replace_space }}')">
                                                 <span class="glyphicon glyphicon-remove"></span> Excluir
                                             </button>
                                         </td>
@@ -188,30 +189,38 @@
                     </div>
                 </div>
 
-            </form>
-
-
         </div>
 
     </div>
 </section>
+
+<div id="modal-confirma-exclusao" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Confirmação de exclusão</h4>
+            </div>
+            <div class="modal-body">
+                <p>Deseja realmente excluir esta característica?</p>
+            </div>
+            <div class="modal-footer">
+                <div class="pull-left">
+                    <button type="submit" name="excluir" id="excluir" class="btn btn-success" value="">Confirmar</button>
+                </div>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Sair</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</form>
+
 {% endblock content %}
 
 {% block js %}
-    <script>
-        $('#tab a').click(function(e) {
-          e.preventDefault();
-          $(this).tab('show');
-        });
-
-        // store the currently selected tab in the hash value
-        $("ul.nav-tabs > li > a").on("shown.bs.tab", function(e) {
-          var id = $(e.target).attr("href").substr(1);
-          window.location.hash = id;
-        });
-
-        // on load of the page: switch to the currently selected tab
-        var hash = window.location.hash;
-        $('#tab a[href="' + hash + '"]').tab('show');
-    </script>
+    <script src='/static/js/continuar_mesma_tab.js'></script>
+    <script src='/static/js/regras.js'></script>
 {% endblock js %}
