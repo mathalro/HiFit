@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'usuario',
     'instrutor',
     'aluno',
+    'django_forms_bootstrap',
 ]
 
 MIDDLEWARE = [

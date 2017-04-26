@@ -3,12 +3,15 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib import messages
 from django.contrib.auth.models import User
 from .models import Usuario, Classificacao
-from utils.tipos import TIPO
+from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
+from django.contrib.auth.decorators import login_required
+from usuario.models import Usuario
 
 MIN_SIZE_PASS = 5
 
+import re
 
 def home(request):
 	return render(request, 'base.html',{})
@@ -17,7 +20,7 @@ def home(request):
 def login(request):
 	if request.user.is_authenticated:
 		return redirect("/")
-		
+	
 	if request.method == 'POST':
 		username = request.POST['username']
 		password = request.POST['password']
@@ -87,7 +90,6 @@ def cadastro(request):
 
 	return render(request, 'cadastro.html',{})
 
-
 def gerenciar(request):
 
 	current_user = Usuario.objects.get(user=request.user)
@@ -135,14 +137,33 @@ def gerenciar(request):
 	return render(request, 'gerenciar.html',{'user': current_user})
 
 
+@login_required(login_url="/usuario/login/")
 def fale_conosco(request):
 	if request.method == 'POST':
 		form = FaleConoscoForm(request.POST)
 		if form.is_valid():
+			# Verifica existencia de palavras de baixo calao no texo
+			for palavra in PALAVRAS_BAIXO_CALAO:
+				if re.search(palavra, form.cleaned_data['assunto'].lower()) or re.search(palavra, form.cleaned_data['conteudo'].lower()):
+					messages.warning(request, 'Não se pode enviar mensagem contendo palavra(s) de baixo calão.')
+					return redirect('/fale-conosco')
 			send_mail(form.cleaned_data['tipo'] + ' - ' + form.cleaned_data['assunto'], form.cleaned_data['conteudo'],
 			'hifites@gmail.com', ['hifites@gmail.com'])
-			return redirect('/')
+			messages.success(request, "Sua mensagem foi enviada com sucesso.")
+
+			return redirect('/fale-conosco')
 	else:
 		form = FaleConoscoForm()
 
-	return render(request, 'fale_conosco.html', {'form': form})
+	# Pega informacoes do usuario logado
+	username = request.user.username
+	usuario = User.objects.get(username=username)
+	usuario_logado = Usuario.objects.get(user=usuario)
+
+	# Define a url
+	if usuario_logado.tipo_usuario == TIPO['ALUNO']:
+		url = 'fale_conosco_aluno.html'
+	else:
+		url = 'fale_conosco_instrutor.html'
+
+	return render(request, url, {'form': form})
