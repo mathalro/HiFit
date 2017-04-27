@@ -20,6 +20,6 @@ class Regra(models.Model):
     maleficio = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="maleficio", null=True, blank=True)
     datacriacao = models.DateField(auto_now_add=True)  # Field name made lowercase.
     atividade = models.ForeignKey('usuario.Atividade', on_delete=models.CASCADE)  # Field name made lowercase.
-
+    data_solicitacao = models.DateField(blank=True,null=True)
     def __str__(self):
         return str(self.atividade) + ", data de criacao: " + str(self.datacriacao)

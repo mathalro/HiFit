@@ -19,3 +19,9 @@ PALAVRAS_BAIXO_CALAO = [
     'caralho',
     'merda'
 ]
+
+TIPOS_IDENTIFICACAO = (
+    ('CRM', 'CRM'),
+    ('CREFITO', 'CREFITO'),
+    ('CREF', 'CREF'),
+)

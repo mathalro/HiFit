@@ -1,4 +1,3 @@
-
 function excluirCadastro() {
     $.ajax({
         url: '/instrutor/meu_cadastro/',

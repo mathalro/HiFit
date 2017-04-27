@@ -24,7 +24,7 @@ function solicitarAlteracao(element) {
 
 
 // Seta os campos do modal de edicao de acordo com a regra a ser editada
-function  setModalCampos(element) {
+function  setModalEditar(element) {
     var campos = [];
     // Pega o número da linha da tabela a qual o botão pertence
     var n_linha = element.parentNode.parentNode.rowIndex;
@@ -45,7 +45,6 @@ function  setModalCampos(element) {
 	document.getElementById('in_edit_id').value = campos[NOME_CAMPOS.ID];
 }
 
-
 function setModalExcluir(id) {
-    document.getElementById("excluir").value = id;
+    document.getElementById("excluirRegra").value = id;
 }

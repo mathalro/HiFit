@@ -72,8 +72,8 @@ def confirmar(request):
 
 @login_required(login_url="/usuario/login/")
 def logout(request):
-	auth_logout(request)
-	return redirect('/usuario/login')
+    auth_logout(request)
+    return redirect('/usuario/login')
 
 
 def recuperar(request):
@@ -220,7 +220,6 @@ def cadastro(request):
 	cadastroDados = CadastroForm()
 	return render(request, 'cadastro.html',{'cadastroDados': cadastroDados} )
 
-
 @login_required(login_url="/usuario/login/")
 def gerenciar(request):
 	current_user = Usuario.objects.get(user=request.user)
@@ -271,31 +270,31 @@ def gerenciar(request):
 
 @login_required(login_url="/usuario/login/")
 def fale_conosco(request):
-	if request.method == 'POST':
-		form = FaleConoscoForm(request.POST)
-		if form.is_valid():
-			# Verifica existencia de palavras de baixo calao no texo
-			for palavra in PALAVRAS_BAIXO_CALAO:
-				if re.search(palavra, form.cleaned_data['assunto'].lower()) or re.search(palavra, form.cleaned_data['conteudo'].lower()):
-					messages.warning(request, 'Não se pode enviar mensagem contendo palavra(s) de baixo calão.')
-					return redirect('/fale-conosco')
-			send_mail(form.cleaned_data['tipo'] + ' - ' + form.cleaned_data['assunto'], form.cleaned_data['conteudo'],
-			'hifites@gmail.com', ['hifites@gmail.com'])
-			messages.success(request, "Sua mensagem foi enviada com sucesso.")
+    if request.method == 'POST':
+        form = FaleConoscoForm(request.POST)
+        if form.is_valid():
+            # Verifica existencia de palavras de baixo calao no texo
+            for palavra in PALAVRAS_BAIXO_CALAO:
+                if re.search(palavra, form.cleaned_data['assunto'].lower()) or re.search(palavra, form.cleaned_data['conteudo'].lower()):
+                    messages.warning(request, 'Não se pode enviar mensagem contendo palavra(s) de baixo calão.')
+                    return redirect('/fale-conosco')
+            send_mail(form.cleaned_data['tipo'] + ' - ' + form.cleaned_data['assunto'], form.cleaned_data['conteudo'],
+            'hifites@gmail.com', ['hifites@gmail.com'])
+            messages.success(request, "Sua mensagem foi enviada com sucesso.")
 
-			return redirect('/fale-conosco')
-	else:
-		form = FaleConoscoForm()
+            return redirect('/fale-conosco')
+    else:
+        form = FaleConoscoForm()
 
-	# Pega informacoes do usuario logado
-	username = request.user.username
-	usuario = User.objects.get(username=username)
-	usuario_logado = Usuario.objects.get(user=usuario)
+    # Pega informacoes do usuario logado
+    username = request.user.username
+    usuario = User.objects.get(username=username)
+    usuario_logado = Usuario.objects.get(user=usuario)
 
-	# Define a url
-	if usuario_logado.tipo_usuario == TIPO['ALUNO']:
-		url = 'fale_conosco_aluno.html'
-	else:
-		url = 'fale_conosco_instrutor.html'
+    # Define a url
+    if usuario_logado.tipo_usuario == TIPO['ALUNO']:
+        url = 'fale_conosco_aluno.html'
+    else:
+        url = 'fale_conosco_instrutor.html'
 
-	return render(request, url, {'form': form})
+    return render(request, url, {'form': form})
