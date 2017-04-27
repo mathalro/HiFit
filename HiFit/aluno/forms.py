@@ -6,6 +6,7 @@ class gerenciamentoAlunoForm(forms.Form):
     altura = forms.FloatField(label="Altura (m)",
                               min_value=0,
                               max_value=3,
+                              error_messages={'invalid': 'your custom error message'},
                               widget=forms.NumberInput(attrs={'class': 'form-control', 'id': 'altura', 'step': '0.01'}))
 
     peso = forms.FloatField(label="Peso (Kg)",

@@ -236,7 +236,7 @@ def gerenciar(request):
 		return redirect('/usuario/login')
 
 	if 'alterar-senha' in request.POST:
-		return render(request, 'alterar-senha.html', {'username': username})	
+		return render(request, 'alterar-senha.html', {'username': current_user.user.username})	
 
 	if request.method == 'POST':
 		user2 = authenticate(username = current_user.user.username, password = request.POST['password'])
