@@ -14,6 +14,9 @@ import re
 @login_required(login_url="/usuario/login/")
 def gerenciamento_aluno(request):
 
+    # Iniciar variaveis
+    cadastro = 'completo'
+
     # Pega informacoes do usuario logado
     user_logado = request.user.username
     usuario = User.objects.get(username=user_logado)
@@ -132,7 +135,39 @@ def gerenciamento_aluno(request):
             messages.success(request, 'Característica cadastrada com sucesso.')
             return redirect("/aluno/gerenciar")
 
+    
+    # Checa o que o usuario já cadastrou
+    if not lista_preferencias and not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not lista_doenca and not lista_dificuldade_motora:
+        messages.warning(request, 'Você deve cadastrar uma preferência, todas as características físicas e uma característica fisiológica \
+                         para ter acesso a outras funcionalidades.')
+        cadastro = 'incompleto'
+    elif not lista_preferencias and not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not (TipoCaracteristica['ALTURA'].value in lista_tipo):
+        messages.warning(request, 'Você deve cadastrar uma preferência e todas as características físicas \
+                         para ter acesso a outras funcionalidades.')
+        cadastro = 'incompleto'
+    elif not lista_preferencias and not lista_doenca and not lista_dificuldade_motora:
+        messages.warning(request, 'Você deve cadastrar uma preferência e uma característica fisiológica \
+                         para ter acesso a outras funcionalidades.')
+        cadastro = 'incompleto'
+    elif not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not lista_doenca and not lista_dificuldade_motora:
+        messages.warning(request, 'Você deve cadastrar todas as características físicas e uma característica fisiológica \
+                         para ter acesso a outras funcionalidades.')
+        cadastro = 'incompleto'
+    elif not lista_preferencias:
+        messages.warning(request, 'Você deve cadastrar uma preferência \
+                         para ter acesso a outras funcionalidades.')
+        cadastro = 'incompleto'
+    elif not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not (TipoCaracteristica['ALTURA'].value in lista_tipo):
+        messages.warning(request, 'Você deve cadastrar todas as características físicas \
+                         para ter acesso a outras funcionalidades.')
+        cadastro = 'incompleto'
+    elif not lista_doenca and not lista_dificuldade_motora:
+        messages.warning(request, 'Você deve cadastrar uma característica fisiológica \
+                         para ter acesso a outras funcionalidades.')
+        cadastro = 'incompleto'
+
     return render(request, 'gerenciamento_aluno.html', {'form': form,
+                                                        'cadastro': cadastro,
                                                         'lista_preferencias': lista_preferencias,
                                                         'lista_doenca': lista_doenca,
                                                         'lista_dificuldade_motora': lista_dificuldade_motora})
