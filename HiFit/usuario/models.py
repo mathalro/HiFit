@@ -1,5 +1,5 @@
 from django.db import models
-from utils.tipos import TIPO
+from utils.tipos import TIPO, TIPOS_IDENTIFICACAO
 # from instrutor.models import *
 # from aluno.models import *
 
@@ -25,6 +25,7 @@ class Usuario(models.Model):
     telefone = models.CharField(max_length=20)
     classificacao = models.ForeignKey(Classificacao, on_delete=models.CASCADE, null=True)  # Field name made lowercase.
     cpf = models.CharField(max_length=20)
+    tipo_identificacao = models.CharField(max_length=5, choices=TIPOS_IDENTIFICACAO, default="CRM")
     identificacao = models.CharField(max_length=45, null=True)
     profissao = models.ForeignKey('instrutor.Profissao', on_delete=models.CASCADE, related_name='usuarios', null=True)  # Field name made lowercase.
     caracteristicas = models.ManyToManyField('aluno.Caracteristica',blank=True, null=True)

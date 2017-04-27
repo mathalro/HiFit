@@ -69,6 +69,9 @@ def editarCadastro(request):
 			if edicaoDadosTecnicos.is_valid():
 				edicaoDadosTecnicos.save()
 				messages.success(request,"Alteração de dados realizada com sucesso")
+			else:
+				msg_identificacao_incorreta = edicaoDadosTecnicos.errors.as_text().split('*')[2]
+				messages.warning(request,msg_identificacao_incorreta)
 		else:
 			messages.info(request,"Alteração sem mudanças, formulário idêntico ao exibido")	
 		return redirect("/instrutor/meu_cadastro")
