@@ -46,11 +46,4 @@ class FormularioEdicaoDadosTecnicos(ModelForm):
 			if len(cleaned_data.get("identificacao")) != 8:
 				raise forms.ValidationError("CREF deve conter 8 caracteres!")
 
-		# if cleaned_data.get("profissao") == "Médico" and not cleaned_data.get("tipo_identificacao)" == "CRM":
-		# 	raise forms.ValidationError("A profissão de médico exige o registro do CRM")
-		# if cleaned_data.get("profissao") == "Educador Físico" and not cleaned_data.get("tipo_identificacao)" == "CREF":
-		# 	raise forms.ValidationError("A profissão de educador físico exige o registro do CREF")
-		# if cleaned_data.get("profissao") == "Fisioterapeuta" and not cleaned_data.get("tipo_identificacao)" == "CREFITO":
-		# 	raise forms.ValidationError("A profissão de fisioterapeuta exige o registro do CREFITO")
-
 		return cleaned_data
