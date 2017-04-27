@@ -11,6 +11,7 @@ from utils.tipos import tipoCaracteristica
 from django.db.models import Q      # Para fazer WHERE x=a and x=b
 from django.contrib import messages
 from django.contrib.auth import logout
+from datetime import datetime
 
 msg_regra_salva = 'Regra salva com sucesso.'
 msg_regra_existente = 'Regra já existe.'
@@ -217,11 +218,15 @@ def regras(request):
             instrutorLogado = Usuario.objects.get(user=User.objects.get(username=request.user.username))
             regra = Regra.objects.get(id=request.GET.get('regra_solicitada'))
             regra.solicitante = instrutorLogado
+            regra.data_solicitacao = datetime.today()
             regra.save()
             data = {
               'value' : str(request.GET.get('regra_solicitada'))
             }
             return JsonResponse(data)
+
+        #verifica quais regras já podem ir para o solicitante
+
         #return redirect('/instrutor/regras')
 
     # Salva regras do usuário e de outros usuários, e solicitacoes de perimissao no context
