@@ -48,3 +48,7 @@ function  setModalEditar(element) {
 function setModalExcluir(id) {
     document.getElementById("excluirRegra").value = id;
 }
+
+function setModalExcluirCaracteristica(id) {
+    document.getElementById("excluir").value = id;
+}

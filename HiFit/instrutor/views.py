@@ -123,7 +123,7 @@ def regras(request):
                 maleficio = Caracteristica.objects.get(descricao=maleficio)
 
             # Verifica se a regra ja existe
-            if (existeRegra(atividade, restricao, beneficio, maleficio)):
+            if (existeRegra(Usuario.objects.get(user=usuario_logado.user), atividade, restricao, beneficio, maleficio)):
                 messages.warning(request, msg_regra_existente)
             else:
                 # Cria um obj
@@ -162,7 +162,7 @@ def regras(request):
             else:
                 maleficio = Caracteristica.objects.get(descricao=maleficio)
             # Verifica se a regra ja existe
-            if (existeRegra(atividade, restricao, beneficio, maleficio)):
+            if (existeRegra(Usuario.objects.get(user=usuario_logado.user), atividade, restricao, beneficio, maleficio)):
                 messages.warning(request, msg_regra_existente)
             else:
                 regra_anterior = Regra.objects.get(id=regra_id)
@@ -244,10 +244,12 @@ def regras(request):
 
 # -----------------------------------------------
 # Retorna se a regra ja esta cadastrada no banco
-def existeRegra(atividade, restricao, beneficio, maleficio):
+def existeRegra(dono, atividade, restricao, beneficio, maleficio):
     existe = list(Regra.objects.filter(Q(atividade=atividade) &
                                        Q(restricao=restricao) &
                                        Q(beneficio=beneficio) &
-                                       Q(maleficio=maleficio)))
+                                       Q(maleficio=maleficio) &
+                                       Q(dono=dono)
+                                       ))
     return existe
 
