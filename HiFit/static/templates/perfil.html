@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Perfil{% endblock %}
+
+{% block titulo %}{% endblock %}
+
+{% block content %}
+	<h3>{{ usuario.user.username }}<h3>
+	<p>{{ usuario.descricao }}</p>
+	<h3>Postagens</h3>
+	{% for p in posts %}
+		<br>
+		<p>{{ p.conteudo }}</p>
+		<p>{{ p.privacidade }}</p>
+	{% endfor %}
+{% endblock %}

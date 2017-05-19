@@ -22,6 +22,7 @@ urlpatterns = [
 	url(r'^cadastro/', cadastro),
     url(r'^gerenciar/', gerenciar),
     url(r'^confirmar/$', confirmar),
+    url(r'^perfil/$', perfil),
     url(r'^valida-token-senha/$', valida_token_senha),
     url(r'^recuperar/', recuperar),
     url(r'^alterar-senha/', alterar_senha),

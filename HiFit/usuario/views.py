@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import Usuario, Classificacao
+from .models import Usuario, Classificacao, Post
 from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
@@ -23,6 +23,44 @@ def home(request):
 		}
 		return render(request, 'base.html',context)
 	return render(request, 'base.html',{'aluno': False})
+
+
+def perfil(request):
+	if request.user.is_authenticated:
+		usuario = Usuario.objects.get(user=request.user)
+		if request.method == 'GET':
+			try:
+				perfil_dono = request.GET['usuario']
+				try:
+					user = User.objects.get(username=perfil_dono)
+					usuario_perfil = Usuario.objects.get(user=user)
+					aluno = usuario.isAluno()
+					#Atribuir o valor de seguindo comparando se está ou não na lista de seguidos.
+					seguindo = 0
+
+					# pega post
+					posts = Post.objects.all()
+					posts_validos = []
+					if(usuario_perfil.user==usuario.user):
+						posts_validos = posts
+					else:
+						for p in posts:
+							if(p.usuario.user.id == usuario_perfil.user.id):
+								if(seguindo or p.privacidade == 0):
+									print("teste")
+									posts_validos.append(p)
+					#Coloca em ordem cronológica
+					posts_validos = reversed(posts_validos)
+					return render(request, 'perfil.html', {'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_validos})
+				except:
+					user = None
+					messages.warning(request, "Usuário não encontrado. ")
+					return redirect('/')
+			except:
+				return redirect('/usuario/perfil?usuario='+usuario.user.username)
+
+
+	return render(request, 'login.html')
 
 
 def login(request):
