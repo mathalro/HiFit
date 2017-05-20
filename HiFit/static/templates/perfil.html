@@ -1,16 +1,54 @@
 {% extends 'base.html' %}
 
 {% block title %}Perfil{% endblock %}
-
+		
 {% block titulo %}{% endblock %}
 
 {% block content %}
-	<h3>{{ usuario.user.username }}<h3>
-	<p>{{ usuario.descricao }}</p>
-	<h3>Postagens</h3>
-	{% for p in posts %}
-		<br>
-		<p>{{ p.conteudo }}</p>
-		<p>{{ p.privacidade }}</p>
-	{% endfor %}
+	<div style="">
+	<div class="col-md-2">
+		<img src="../../static/imagens/preguica.png" width="150" height="100">
+	</div>
+	<div class="col-md-2">
+		<h3>{% if perfil_aluno %}Aluno: {% else %}Instrutor: {% endif %}{{ usuario.user.username }}</h3>
+	</div>
+	<div class="col-md-2"><a href="#" class="col-md-12 btn btn-primary">Seguir</a></div>
+	<div class="col-md-2"><a href="#" class="col-md-12 btn btn-danger">Avaliar</a></div>
+	{% if not perfil_aluno %}
+		<div class="col-md-2"><a href="#" class="col-md-12 btn btn-success">Associar-se</a></div>
+	{% endif %}
+	<div class="col-md-12"><p>{{ usuario.descricao }}</p></div>
+
+	<div class="col-md-12">
+		<hr>
+		{% for p in posts %}
+			<p>Em {{ p.data }} {{ usuario }} disse: </o>
+			<h4>{{ p.conteudo }}</h4>
+			<a href="#">Avaliar</a>
+			<div class="pull-right">{% if p.privacidade != 0 %}
+				Privado
+			{% else %}
+				Público
+			{% endif %}
+			</div>
+			<hr>
+		{% endfor %}
+		<div class="pagination">
+		    <span class="step-links">
+		        {% if posts.has_previous %}
+		            <a href="/usuario/perfil/?usuario={{ usuario.user.username }}&page={{ posts.previous_page_number }}"><<</a>
+		        {% endif %}
+
+		        <span class="current">
+		            {% if posts %}
+		            	Página {{ posts.number }} de {{ posts.paginator.num_pages }}.
+		            {% endif %}
+		        </span>
+
+		        {% if posts.has_next %}
+		            <a href="/usuario/perfil?usuario={{ usuario.user.username }}&page={{ posts.next_page_number }}">>></a>
+		        {% endif %}
+		    </span>
+		</div>
+	</div>
 {% endblock %}

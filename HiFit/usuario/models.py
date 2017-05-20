@@ -47,6 +47,9 @@ class Post(models.Model):
     classificacao = models.ForeignKey(Classificacao, on_delete=models.CASCADE)  # Field name made lowercase.
     privacidade = models.IntegerField(null=True)
 
+    def __str__(self):
+        return str(self.id)
+
 
 class Comentario(models.Model):
     conteudo = models.TextField(max_length=140)
