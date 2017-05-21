@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Estatísticas{% endblock %}
+
+{% block content %}
+	<section class="content-header">
+	    <h1>Geração de Estatísticas</h1>
+	</section>
+	<div class="col-md-12">
+		<div style="">
+			<form method="post" action="/usuario/estatisticas/">
+				{% csrf_token %}
+				<div class="col-md-3">
+					<label>Usuario</label>
+					<select name="usuario" class="form-control">
+					{% for p in associados %}
+						<option value="{{p.user.username}}"">{{p.nome}}</option>
+					{% endfor %}
+					</select>
+				</div>	
+				<div class="col-md-3">
+					<label>Periodo Inicial</label>
+					<div>{{ estatisticasDados.inicial}} </div>
+				</div>	
+				<div class="col-md-3">
+					<label>Periodo Final</label>
+					<div>{{ estatisticasDados.final}} </div>
+				</div>	
+				<div class="col-md-2"><br>
+					<input type="submit" class="form-control btn btn-primary" value="Visualizar">
+				</div>	
+			</form>
+		</div>
+	</div>
+	<div class="col-md-12">
+		{% if post %}
+		<h3>{% if estatisticas_aluno %}Aluno: {% else %}Instrutor: {% endif %}{{ estatisticas_dono.nome }}</h3>
+			<table style="width:100%">
+			  <tr>
+			    <th><h3>Atividades Recomendadas</h3></th>
+			    <th><h3>Atividades Aceitas</h3></th>
+			  </tr>
+			  <tr>
+			    <td><ul>
+					{% for p in recomendadas %}
+						<li><label>{{ p }}</label><br></li>
+					{% endfor %}
+			    </ul></td>
+			    <td><ul>
+					{% for p in aceitas %}
+						<li><label>{{ p }}</label><br></li>
+					{% endfor %}
+			    </ul></td>
+			  </tr>
+			  <tr>
+			    <th><h3>Impacto das Atividades em suas preferências</h3></th>
+			    <th><h3>Popularidade das Atividades</h3></th>
+			  </tr>
+			  <tr>
+			    <td><ul>
+					{% for p in impacto %}
+						<li><label>{{ p }}</label><br></li>
+					{% endfor %}
+			    </ul></td>
+			    <td><ul>
+					{% for p in popularidade %}
+						<li><label>{{ p }}</label><br></li>
+					{% endfor %}
+			    </ul></td>
+			  </tr>
+			</table>
+		{% endif %}
+	</div>
+{% endblock %}
