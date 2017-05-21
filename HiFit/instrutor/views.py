@@ -41,8 +41,10 @@ def cadastroInstrutor(request):
 			return redirect("/instrutor/cadastro")
 	else:
 		cadastroDadosTecnicos = FormularioDadosTecnicos()
-	
+
+	usuario = Usuario.objects.get(user=request.user)
 	context = {
+        'aluno' : usuario.isAluno(),
 		'cadastro'				: True,
 		'cadastroDadosTecnicos' : cadastroDadosTecnicos,
 	}
@@ -53,8 +55,6 @@ def cadastroInstrutor(request):
 @login_required
 def editarCadastro(request):
 	instrutorLogado = Usuario.objects.get(user=request.user)
-
-	print()
 
 	if request.method == 'POST':
 		if "excluirCadastro" in request.POST:
@@ -76,14 +76,14 @@ def editarCadastro(request):
 		else:
 			messages.info(request,"Alteração sem mudanças, formulário idêntico ao exibido")	
 		return redirect("/instrutor/meu_cadastro")
-	else:	
+	else:
 		edicaoDadosTecnicos = FormularioEdicaoDadosTecnicos(instance=instrutorLogado)
-	
+
 	context = {
+		'aluno' : instrutorLogado.isAluno(),
 		'cadastro'				: False,
 		'edicaoDadosTecnicos' : edicaoDadosTecnicos,
 	}
-
 	return render(request,'gerenciamento_instrutor.html',context)
 
 
@@ -233,13 +233,19 @@ def regras(request):
     minhas_regras = Regra.objects.filter(dono=usuario_logado)
     outras_regras = Regra.objects.exclude(dono=usuario_logado)
     solicitacoes = Regra.objects.filter(Q(solicitante__isnull=False) & Q(dono=usuario_logado))
-    return render(request, 'regras.html', {'atividades': atividades,
-                                           'restricoes': restricoes,
-                                           'beneficios': beneficios,
-                                           'maleficios': maleficios,
-                                           'minhas_regras': minhas_regras,
-                                           'outras_regras': outras_regras,
-                                           'solicitacoes': solicitacoes})
+    usuario = Usuario.objects.get(user=request.user)
+    context = {
+        'aluno' : usuario.isAluno(),
+        'atividades': atividades,
+        'restricoes': restricoes,
+        'beneficios': beneficios,
+        'maleficios': maleficios,
+        'minhas_regras': minhas_regras,
+        'outras_regras': outras_regras,
+        'solicitacoes': solicitacoes
+    }
+    
+    return render(request, 'regras.html', context)
 
 
 # -----------------------------------------------

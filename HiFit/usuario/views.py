@@ -23,6 +23,7 @@ def home(request):
 		context = {
 			'aluno' : usuario.isAluno()
 		}
+		print(context)
 		return render(request, 'base.html',context)
 	return render(request, 'base.html',{'aluno': False})
 
@@ -50,20 +51,56 @@ def perfil(request):
 
 					paginator = Paginator(posts, 3)
 
-					page = int(request.GET['page'])
-					
 					try:
+						page = int(request.GET['page'])
 						posts_pagina = paginator.page(page)
 					except:
 						posts_pagina = paginator.page(1)
 
-					return render(request, 'perfil.html', {'usuario': usuario_perfil , 'aluno': aluno,
-														   'posts': posts_pagina, 'perfil_aluno': perfil_aluno})
+					return render(request, 'perfil.html', {'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_pagina, 'perfil_aluno': perfil_aluno})
 				except:
 					messages.warning(request, "Usuário não encontrado. ")
 					return redirect('/')
 			except:
 				return redirect('/usuario/perfil?usuario='+usuario.user.username+'&page=1')
+
+
+	return render(request, 'login.html')
+
+def estatisticas(request):
+	if request.user.is_authenticated:
+		usuario = Usuario.objects.get(user=request.user)
+		if request.method == 'GET':
+			try:
+				perfil_dono = request.GET['usuario']
+				try:
+					user = User.objects.get(username=perfil_dono)
+					usuario_perfil = Usuario.objects.get(user=user)
+					aluno = usuario.isAluno()
+					perfil_aluno = usuario_perfil.isAluno()
+
+					#Atribuir o valor de associado comparando se está ou não na lista de associados.
+					associado = 0
+
+					# pega posts do usuario dono do perfil com base na privacidade
+					if usuario_perfil == usuario or associado:
+						messages.warning(request, "Ok!. ")
+						posts = Post.objects.filter(usuario=usuario_perfil).order_by('-id')
+						paginator = Paginator(posts, 3)
+						return redirect('/usuario/perfil?usuario='+usuario.user.username+'&page=1')
+
+					else:
+						messages.warning(request, "Você não é associado a este usuário. ")
+						return redirect('/')
+					
+				except:
+					messages.warning(request, "Usuário não encontrado. ")
+					return redirect('/')
+			except:
+				return redirect('/usuario/perfil?usuario='+usuario.user.username+'&page=1')
+
+
+#		if request.method == 'POST':
 
 
 	return render(request, 'login.html')
@@ -270,7 +307,7 @@ def gerenciar(request):
 	name = current_user.nome
 	phone = current_user.telefone
 	data = current_user.datanascimento
-
+	aluno = current_user.isAluno()
 	if 'excluir' in request.POST:
 		auth_logout(request)
 		user = User.objects.get(username=current_user.user.username)
@@ -279,7 +316,7 @@ def gerenciar(request):
 		return redirect('/usuario/login')
 
 	if 'alterar-senha' in request.POST:
-		return render(request, 'alterar-senha.html', {'username': current_user.user.username})	
+		return render(request, 'alterar-senha.html', {'username': current_user.user.username, 'aluno': aluno})	
 
 	if request.method == 'POST':
 		user2 = authenticate(username = current_user.user.username, password = request.POST['password'])
@@ -307,8 +344,6 @@ def gerenciar(request):
 	
 
 	editarDados = EditarForm()
-
-	aluno = current_user.isAluno()
 	return render(request, 'gerenciar.html',{'user': current_user, 'editarDados': editarDados, 'aluno': aluno})
 
 
@@ -334,11 +369,5 @@ def fale_conosco(request):
     username = request.user.username
     usuario = User.objects.get(username=username)
     usuario_logado = Usuario.objects.get(user=usuario)
-
-    # Define a url
-    if usuario_logado.tipo_usuario == TIPO['ALUNO']:
-        url = 'fale_conosco_aluno.html'
-    else:
-        url = 'fale_conosco_instrutor.html'
-
-    return render(request, url, {'form': form})
+    aluno = usuario_logado.isAluno()
+    return render(request, 'fale_conosco.html', {'form': form, 'aluno': aluno})

@@ -165,9 +165,12 @@ def gerenciamento_aluno(request):
         messages.warning(request, 'Você deve cadastrar uma característica fisiológica \
                          para ter acesso a outras funcionalidades.')
         cadastro = 'incompleto'
-
-    return render(request, 'gerenciamento_aluno.html', {'form': form,
-                                                        'cadastro': cadastro,
-                                                        'lista_preferencias': lista_preferencias,
-                                                        'lista_doenca': lista_doenca,
-                                                        'lista_dificuldade_motora': lista_dificuldade_motora})
+    context = {
+        'aluno' : aluno_logado.isAluno(),
+        'form': form,
+        'cadastro': cadastro,
+        'lista_preferencias': lista_preferencias,
+        'lista_doenca': lista_doenca,
+        'lista_dificuldade_motora': lista_dificuldade_motora
+    }
+    return render(request, 'gerenciamento_aluno.html', context)
