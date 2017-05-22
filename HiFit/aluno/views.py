@@ -171,3 +171,24 @@ def gerenciamento_aluno(request):
                                                         'lista_preferencias': lista_preferencias,
                                                         'lista_doenca': lista_doenca,
                                                         'lista_dificuldade_motora': lista_dificuldade_motora})
+
+
+
+@login_required(login_url="/usuario/login/")
+def historico_recomendacoes(request):
+    filtro_data = fitroPorDataRecomendacoes()
+    if request.method == "POST":
+        pass
+    else:
+        #pega uma lista de recomendacoes ordenadas de forma descendente por data
+        recomendacoes = Recomendacao.objects.filter().order_by('-data')
+        context = {
+            'recomendacoes': recomendacoes,
+            'filtro_data'  : filtro_data
+        }
+        return render(request,"historico_recomendacoes.html",context)
+
+
+
+
+    

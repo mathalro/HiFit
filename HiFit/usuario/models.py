@@ -14,7 +14,12 @@ class Atividade(models.Model):
 
 class Classificacao(models.Model):
     somanota = models.IntegerField()  # Field name made lowercase.
-    somapessoas = models.IntegerField()  # Field name made lowercase.
+    somapessoas = models.IntegerField(blank=True,null=True)  # Field name made lowercase.
+
+    def __str__(self):
+        return "Nota: " + str(self.somanota) + " Total: " + str(self.somapessoas)
+
+
 
 
 class Usuario(models.Model):

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-
+from django.forms.extras.widgets import SelectDateWidget
 
 class gerenciamentoAlunoForm(forms.Form):
     altura = forms.FloatField(label="Altura (m)",
@@ -13,3 +13,7 @@ class gerenciamentoAlunoForm(forms.Form):
                             min_value=0,
                             max_value=500,
                             widget=forms.NumberInput(attrs={'class': 'form-control', 'id': 'peso', 'step': '0.001'}))
+
+class fitroPorDataRecomendacoes(forms.Form):
+	data_corte = forms.DateField(label="Período antes de:",
+								 widget=forms.DateInput(attrs={'class':'form-control datepicker','style' : 'width:100px;'}))

@@ -54,7 +54,12 @@ class Caracteristica(models.Model):
 
 
 class Recomendacao(models.Model):
-    data = models.DateField(auto_now_add=True)  # Field name made lowercase.
+    data = models.DateField()  # Field name made lowercase.
     classificacao = models.ForeignKey('usuario.Classificacao', on_delete=models.CASCADE)  # Field name made lowercase.
-    usuario = models.ForeignKey('usuario.Usuario', on_delete=models.CASCADE, related_name='recomendacoes')  # Field name made lowercase.
+    aluno = models.ForeignKey('usuario.Usuario', on_delete=models.CASCADE, related_name='recomendacoes_aluno', null=True)  # Field name made lowercase.
+    instrutor = models.ForeignKey('usuario.Usuario', on_delete=models.CASCADE, related_name='recomendacoes_instrutor', null=True)  # Field name made lowercase.
     regras = models.ManyToManyField('instrutor.Regra', related_name='recomendacoes')
+
+    def __str__(self):
+        return "Aluno: " + str(self.aluno) + "- Instrutor: " + str(self.instrutor) + ", Classificacao: " + str(self.classificacao)
+

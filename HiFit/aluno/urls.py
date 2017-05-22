@@ -18,4 +18,5 @@ from .views import *
 
 urlpatterns = [
     url(r'^gerenciar/', gerenciamento_aluno),
+    url(r'^historico_recomendacoes/',historico_recomendacoes)
 ]
