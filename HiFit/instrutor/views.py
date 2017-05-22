@@ -283,11 +283,12 @@ def relatorios(request):
                 acao = "visualizar"
 
             if tipo_relatorio == "geral":
-                recomendacoes = Recomendacao.objects.filter(instrutor=instrutor_logado)
+                recomendacoes = Recomendacao.objects.filter(Q(instrutor=instrutor_logado) & Q(data__range=(dt_inicial_obj, dt_final_obj)))
                 qtd_recomendacoes = recomendacoes.count()
-                media_classificacao = calcMediaClassificacao(recomendacoes)
+                media_classificacao, atividades = getComponentesRecomendacao(recomendacoes)
                 context = {
-                        'qtd_recomendacoes' : qtd_recomendacoes,
+                        'qtd_recomendacoes': qtd_recomendacoes,
+                        'atividades': atividades,
                         'media_clasificacao': media_classificacao,
                         'tipo_relatorio': tipo_relatorio,
                         'acao': acao

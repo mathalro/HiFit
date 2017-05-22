@@ -23,11 +23,26 @@ def validaDatas(dt_inicial, dt_final):
     return mensagens, dt_inicial_obj, dt_final_obj
 
 
-# Calcula a media de classificacoes
-def calcMediaClassificacao(recomendacoes):
+# Retorna true se a atividade ja estiver no array
+def atividadeRepetida(array, atividade):
+    for a in array:
+        if a == atividade:
+            return True
+    return False
+
+
+# Calcula a media de classificacoes e retorna as atividades recomendadas
+# @return float media, string atividades
+def getComponentesRecomendacao(recomendacoes):
     total = 0
+    atividades = []
+    str_atividades = ''
     if len(recomendacoes) == 0:     # Nao ha recomendacaoes
-        return 0
+        return "Não há recomendações.", "Não há recomendações."
     for recomendacao in recomendacoes:
-        total += recomendacao.classificacao
-    return total / len(recomendacoes)
+        atividade = recomendacao.atividade.nome
+        if not atividadeRepetida(atividades, atividade):
+            atividades.append(atividade)
+            str_atividades += atividade + ', '
+        total += recomendacao.classificacao.somanota
+    return (total / len(recomendacoes)), str_atividades[:-2]            # :-2 remove as virgulas
