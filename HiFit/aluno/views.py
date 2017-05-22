@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from .models import *
+from utils.tipos import *
 from usuario.models import Usuario
 from .forms import *
 from django.contrib.auth.decorators import login_required
@@ -27,22 +28,22 @@ def gerenciamento_aluno(request):
     lista_tipo = [d['tipo'] for d in lista_caracteristicas]
 
     # Constroi lista de acordo com o tipo
-    lista_preferencias = [l for l in lista_caracteristicas if TipoCaracteristica.PREFERENCIA.value == l['tipo']]
-    lista_doenca = [l for l in lista_caracteristicas if TipoCaracteristica.DOENCA.value == l['tipo']]
+    lista_preferencias = [l for l in lista_caracteristicas if tipoCaracteristica.PREFERENCIA.value == l['tipo']]
+    lista_doenca = [l for l in lista_caracteristicas if tipoCaracteristica.DOENCA.value == l['tipo']]
     lista_dificuldade_motora = [l for l in lista_caracteristicas if
-                                TipoCaracteristica.DIFICULDADE_MOTORA.value == l['tipo']]
+                                tipoCaracteristica.DIFICULDADE_MOTORA.value == l['tipo']]
 
     # Cria form e preenche com valores ja cadastrados
     form = gerenciamentoAlunoForm()
     if aluno_logado.caracteristicas.all():
 
         # Altura
-        aluno_logado_altura = aluno_logado.caracteristicas.filter(tipo=TipoCaracteristica.ALTURA.value)
+        aluno_logado_altura = aluno_logado.caracteristicas.filter(tipo=tipoCaracteristica.ALTURA.value)
         if aluno_logado_altura:
             form.fields['altura'].initial = aluno_logado_altura[0].descricao
 
         # Peso
-        aluno_logado_peso = aluno_logado.caracteristicas.filter(tipo=TipoCaracteristica.PESO.value)
+        aluno_logado_peso = aluno_logado.caracteristicas.filter(tipo=tipoCaracteristica.PESO.value)
         if aluno_logado_peso:
             form.fields['peso'].initial = aluno_logado_peso[0].descricao
 
@@ -109,39 +110,39 @@ def gerenciamento_aluno(request):
         if form.is_valid():
 
             # Caso a caracteristica altura seja nova
-            if TipoCaracteristica.ALTURA.value not in lista_tipo:
+            if tipoCaracteristica.ALTURA.value not in lista_tipo:
 
                 caracteristica = Caracteristica(descricao=str(form.cleaned_data.get('altura')),
                                                 valor=ValorCaracteristica.ALTURA.value,
-                                                tipo=TipoCaracteristica.ALTURA.value)
+                                                tipo=tipoCaracteristica.ALTURA.value)
                 caracteristica.save()
                 aluno_logado.caracteristicas.add(caracteristica)
 
             else:
-                aluno_logado.caracteristicas.filter(tipo=TipoCaracteristica.ALTURA.value).update(descricao=str(form.cleaned_data.get('altura')))
+                aluno_logado.caracteristicas.filter(tipo=tipoCaracteristica.ALTURA.value).update(descricao=str(form.cleaned_data.get('altura')))
 
             # Caso a caracteristica peso seja nova
-            if TipoCaracteristica.PESO.value not in lista_tipo:
+            if tipoCaracteristica.PESO.value not in lista_tipo:
 
                 caracteristica = Caracteristica(descricao=str(form.cleaned_data.get('peso')),
                                                 valor=ValorCaracteristica.PESO.value,
-                                                tipo=TipoCaracteristica.PESO.value)
+                                                tipo=tipoCaracteristica.PESO.value)
                 caracteristica.save()
                 aluno_logado.caracteristicas.add(caracteristica)
 
             else:
-                aluno_logado.caracteristicas.filter(tipo=TipoCaracteristica.PESO.value).update(descricao=str(form.cleaned_data.get('peso')))
+                aluno_logado.caracteristicas.filter(tipo=tipoCaracteristica.PESO.value).update(descricao=str(form.cleaned_data.get('peso')))
 
             messages.success(request, 'Característica cadastrada com sucesso.')
             return redirect("/aluno/gerenciar")
 
-    
+
     # Checa o que o usuario já cadastrou
-    if not lista_preferencias and not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not lista_doenca and not lista_dificuldade_motora:
+    if not lista_preferencias and not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not lista_doenca and not lista_dificuldade_motora:
         messages.warning(request, 'Você deve cadastrar uma preferência, todas as características físicas e uma característica fisiológica \
                          para ter acesso a outras funcionalidades.')
         cadastro = 'incompleto'
-    elif not lista_preferencias and not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not (TipoCaracteristica['ALTURA'].value in lista_tipo):
+    elif not lista_preferencias and not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not (tipoCaracteristica['ALTURA'].value in lista_tipo):
         messages.warning(request, 'Você deve cadastrar uma preferência e todas as características físicas \
                          para ter acesso a outras funcionalidades.')
         cadastro = 'incompleto'
@@ -149,7 +150,7 @@ def gerenciamento_aluno(request):
         messages.warning(request, 'Você deve cadastrar uma preferência e uma característica fisiológica \
                          para ter acesso a outras funcionalidades.')
         cadastro = 'incompleto'
-    elif not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not lista_doenca and not lista_dificuldade_motora:
+    elif not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not lista_doenca and not lista_dificuldade_motora:
         messages.warning(request, 'Você deve cadastrar todas as características físicas e uma característica fisiológica \
                          para ter acesso a outras funcionalidades.')
         cadastro = 'incompleto'
@@ -157,7 +158,7 @@ def gerenciamento_aluno(request):
         messages.warning(request, 'Você deve cadastrar uma preferência \
                          para ter acesso a outras funcionalidades.')
         cadastro = 'incompleto'
-    elif not (TipoCaracteristica['ALTURA'].value in lista_tipo) and not (TipoCaracteristica['ALTURA'].value in lista_tipo):
+    elif not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not (tipoCaracteristica['ALTURA'].value in lista_tipo):
         messages.warning(request, 'Você deve cadastrar todas as características físicas \
                          para ter acesso a outras funcionalidades.')
         cadastro = 'incompleto'
@@ -165,12 +166,31 @@ def gerenciamento_aluno(request):
         messages.warning(request, 'Você deve cadastrar uma característica fisiológica \
                          para ter acesso a outras funcionalidades.')
         cadastro = 'incompleto'
+    
     context = {
         'aluno' : aluno_logado.isAluno(),
         'form': form,
         'cadastro': cadastro,
         'lista_preferencias': lista_preferencias,
         'lista_doenca': lista_doenca,
-        'lista_dificuldade_motora': lista_dificuldade_motora
+        'lista_dificuldade_motora': lista_dificuldade_motora,
+        'opcoes_doenca': CaracteristicaQualitativa.DOENCA[1:],
+        'opcoes_dificuldade_motora': CaracteristicaQualitativa.DIFICULDADE_MOTORA[1:]
     }
+
     return render(request, 'gerenciamento_aluno.html', context)
+
+
+@login_required(login_url="/usuario/login/")
+def buscar_recomendacoes(request):
+    aluno_logado = Usuario.objects.get(user=request.user)
+    aluno = aluno_logado.isAluno()
+    recomendacoes = {}
+
+    if 'buscar_recomendacoes' in request.POST:
+
+        
+
+        return redirect("/aluno/buscar-recomendacoes")
+
+    return render(request, 'buscar_recomendacoes.html', {'aluno': aluno})

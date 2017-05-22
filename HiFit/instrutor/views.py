@@ -1,13 +1,12 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from .forms import *
-from utils.tipos import TIPO
+from utils.tipos import *
 from django.http import JsonResponse
 from usuario.models import Usuario
 from .models import Regra
 from usuario.models import Atividade
 from aluno.models import Caracteristica
-from utils.tipos import tipoCaracteristica
 from django.db.models import Q      # Para fazer WHERE x=a and x=b
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -93,9 +92,10 @@ def regras(request):
         return redirect("/usuario/login")
     usuario_logado = Usuario.objects.get(user=request.user)
     atividades = Atividade.objects.all()
-    restricoes = Caracteristica.objects.filter(Q(tipo=tipoCaracteristica.DOENCA) | Q(tipo=tipoCaracteristica.DIFICULDADE_MOTORA))
-    beneficios = Caracteristica.objects.filter(tipo=tipoCaracteristica.BENEFICIO)
-    maleficios = Caracteristica.objects.filter(tipo=tipoCaracteristica.MALEFICIO)
+    restricoes = CaracteristicaQualitativa.DOENCA + CaracteristicaQualitativa.DIFICULDADE_MOTORA[1:]
+    beneficios = CaracteristicaQualitativa.PREFERENCIA
+    maleficios = CaracteristicaQualitativa.MALEFICIO
+
     # Reaproveitando algumas partes do codigo para cadastro e edicao
     if (request.method == 'POST'):
         # ----- Salvar regra
@@ -108,19 +108,25 @@ def regras(request):
             pontuacao = request.POST['in_cad_pontuacao']
 
             # Pega os objetos referentes a cada campo
-            atividade = Atividade.objects.get(nome=atividade)
+            atividade = Atividade.objects.get_or_create(nome=atividade)[0]
             if (restricao == ""):
                 restricao = None
-            else:
-                restricao = Caracteristica.objects.get(descricao=restricao)
+            elif (restricao != maleficio):
+                restricao = Caracteristica.objects.get_or_create(descricao=restricao)[0]
+
             if (beneficio == ""):
                 beneficio = None
             else:
-                beneficio = Caracteristica.objects.get(descricao=beneficio)
+                beneficio = Caracteristica.objects.get_or_create(descricao=beneficio)[0]
+
             if (maleficio == ""):
                 maleficio = None
             else:
-                maleficio = Caracteristica.objects.get(descricao=maleficio)
+                # Caso maleficio e restricao sejam 'Nao ha'
+                if str(maleficio) == restricao:
+                    restricao = maleficio
+
+                maleficio = Caracteristica.objects.get_or_create(descricao=maleficio)[0]
 
             # Verifica se a regra ja existe
             if (existeRegra(Usuario.objects.get(user=usuario_logado.user), atividade, restricao, beneficio, maleficio)):
@@ -148,19 +154,31 @@ def regras(request):
             regra_id  = request.POST['in_edit_id']
 
             # Pega os objetos referentes a cada campo
-            atividade = Atividade.objects.get(nome=atividade)
+            atividade = Atividade.objects.get_or_create(nome=atividade)[0]
             if (restricao == ""):
                 restricao = None
             else:
-                restricao = Caracteristica.objects.get(descricao=restricao)
+                if restricao in CaracteristicaQualitativa.DOENCA:
+                    restricao_valor = ValorCaracteristica.DOENCA.value
+                    restricao_tipo = tipoCaracteristica.DOENCA.value
+                else:
+                    restricao_valor = ValorCaracteristica.DIFICULDADE_MOTORA.value
+                    restricao_tipo = tipoCaracteristica.DIFICULDADE_MOTORA.value
+                restricao = Caracteristica.objects.get_or_create(descricao=restricao,
+                                                                 valor=restricao_valor, tipo=restricao_tipo)[0]
             if (beneficio == ""):
                 beneficio = None
             else:
-                beneficio = Caracteristica.objects.get(descricao=beneficio)
+                beneficio = Caracteristica.objects.get_or_create(descricao=beneficio,
+                                                                 valor=ValorCaracteristica.PREFERENCIA.value,
+                                                                 tipo=tipoCaracteristica.PREFERENCIA.value)[0]
             if (maleficio == ""):
                 maleficio = None
             else:
-                maleficio = Caracteristica.objects.get(descricao=maleficio)
+                maleficio = Caracteristica.objects.get_or_create(descricao=maleficio,
+                                                                 valor=ValorCaracteristica.MALEFICIO.value,
+                                                                 tipo=tipoCaracteristica.MALEFICIO.value)[0]
+
             # Verifica se a regra ja existe
             if (existeRegra(Usuario.objects.get(user=usuario_logado.user), atividade, restricao, beneficio, maleficio)):
                 messages.warning(request, msg_regra_existente)
@@ -225,11 +243,11 @@ def regras(request):
             }
             return JsonResponse(data)
 
-        #verifica quais regras já podem ir para o solicitante
+        #verifica quais regras ja podem ir para o solicitante
 
         #return redirect('/instrutor/regras')
 
-    # Salva regras do usuário e de outros usuários, e solicitacoes de perimissao no context
+    # Salva regras do usuário e de outros usuarios, e solicitacoes de perimissao no context
     minhas_regras = Regra.objects.filter(dono=usuario_logado)
     outras_regras = Regra.objects.exclude(dono=usuario_logado)
     solicitacoes = Regra.objects.filter(Q(solicitante__isnull=False) & Q(dono=usuario_logado))

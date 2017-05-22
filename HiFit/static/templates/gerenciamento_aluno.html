@@ -103,9 +103,9 @@
                         <label for="select_field_doenca">Doença:</label>
                         <select class="form-control" id="select_field_doenca" name="select_field_doenca">
                             <option disabled selected value> -- Selecione uma opção -- </option>
-                            <option>Asma</option>
-                            <option>Diabetes</option>
-                            <option>Pressão alta</option>
+                            {% for d in opcoes_doenca %}
+                                <option>{{ d }}</option>
+                            {% endfor %}
                         </select>
                     </div>
 
@@ -143,10 +143,9 @@
                         <label for="select_field_dificuldade_motora">Dificuldade motora:</label>
                         <select class="form-control" id="select_field_dificuldade_motora" name="select_field_dificuldade_motora">
                             <option disabled selected value> -- Selecione uma opção -- </option>
-                            <option>Dor no joelho</option>
-                            <option>Hérnia de disco</option>
-                            <option>Mobilidade braço</option>
-                            <option>Mobilidade perna</option>
+                            {% for m in opcoes_dificuldade_motora %}
+                                <option>{{ m }}</option>
+                            {% endfor %}
                         </select>
                     </div>
 

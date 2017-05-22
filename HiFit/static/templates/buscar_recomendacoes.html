@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% load replace_space %}
+
+{% block title %}Configurações{% endblock %}
+
+{% block content %}
+<section class="content-header">
+    <h1>Busca de Recomendações</h1>
+</section>
+
+<form method="POST">
+    {% csrf_token %}
+    <br><br><button type="submit" name="buscar_recomendacoes" class="btn btn-primary pull-left" value="salvar">Buscar minhas recomendações</button>
+</form>
+
+{% endblock content %}
+
+{% block js %}
+{% endblock js %}
