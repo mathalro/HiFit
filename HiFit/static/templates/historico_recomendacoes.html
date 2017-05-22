@@ -8,48 +8,76 @@
 
 {% block content %}
 <div class="row" style="padding-bottom: 30px;">
-	<form action="" method="POST">
-		{% csrf_token %}
-		{{ filtro_data }}
-		<span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
-		<input class="btn btn-primary" style="margin-top:10px" type="submit" value="Filtrar"/>
-	</form>
+	<div class="col-lg-4 col-md-4">
+		<form class="form-inline" action="" method="POST">
+			{% csrf_token %}
+			{% for field in filtro_data %}
+				{{field}}
+			{% endfor %}
+			<span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+			<input class="btn btn-primary" style="margin-left:10px;" type="submit" value="Filtrar por Data"/>
+		</form>
+	</div>
+	<div class="col-lg-4 col-md-4">
+		<form action="" method="POST">
+			{% csrf_token %}
+			<button class="btn btn-primary" type="submit" name="filtro_caracteristica" value="true">Filtrar com base nas minhas características</button>
+		</form>
+	</div>
 </div>
 
 <div class="row">
-{% for recomendacao in recomendacoes %}
-	<div class="panel-group">
-	  <div class="panel panel-default">
-	    <div class="panel-heading">
-	      <h4 class="panel-title">
-	        <a data-toggle="collapse" href="#collapse{{recomendacao.id}}">{{recomendacao.aluno}} - {{recomendacao.data}}</a>
-	      </h4>
-	    </div>
-	    <div id="collapse{{recomendacao.id}}" class="panel-collapse collapse">
-	      <div class="panel-body">
-			<div class="row">
-				<div class="col-md-4 panel panel-primary">
-					<div class="panel-body">
-						<ul>
-						 	<li>{{recomendacao.aluno.caracteristicas}}</li>
-						</ul>
+	<div class="col-lg-12 col-md-12">
+	{% for recomendacao in recomendacoes %}
+		<div class="panel-group">
+		  <div class="panel panel-default">
+		    <div class="panel-heading">
+		      <h4 class="panel-title">
+		        <a data-toggle="collapse" href="#collapse{{recomendacao.id}}">{{recomendacao.aluno}} - {{recomendacao.data}}</a>
+		      </h4>
+		    </div>
+		    <div id="collapse{{recomendacao.id}}" class="panel-collapse collapse">
+		      <div class="panel-body">
+				<div class="row">
+					<div class="col-md-4 panel panel-primary">
+						<div class="panel-body">
+							<ul>
+							 	{% for caracteristica in recomendacao.aluno.caracteristicas.all %}
+									{% if caracteristica.tipo == 1 %}
+										<li>Altura: {{caracteristica.descricao}}</li>
+									{% elif caracteristica.tipo == 2 %}
+										<li>Peso: {{caracteristica.descricao}}</li>
+									{% elif caracteristica.tipo == 0 %}
+										<li>Preferencia: {{caracteristica.descricao}}</li>
+									{% endif %}
+							 	{% endfor %}
+							</ul>
+						</div>
+					</div>
+					<div class="col-md-8 panel panel-primary" style="margin-top:0px">
+						<div class="panel-body">
+							<ul>
+								<li>Atividade Recomendada: {{recomendacao.atividade}}</li>
+								<li>Instrutor: {{recomendacao.instrutor}}</li>
+								<li>Nota: {{recomendacao.classificacao.somanota}}</li>
+							</ul>
+						</div>
 					</div>
 				</div>
-				<div class="col-md-8 panel panel-primary">
-					<div class="panel-body">teste</div>
-				</div>
-			</div>
-	      </div>
-	      <div class="panel-footer"></div>
-	    </div>
-	  </div>
+		      </div>
+		      <div class="panel-footer"></div>
+		    </div>
+		  </div>
+		</div>
+	{% endfor %}
 	</div>
-{% endfor %}
 </div>
 
 <script>
 $(document).ready(function() {
-    $('.datepicker').datepicker();
+    $('.datepicker').datepicker({
+    	dateFormat : "yy-mm-dd"
+    });
 });
 </script>
 
@@ -62,4 +90,5 @@ $(document).ready(function() {
 {% block js %}
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+<script src='/static/js/historico_recomendacoes.js'></script>
 {% endblock %}
