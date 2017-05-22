@@ -50,7 +50,7 @@ class Caracteristica(models.Model):
             self.tipo = TipoCaracteristica.PREFERENCIA.value
 
     def __str__(self):
-        return self.descricao
+        return str(self.descricao)
 
 
 class Recomendacao(models.Model):
