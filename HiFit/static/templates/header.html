@@ -20,22 +20,33 @@
                 <div class="navbar-custom-menu pull-left">
                     <ul class="nav navbar-nav">
                         {% if aluno %}
-                            <li><a href="/aluno/gerenciar">Gerenciamento</a></li>  
+                            {% include 'headerAluno.html' %}
                         {% else %}
-                            <li><a href="/instrutor/meu_cadastro">Meu Cadastro</a></li>  
-                            <li><a href="/instrutor/regras">Regras</a></li>
+                            {% include 'headerInstrutor.html' %}
                         {% endif %}
+                        <li><a href="/usuario/perfil">Perfil</a></li>
+                        <li><a href="/usuario/estatisticas">Estatísticas</a></li>
                     </ul>
                 </div>
                 <div class="navbar-custom-menu pull-right">
                     <ul class="nav navbar-nav">
-                            <li><a href="/usuario/gerenciar">Conta</a></li>
-                            <li><a href="#">Sobre</a></li>
-                            <li><a href="/fale-conosco">Fale Conosco</a></li>
-                            <li><a href="/usuario/logout">Sair</a></li>
+                        <li><a href="/usuario/gerenciar">Conta</a></li>
+                        <li><a href="/sobre">Sobre</a></li>
+                        <li><a href="/fale-conosco">Fale Conosco</a></li>
+                        <li><a href="/usuario/logout">Sair</a></li>
                     </ul>   
                 </div>
             {% endif %}
         </div>
     </nav>
 </header>
+
+<script>
+    $(document).ready(function(){ 
+        var teste = "{{ cadastro }}"
+        if (teste == "completo")
+            $("a[id='fale-conosco']").attr("href", "/fale-conosco");
+        else
+            $("a[id='fale-conosco']").removeAttr("href");   
+    });
+</script>

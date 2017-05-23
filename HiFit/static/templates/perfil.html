@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+
+{% block css %}
+	<style>
+		.post-container {
+			margin-bottom: 30px;
+			background-color: #eee;
+			border-style: solid;
+			border-width: 1px;
+			border-radius: 6px;
+			border-color: #aaa;
+		}
+
+		.post-container .post-usuario {
+			padding: 10px;
+		}
+
+		.post-container .post-dados {
+			padding-bottom: 10px;
+			padding-right: 10px;
+		}
+
+		.post-container p, h4, a {
+			padding: 10px 10px 10px 10px;
+		}
+
+		.hr-black {
+			border-color: black;
+		}
+
+		.hr-gray {
+			border-color: #ccc;
+		}
+
+		.non-margin {
+			margin-top: 0;
+		} 
+
+ 	    .details li {
+	    	list-style: none;
+	    	padding-left: none;
+	    }
+
+	    li {
+	        margin-bottom:10px;
+	    }
+	</style>
+{% endblock %}
+
+{% block title %}Perfil{% endblock %}
+		
+{% block titulo %}{% endblock %}
+
+{% block content %}
+	<div class="container">    
+	    <div class="row">
+	        <div class="col-md-3">
+	            <img src="https://www.svgimages.com/svg-image/s5/man-passportsize-silhouette-icon-256x256.png" alt="stack photo" class="img img-responsive img-thumbnail">
+	        </div>
+	        <div class="col-md-9">
+	            <div class="container">
+	                <h2>{% if perfil_aluno %}Aluno: {% else %}Instrutor: {% endif %}{{ usuario.user.username }}</h2>
+		            <ul class="list-inline details align-middle">
+	              		<li><a href="#" class="btn btn-primary align-middle">Seguir</a></li>
+	              		<li><a href="#" class="btn btn-danger align-middle">Avaliar</a></li>
+	              		<li>{% if not perfil_aluno %}<a href="#" class="btn btn-success">Associar-se</a>{% endif %}</li>
+	            	</ul>
+	            </div>
+	            <hr class="non-margin">
+	            {% if not perfil_aluno %}
+		            <div class="col-md-12">
+		        		<p>{{ usuario.descricao }}</p>    	
+		            </div>
+		        {% endif %}
+	        </div>
+	    </div>
+    </div>
+
+	<hr class="hr-black">
+	{% for p in posts %}
+		<div class="post-container">
+			<div class="post-content">
+				
+				<div class="row">
+					<div class="col-md-4 nopadding"><p><b>{{ usuario }}</b></p></li></div>
+					<div class="col-md-8"><p class="pull-right">{{ p.data }}</p></div>
+				</div>
+				<p>{{ p.conteudo }}</p>
+				<div class="row">
+					<div class="col-md-12 col-md-offset-11 post-dados">
+						<a href="#">
+							<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+						</a>
+						{% if p.privacidade != 0 %}
+							<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+						{% else %}
+							<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+	<div class="pagination">
+	    <span class="step-links">
+	        {% if posts.has_previous %}
+	            <a href="/usuario/perfil/?usuario={{ usuario.user.username }}&page={{ posts.previous_page_number }}"><span class="glyphicon glyphicon-backward" aria-hidden="true"></span></a>
+	        {% endif %}
+
+	        <span class="current">
+	            {% if posts %}
+	            	Página {{ posts.number }} de {{ posts.paginator.num_pages }}.
+	            {% endif %}
+	        </span>
+
+	        {% if posts.has_next %}
+	            <a href="/usuario/perfil?usuario={{ usuario.user.username }}&page={{ posts.next_page_number }}"><span class="glyphicon glyphicon-forward" aria-hidden="true"></span></a>
+	        {% endif %}
+	    </span>
+	</div>
+{% endblock %}
+

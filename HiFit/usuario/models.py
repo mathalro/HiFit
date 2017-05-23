@@ -41,16 +41,19 @@ class Usuario(models.Model):
     def isAluno(self):
         return self.tipo_usuario == TIPO['ALUNO']
 
-
-
     def __str__(self):
         return str(self.nome)
+
 
 class Post(models.Model):
     conteudo = models.TextField(max_length=500)
     data = models.DateField(auto_now_add=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='posts')  # Field name made lowercase.
     classificacao = models.ForeignKey(Classificacao, on_delete=models.CASCADE)  # Field name made lowercase.
+    privacidade = models.IntegerField(null=True)
+
+    def __str__(self):
+        return str(self.id)
 
 
 class Comentario(models.Model):
