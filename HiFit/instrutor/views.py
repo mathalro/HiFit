@@ -282,18 +282,26 @@ def relatorios(request):
             elif "visualizar-relatorios" in request.POST:
                 acao = "visualizar"
 
+            # Filtra a recomendacao por instrutor e data
+            recomendacoes = Recomendacao.objects.filter(Q(instrutor=instrutor_logado) & Q(data__range=(dt_inicial_obj, dt_final_obj)))
+
             if tipo_relatorio == "geral":
-                recomendacoes = Recomendacao.objects.filter(Q(instrutor=instrutor_logado) & Q(data__range=(dt_inicial_obj, dt_final_obj)))
                 qtd_recomendacoes = recomendacoes.count()
                 media_classificacao, atividades = getComponentesRecomendacao(recomendacoes)
                 context = {
-                        'qtd_recomendacoes': qtd_recomendacoes,
-                        'atividades': atividades,
-                        'media_clasificacao': media_classificacao,
-                        'tipo_relatorio': tipo_relatorio,
-                        'acao': acao
+                    'qtd_recomendacoes': qtd_recomendacoes,
+                    'atividades': atividades,
+                    'media_clasificacao': media_classificacao,
+                    'tipo_relatorio': tipo_relatorio,
+                    'acao': acao
                 }
             elif tipo_relatorio == "aluno":
-                print("relatorio aluno")
+                alunos = getDadosAlunos(recomendacoes)
+                context = {
+                    'alunos': alunos,
+                    'tipo_relatorio': tipo_relatorio,
+                    'acao': acao,
+                    'AlunoRelatorio': AlunoRelatorio
+                }
 
     return render(request, 'relatorios.html', context)

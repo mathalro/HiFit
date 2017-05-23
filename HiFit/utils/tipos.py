@@ -13,6 +13,8 @@ class tipoCaracteristica(IntEnum):
     DIFICULDADE_MOTORA = 4
     BENEFICIO = 5
     MALEFICIO = 6
+    IDADE = 7
+    NAO_HA = 10
 
 
 PALAVRAS_BAIXO_CALAO = [

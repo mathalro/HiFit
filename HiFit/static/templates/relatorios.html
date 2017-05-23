@@ -93,13 +93,19 @@
                             </div>
                         </div>"
                 {% else %}
-                    srcdoc="
+
+                    {% if sem_aluno %}
+                        srcdoc="
                             <center><h1>Relatório por Aluno</h1></center>
                             <hr>
-                            <div class="row">
-                                <label>Informações aluno:</label>
-                                <label>Suas recomendações aceitas pelo alunos:</label>
-                            </div>"
+                            <p>Não há alunos.</p>"
+                    {% else %}
+                        srcdoc="
+                            <center><h1>Relatório por Aluno</h1></center>
+                            <hr>
+                            {{ alunos }}
+                        "
+                    {% endif %}
                 {% endif %}
             ></iframe>
         {% else %}
