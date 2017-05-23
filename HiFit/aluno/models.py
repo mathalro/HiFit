@@ -50,7 +50,7 @@ class Caracteristica(models.Model):
             self.tipo = TipoCaracteristica.PREFERENCIA.value
 
     def __str__(self):
-        return self.descricao
+        return str(self.descricao)
 
 
 class Recomendacao(models.Model):
@@ -62,5 +62,5 @@ class Recomendacao(models.Model):
     regras = models.ManyToManyField('instrutor.Regra', related_name='recomendacoes')
 
     def __str__(self):
-        return "Aluno: " + str(self.aluno) + "- Instrutor: " + str(self.instrutor) + ", Classificacao: " + str(self.classificacao)
+        return str("Aluno: " + str(self.aluno) + "- Instrutor: " + str(self.instrutor) + ", Classificacao: " + str(self.classificacao))
 

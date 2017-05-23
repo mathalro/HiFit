@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    {% include 'headerInstrutor.html' %}
+{% endblock header %}
+
+
+{% block title %}Relatórios{% endblock %}
+
+
+{% block js %}
+    <script src='/static/js/relatorios.js'></script>
+{% endblock js %}
+
+{% block content %}
+    <section class="content">
+        <h2>Geração de Relatórios</h2>
+        <hr>
+        <form action="/instrutor/relatorios/" method="POST" id="form-relatorios" name="form-relatorios">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        <label for="dt-inicial-relatorios">Data inicial:</label>
+                        <input class="form-control  date" type="date" name="dt-inicial-relatorios" id="dt-inicial-relatorios" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dt-final-relatorios">Data final:</label>
+                        <input class="form-control date" type="date" name="dt-final-relatorios" id="dt-final-relatorios" required>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                        <label for="sel-relatorios-tipo">Tipo:</label>
+                        <select class="form-control" id="sel-relatorios-tipo" name="sel-relatorios-tipo" required>
+                            <option disabled selected value> -- Selecione uma opção -- </option>
+                            <option value="geral">Relatório geral</option>
+                            <option value="aluno">Relatório por aluno</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                        <button type="submit" name="salvar-relatorios" id="salvar-relatorios" class="btn btn-default pull-right">Salvar</button>
+                        <button type="submit" name="visualizar-relatorios" id="visualizar-relatorios" class="btn btn-default pull-right">Visualizar</button>
+                    </div>
+                </div>
+            </div>
+            <hr>
+        </form>
+
+        {% if acao == "salvar" %}
+            <div id="salvar-iframe"></div>
+        {% endif %}
+
+        {% if acao %}
+            <iframe name="iframe-relatorios" id="iframe-relatorios" frameborder="1"
+                {% if acao == 'salvar' %}
+                    style="display:none; top:100px; left:100px; width:100%; height:200px;"
+                {% else %}
+                    style="top:100px; left:100px; width:100%; height:200px;"
+                {% endif %}
+                {% if tipo_relatorio == "geral" %}
+                    srcdoc="
+                        <center><h1>Relatório Geral</h1></center>
+                        <hr>
+                        <div class='row'>
+                            <div class='col-md-4'>
+                                <p><b>Quantidade de recomendações aceitas:</b></p>
+                            </div>
+                            <div class='col-md-8'>
+                                <p>{{ qtd_recomendacoes }} recomendações.</p>
+                            </div>
+                        </div>
+                        <div class='row'>
+                            <div class='col-md-4'>
+                                <b><p>Atividades mais recomendadas aos alunos:</p></b>
+                            </div>
+                            <div class='col-md-8'>
+                                {{ atividades }}
+                            </div>
+                        </div>
+                        <div class='row'>
+                            <div class='col-md-4'>
+                                <b><p>Classificação média de suas recomendações:</p></b>
+                            </div>
+                            <div class='col-md-8'>
+                                {{ media_clasificacao }}
+                            </div>
+                        </div>"
+                {% else %}
+
+                    {% if sem_aluno %}
+                        srcdoc="
+                            <center><h1>Relatório por Aluno</h1></center>
+                            <hr>
+                            <p>Não há alunos.</p>"
+                    {% else %}
+                        srcdoc="
+                            <center><h1>Relatório por Aluno</h1></center>
+                            <hr>
+                            {{ alunos }}
+                        "
+                    {% endif %}
+                {% endif %}
+            ></iframe>
+        {% else %}
+            <iframe name="iframe-relatorios" id="iframe-relatorios" src="about:blank" style="display:none;"></iframe>
+        {% endif %}
+    </section>
+
+{% endblock content %}
