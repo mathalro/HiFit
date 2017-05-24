@@ -26,6 +26,10 @@ def home(request):
 		return render(request, 'base.html',context)
 	return render(request, 'base.html')
 
+def handle_error(request):
+	messages.warning(request,"Página não encontrada.")
+	return redirect('/')
+
 
 @login_required(login_url="/usuario/login/")
 def perfil(request):

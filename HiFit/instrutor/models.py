@@ -22,4 +22,4 @@ class Regra(models.Model):
     atividade = models.ForeignKey('usuario.Atividade', on_delete=models.CASCADE)  # Field name made lowercase.
     data_solicitacao = models.DateField(blank=True,null=True)
     def __str__(self):
-        return str(self.atividade) + ", data de criacao: " + str(self.datacriacao)
+        return str("Dono: " + str(self.dono) + ", " + str(self.atividade) + ", data de criacao: " + str(self.datacriacao))

@@ -1,1 +1,1 @@
-	modified:   instrutor/views.py
+	both modified:   utils/tipos.py

@@ -7,7 +7,6 @@ TIPO = {
     'INSTRUTOR' : 2
 }
 
-
 PALAVRAS_BAIXO_CALAO = [
     'caralho',
     'merda'

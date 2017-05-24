@@ -31,7 +31,7 @@ class Caracteristica(models.Model):
             self.tipo = tipoCaracteristica.MALEFICIO.value
 
     def __str__(self):
-        return self.descricao
+        return str(self.descricao)
 
 
 class Recomendacao(models.Model):
@@ -44,5 +44,3 @@ class Recomendacao(models.Model):
 
     def __str__(self):
         return str("Aluno: " + str(self.aluno) + "- Instrutor: " + str(self.instrutor) + ", Classificacao: " + str(self.classificacao))
-
-

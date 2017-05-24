@@ -25,5 +25,6 @@ urlpatterns = [
     url(r'^aluno/', include('aluno.urls')),
     url(r'^instrutor/', include('instrutor.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^.*/$', handle_error),
 ]
 

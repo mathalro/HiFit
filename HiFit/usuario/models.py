@@ -14,7 +14,12 @@ class Atividade(models.Model):
 
 class Classificacao(models.Model):
     somanota = models.IntegerField()  # Field name made lowercase.
-    somapessoas = models.IntegerField()  # Field name made lowercase.
+    somapessoas = models.IntegerField(blank=True,null=True)  # Field name made lowercase.
+
+    def __str__(self):
+        return str("Nota: " + str(self.somanota) + " Total: " + str(self.somapessoas))
+
+
 
 
 class Usuario(models.Model):
@@ -32,12 +37,13 @@ class Usuario(models.Model):
     descricao = models.TextField(null=True)
     auth_id = models.CharField(max_length=32, null=True)
     situacao = models.IntegerField(null=True)
+    cadastro_completo = models.IntegerField(default=1)
 
     def isAluno(self):
         return self.tipo_usuario == TIPO['ALUNO']
 
     def __str__(self):
-        return self.nome
+        return str(self.nome)
 
 
 class Post(models.Model):
@@ -57,7 +63,7 @@ class Comentario(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)  # Field name made lowercase.
 
     def __str__(self):
-        return self.data + ': ' +self.conteudo
+        return str(self.data + ': ' +self.conteudo)
 
 
 class Denuncia(models.Model):
@@ -67,7 +73,7 @@ class Denuncia(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='denuncias')  # Field name made lowercase.
 
     def __str__(self):
-        return self.titulo
+        return str(self.titulo)
 
 
 class Mensagem(models.Model):

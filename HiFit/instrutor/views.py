@@ -11,7 +11,12 @@ from django.db.models import Q      # Para fazer WHERE x=a and x=b
 from django.contrib import messages
 from django.contrib.auth import logout
 from datetime import datetime
+from .utils_relatorios import *
+from aluno.models import Recomendacao
+from django.http import JsonResponse
 
+#------ Mensagens do browser
+# Tela Regras
 msg_regra_salva = 'Regra salva com sucesso.'
 msg_regra_existente = 'Regra já existe.'
 msg_regra_nao_existe = 'Regra não existe.'
@@ -22,7 +27,6 @@ msg_permissao_concedida = 'Permissão concedida'
 msg_solicitante_nao_existe = 'Usuário solicitante não existe'
 msg_permissao_nao_concedida = 'Permissão não concedida'
 
-# Create your views here.
 
 @login_required
 def cadastroInstrutor(request):
@@ -47,7 +51,7 @@ def cadastroInstrutor(request):
 		'cadastro'				: True,
 		'cadastroDadosTecnicos' : cadastroDadosTecnicos,
 	}
-	
+
 	return render(request,'gerenciamento_instrutor.html',context)
 
 
@@ -73,7 +77,7 @@ def editarCadastro(request):
 				msg_identificacao_incorreta = edicaoDadosTecnicos.errors.as_text().split('*')[2]
 				messages.warning(request,msg_identificacao_incorreta)
 		else:
-			messages.info(request,"Alteração sem mudanças, formulário idêntico ao exibido")	
+			messages.info(request,"Alteração sem mudanças, formulário idêntico ao exibido")
 		return redirect("/instrutor/meu_cadastro")
 	else:
 		edicaoDadosTecnicos = FormularioEdicaoDadosTecnicos(instance=instrutorLogado)
@@ -270,3 +274,53 @@ def existeRegra(dono, atividade, restricao, beneficio, maleficio):
                                        ))
     return existe
 
+@login_required
+def relatorios(request):
+    instrutor_logado = Usuario.objects.get(user=request.user)
+    if request.method == 'POST':
+        dt_inicial = request.POST['dt-inicial-relatorios']
+        dt_final = request.POST['dt-final-relatorios']
+        tipo_relatorio = request.POST['sel-relatorios-tipo']
+
+        dt_inicial = dt_inicial.replace("/", "")
+        dt_final = dt_final.replace("/", "")
+
+        # Valida as datas
+        erros, dt_inicial_obj, dt_final_obj = validaDatas(dt_inicial, dt_final)
+        if erros:
+            for i in range(0, len(erros)):
+                messages.warning(request, erros[i])
+
+        else:
+            acao = ""
+            if "salvar-relatorios" in request.POST:
+                acao = "salvar"
+            elif "visualizar-relatorios" in request.POST:
+                acao = "visualizar"
+
+            # Filtra a recomendacao por instrutor e data
+            recomendacoes = Recomendacao.objects.filter(Q(instrutor=instrutor_logado) & Q(data__range=(dt_inicial_obj, dt_final_obj)))
+
+            if tipo_relatorio == "geral":
+                qtd_recomendacoes = recomendacoes.count()
+                media_classificacao, atividades = getComponentesRecomendacao(recomendacoes)
+                context = {
+                    'qtd_recomendacoes': qtd_recomendacoes,
+                    'atividades': atividades,
+                    'media_clasificacao': media_classificacao,
+                    'tipo_relatorio': tipo_relatorio,
+                    'acao': acao
+                }
+            elif tipo_relatorio == "aluno":
+                alunos = getDadosAlunos(recomendacoes)
+                context = {
+                    'aluno': instrutor_logado.isAluno(),
+                    'alunos': alunos,
+                    'tipo_relatorio': tipo_relatorio,
+                    'acao': acao,
+                    'AlunoRelatorio': AlunoRelatorio
+                }
+    else:
+        context = {'aluno': instrutor_logado.isAluno()}
+
+    return render(request, 'relatorios.html', context)
