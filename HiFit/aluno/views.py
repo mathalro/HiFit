@@ -12,15 +12,12 @@ from instrutor.models import Regra
 from .forms import *
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from instrutor.models import Regra
 from django.http import JsonResponse
+from datetime import date
 
 
 @login_required(login_url="/usuario/login/")
 def gerenciamento_aluno(request):
-
-    # Iniciar variaveis
-    cadastro = 'completo'
 
     # Pega informacoes do usuario logado
     user_logado = request.user.username
@@ -145,36 +142,40 @@ def gerenciamento_aluno(request):
     if not lista_preferencias and not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not lista_doenca and not lista_dificuldade_motora:
         messages.warning(request, 'Você deve cadastrar uma preferência, todas as características físicas e uma característica fisiológica \
                          para ter acesso a outras funcionalidades.')
-        cadastro = 'incompleto'
+        aluno_logado.cadastro_completo = 0
     elif not lista_preferencias and not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not (tipoCaracteristica['ALTURA'].value in lista_tipo):
         messages.warning(request, 'Você deve cadastrar uma preferência e todas as características físicas \
                          para ter acesso a outras funcionalidades.')
-        cadastro = 'incompleto'
+        aluno_logado.cadastro_completo = 0
     elif not lista_preferencias and not lista_doenca and not lista_dificuldade_motora:
         messages.warning(request, 'Você deve cadastrar uma preferência e uma característica fisiológica \
                          para ter acesso a outras funcionalidades.')
-        cadastro = 'incompleto'
+        aluno_logado.cadastro_completo = 0
     elif not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not lista_doenca and not lista_dificuldade_motora:
         messages.warning(request, 'Você deve cadastrar todas as características físicas e uma característica fisiológica \
                          para ter acesso a outras funcionalidades.')
-        cadastro = 'incompleto'
+        aluno_logado.cadastro_completo = 0
     elif not lista_preferencias:
         messages.warning(request, 'Você deve cadastrar uma preferência \
                          para ter acesso a outras funcionalidades.')
-        cadastro = 'incompleto'
+        aluno_logado.cadastro_completo = 0
     elif not (tipoCaracteristica['ALTURA'].value in lista_tipo) and not (tipoCaracteristica['ALTURA'].value in lista_tipo):
         messages.warning(request, 'Você deve cadastrar todas as características físicas \
                          para ter acesso a outras funcionalidades.')
-        cadastro = 'incompleto'
+        aluno_logado.cadastro_completo = 0
     elif not lista_doenca and not lista_dificuldade_motora:
         messages.warning(request, 'Você deve cadastrar uma característica fisiológica \
                          para ter acesso a outras funcionalidades.')
-        cadastro = 'incompleto'
-    
+        aluno_logado.cadastro_completo = 0
+    else:
+        aluno_logado.cadastro_completo = 1
+
+    aluno_logado.save()
+
     context = {
         'aluno' : aluno_logado.isAluno(),
         'form': form,
-        'cadastro': cadastro,
+        'cadastro_completo': aluno_logado.cadastro_completo,
         'lista_preferencias': lista_preferencias,
         'lista_doenca': lista_doenca,
         'lista_dificuldade_motora': lista_dificuldade_motora,
@@ -277,7 +278,7 @@ def buscar_recomendacoes(request):
         # Gera ranking das tres melhores recomendacoes
         lista_recomendacoes_aluno = geraRankingTresMelhoresRecomendacoes(recomendacoes)
 
-        return render(request, 'buscar_recomendacoes.html', {'lista_recomendacoes_aluno': lista_recomendacoes_aluno, 'aluno': aluno})
+        return render(request, 'buscar_recomendacoes.html', {'lista_recomendacoes_aluno': lista_recomendacoes_aluno, 'aluno': aluno, 'cadastro_completo': aluno_logado.cadastro_completo})
 
     elif request.method == 'GET' and request.GET.get('click',0):
         recomendacao_aceita = request.GET.get('recomendacao_aceita').replace('_space_sep_', ' ')
@@ -303,4 +304,63 @@ def buscar_recomendacoes(request):
         }
         return JsonResponse(data)
 
-    return render(request, 'buscar_recomendacoes.html', {'aluno': aluno})
+    return render(request, 'buscar_recomendacoes.html', {'aluno': aluno, 'cadastro_completo': aluno_logado.cadastro_completo})
+
+
+@login_required(login_url="/usuario/login/")
+def historico_recomendacoes(request):
+    solicitante = Usuario.objects.get(user=request.user)
+    #pega uma lista de recomendacoes ordenadas de forma descendente primeiramente
+    #classificação do instrutor no sistema e depois pela data.
+    recomendacoes = Recomendacao.objects.filter().order_by('-instrutor__classificacao__somapessoas','-data')
+    filtro_data = filtroPorDataRecomendacoes()
+    if request.method == "POST":
+        #requisiçao do filtro por caracteristica
+        if "filtro_caracteristica" in request.POST:
+            #resgatando altura e peso do aluno solicitante:
+            altura_solicitante = solicitante.caracteristicas.get(tipo=1).descricao
+            peso_solicitante = solicitante.caracteristicas.get(tipo=2).descricao
+            #resgatando todas as características tipo 1 e 2 do sistema:
+            aluno_semelhante = []
+            recomendacoes = []
+            for aluno in Usuario.objects.filter(tipo_usuario=1):
+                try:
+                    altura = aluno.caracteristicas.get(tipo=1).descricao
+                except Caracteristica.DoesNotExist:
+                    altura = None
+                try:
+                    peso = aluno.caracteristicas.get(tipo=2).descricao
+                except Caracteristica.DoesNotExist:
+                    peso = None
+                if aluno != solicitante and altura_solicitante == altura and peso_solicitante == peso:
+                    aluno_semelhante.append(aluno)
+                    #armazena as recomendacoes feitas aquele aluno
+                    for recomendacao in Recomendacao.objects.filter(aluno=aluno):
+                        recomendacoes.append(recomendacao)
+            recomendacoes = sorted(recomendacoes, key=getKeyInstrutor)
+            recomendacoes = sorted(recomendacoes, key=getKeyData, reverse=True)
+        else:
+            #requisição para filtrar por data, ainda mantém a ordenação pela classificação do instrutor.
+            filtro_data = filtroPorDataRecomendacoes(request.POST)
+            if filtro_data.is_valid():
+                data_corte = filtro_data.cleaned_data.get("data_corte")
+                recomendacoes = Recomendacao.objects.filter(data__lte=data_corte).order_by('-instrutor__classificacao__somapessoas','-data',)
+            else:
+                messages.warning(request,"Data inválida: data informada é futura, informe novamente.")
+    else:   
+        filtro_data = filtroPorDataRecomendacoes()
+
+    context = {
+        'recomendacoes': recomendacoes,
+        'cadastro_completo': solicitante.cadastro_completo,
+        'filtro_data'  : filtro_data,
+        'aluno': solicitante.isAluno(),
+    }
+       
+    return render(request,"historico_recomendacoes.html",context)
+
+#funcoes para ordenar a lista de recomendacoes quando acionado o filtro de caracteristicas
+def getKeyData(recomendacao):
+    return recomendacao.data
+def getKeyInstrutor(recomendacao):
+    return recomendacao.instrutor.classificacao.somapessoas

@@ -26,7 +26,7 @@
                         {% endif %}
                         <li><a href="/usuario/amigos">Amigos</a></li>
                         <li><a href="/usuario/perfil">Perfil</a></li>
-                        <li><a href="/usuario/estatisticas">Estatísticas</a></li>
+                        <li><a id="estatistica" href="/usuario/estatisticas">Estatísticas</a></li>
                     </ul>
                 </div>
                 <div class="navbar-custom-menu pull-right">
@@ -43,11 +43,11 @@
 </header>
 
 <script>
-    $(document).ready(function(){ 
-        var teste = "{{ cadastro }}"
-        if (teste == "completo")
-            $("a[id='fale-conosco']").attr("href", "/fale-conosco");
-        else
-            $("a[id='fale-conosco']").removeAttr("href");   
+    $(document).ready(function(){
+        $("a[id='estatistica']").attr("href", "/usuario/estatisticas");
+        $("a[id='recomendacoes']").attr("href", "/aluno/buscar-recomendacoes");
+        $("a[id='historico_recomendacoes']").attr("href", "/aluno/historico_recomendacoes");
+        if ({{ cadastro_completo }} == 0)
+            $("a[id='estatistica'], a[id='recomendacoes'], a[id='historico_recomendacoes']").removeAttr("href");
     });
 </script>

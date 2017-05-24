@@ -1,0 +1,13 @@
+python manage.py shell
+from django.contrib.auth.models import User
+from usuario.models import Usuario
+user = User.objects.create_user(username='instrutor_1', password='instrutor_1')
+new_user = Usuario(user=user, tipo_usuario=2, situacao=1)
+new_user.save()
+
+python manage.py shell
+from django.contrib.auth.models import User
+from usuario.models import Usuario
+user = User.objects.create_user(username='aluno_1', password='aluno_1')
+new_user = Usuario(user=user, tipo_usuario=1, situacao=1)
+new_user.save()
