@@ -25,7 +25,7 @@
                             {% include 'headerInstrutor.html' %}
                         {% endif %}
                         <li><a href="/usuario/perfil">Perfil</a></li>
-                        <li><a href="/usuario/estatisticas">Estatísticas</a></li>
+                        <li><a id="estatistica" href="/usuario/estatisticas">Estatísticas</a></li>
                     </ul>
                 </div>
                 <div class="navbar-custom-menu pull-right">
@@ -43,10 +43,12 @@
 
 <script>
     $(document).ready(function(){ 
-        var teste = "{{ cadastro }}"
-        if (teste == "completo")
-            $("a[id='fale-conosco']").attr("href", "/fale-conosco");
+        var teste = "{{ cadastro }}";
+        if (teste == "completo") {
+            $("a[id='estatistica']").attr("href", "/fale-conosco");
+            $("a[id='recomendacoes']").attr("href", "/aluno/buscar-recomendacoes");
+        }
         else
-            $("a[id='fale-conosco']").removeAttr("href");   
+            $("a[id='estatistica'], a[id='recomendacoes']").removeAttr("href");
     });
 </script>
