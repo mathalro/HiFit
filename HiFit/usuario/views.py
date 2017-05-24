@@ -368,3 +368,22 @@ def fale_conosco(request):
     usuario_logado = Usuario.objects.get(user=usuario)
     aluno = usuario_logado.isAluno()
     return render(request, 'fale_conosco.html', {'form': form, 'aluno': aluno})
+
+@login_required(login_url="/usuario/login/")
+def amigos(request):
+	current_user = Usuario.objects.get(user=request.user)
+	amigos = current_user.seguindo.all()
+	return render(request, 'amigos.html', { 'amigos': amigos })
+
+@login_required(login_url="/usuario/login/")
+def seguir(request, uid):	
+	current_user = Usuario.objects.get(user=request.user)	
+	user = Usuario.objects.get(user=uid)
+	current_user.seguindo.add(user)
+	return redirect('/usuario/amigos')
+
+@login_required(login_url="/usuario/login/")
+def deixar_de_seguir(request, uid):	
+	current_user = Usuario.objects.get(user=request.user)
+	current_user.seguindo.remove(uid)
+	return redirect('/usuario/amigos')

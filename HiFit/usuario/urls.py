@@ -27,4 +27,7 @@ urlpatterns = [
     url(r'^valida-token-senha/$', valida_token_senha),
     url(r'^recuperar/', recuperar),
     url(r'^alterar-senha/', alterar_senha),
+    url(r'^amigos/', amigos),
+    url(r'^follow/(?P<uid>\w+)/', seguir),
+    url(r'^unfollow/(?P<uid>\w+)/', deixar_de_seguir),
 ]
