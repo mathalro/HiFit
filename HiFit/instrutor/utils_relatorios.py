@@ -21,8 +21,12 @@ def validaDatas(dt_inicial, dt_final):
     dt_inicial_obj = datetime.today().date()
     dt_final_obj = datetime.today().date()
     try:
-        dt_inicial_obj = datetime.strptime(dt_inicial, '%d%m%Y').date()
-        dt_final_obj = datetime.strptime(dt_final, '%d%m%Y').date()
+        print(dt_inicial)
+        print(dt_final)
+        dt_inicial_obj = datetime.strptime(dt_inicial, '%Y-%m-%d').date()
+        print("passei1")
+        dt_final_obj = datetime.strptime(dt_final, '%Y-%m-%d').date()
+        print("passei2")
         if dt_inicial_obj >= dt_final_obj:
             mensagens.append(msg_relatorios_dt_inicial_maior)
         if dt_final_obj > datetime.today().date():
