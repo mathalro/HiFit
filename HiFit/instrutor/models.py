@@ -14,7 +14,6 @@ class Profissao(models.Model):
 class Regra(models.Model):
     dono = models.ForeignKey('usuario.Usuario', on_delete=models.CASCADE, related_name="minhas_regras")
     solicitante = models.ForeignKey('usuario.Usuario', on_delete=models.CASCADE, null=True, blank=True, related_name="regras_solicitadas")
-    pontuacao = models.IntegerField()
     restricao = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="restricao", null=True, blank=True)
     beneficio = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="beneficio", null=True, blank=True)
     maleficio = models.ForeignKey('aluno.Caracteristica', on_delete=models.CASCADE, related_name="maleficio", null=True, blank=True)

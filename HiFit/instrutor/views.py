@@ -110,7 +110,6 @@ def regras(request):
             restricao = request.POST['sel_cad_restricao']
             beneficio = request.POST['sel_cad_beneficio']
             maleficio = request.POST['sel_cad_maleficio']
-            pontuacao = request.POST['in_cad_pontuacao']
 
             # Pega os objetos referentes a cada campo
             atividade = Atividade.objects.get_or_create(nome=atividade)[0]
@@ -138,7 +137,6 @@ def regras(request):
                                   restricao=restricao,
                                   beneficio=beneficio,
                                   maleficio=maleficio,
-                                  pontuacao=pontuacao,
                                   dono=Usuario.objects.get(user=usuario_logado.user))
                 # Salva o obj no banco de dados
                 regra_obj.save()
@@ -151,9 +149,8 @@ def regras(request):
             restricao = request.POST['sel_edit_restricao']
             beneficio = request.POST['sel_edit_beneficio']
             maleficio = request.POST['sel_edit_maleficio']
-            pontuacao = request.POST['in_edit_pontuacao']
             regra_id  = request.POST['in_edit_id']
-
+            print(regra_id)
             # Pega os objetos referentes a cada campo
             atividade = Atividade.objects.get_or_create(nome=atividade)[0]
             if (restricao == ""):
@@ -184,8 +181,7 @@ def regras(request):
                     regra_anterior.restricao=restricao
                     regra_anterior.beneficio=beneficio
                     regra_anterior.maleficio=maleficio
-                    regra_anterior.pontuacao=pontuacao
-                    regra_anterior.save(update_fields=['atividade', 'restricao', 'beneficio', 'maleficio', 'pontuacao'])
+                    regra_anterior.save(update_fields=['atividade', 'restricao', 'beneficio', 'maleficio'])
                     messages.success(request, msg_regra_atualizada)
 
         # ---------- Excluir regra

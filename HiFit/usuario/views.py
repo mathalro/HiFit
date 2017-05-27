@@ -72,7 +72,8 @@ def perfil(request):
 def estatisticas(request):
 	estatisticasDados = EstatisticasForm()
 	usuario = Usuario.objects.get(user=request.user)
-	associados = {usuario}
+	user2 = User.objects.get(username="instrutor_1")
+	associados = {usuario, Usuario.objects.get(user=user2)}
 	aluno = usuario.isAluno()
 	if request.method == 'POST':
 		estatisticasDados = EstatisticasForm(request.POST)

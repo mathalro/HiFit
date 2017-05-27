@@ -1,6 +1,6 @@
 // Enum de campos da linha da tabela
 var NOME_CAMPOS = {
-    ATIVIDADE: 0, RESTRICAO: 1, BENEFICIO: 2, MALEFICIO: 3, PONTUACAO: 4, ID: 5, SOLICITANTE: 7
+    ATIVIDADE: 0, RESTRICAO: 1, BENEFICIO: 2, MALEFICIO: 3, ID: 4
 };
 
 
@@ -30,7 +30,7 @@ function  setModalEditar(element) {
     var n_linha = element.parentNode.parentNode.rowIndex;
     // Pega a linha da tabela
 	var linha = document.getElementById("table-edit-minhas").rows[n_linha].cells;
-    for (var i = 0; i <= 5; i++) {
+    for (var i = 0; i <= linhas.length - 2; i++) {
         if (linha[i].innerHTML == "None")
             campos[i] = "";
         else
@@ -41,7 +41,6 @@ function  setModalEditar(element) {
 	document.getElementById('sel_edit_restricao').value = campos[NOME_CAMPOS.RESTRICAO];
 	document.getElementById('sel_edit_beneficio').value = campos[NOME_CAMPOS.BENEFICIO];
 	document.getElementById('sel_edit_maleficio').value = campos[NOME_CAMPOS.MALEFICIO];
-	document.getElementById('in_edit_pontuacao').value = campos[NOME_CAMPOS.PONTUACAO];
 	document.getElementById('in_edit_id').value = campos[NOME_CAMPOS.ID];
 }
 
@@ -66,9 +65,7 @@ function aceitarRecomendacao(element) {
         success: function (data) {
             $("#"+ data.value).attr('class','btn btn-success');
             $("#"+ data.value).html("Recomendação aceita");
-            $(".btn:not(#buscar_minhas_recomendacoes").attr('disabled',true);
-            $(".btn:not(#"+data.value+", #buscar_minhas_recomendacoes)").html("Já existe recomendação aceita");
-            $(".btn:not(#"+data.value+", #buscar_minhas_recomendacoes)").attr('class','btn btn-danger');
+            $("#"+ data.value).attr('disabled',true);
         }
     });
 }
