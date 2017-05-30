@@ -13,7 +13,7 @@ class Atividade(models.Model):
         return self.nome
 
 class Classificacao(models.Model):
-    somanota = models.IntegerField()  # Field name made lowercase.
+    somanota = models.FloatField(blank=True,null=True)  # Field name made lowercase.
     somapessoas = models.IntegerField(blank=True,null=True)  # Field name made lowercase.
 
     def __str__(self):

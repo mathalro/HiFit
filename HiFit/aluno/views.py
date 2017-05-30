@@ -224,12 +224,10 @@ def geraRankingRecomendacoes(recomendacoes, numRecomendacoes):
         return lista_recomendacoes_aluno
 
 
-
-
 def removeRecomendacao(aluno,nomeAtividade):
     try:
         recomendacao = Recomendacao.objects.filter(aluno=aluno)
-        atividade = Atividade.objects.get(nome=nomeAtividade)
+        atividade = Atividade.objects.get(nome=nomeAtividade.replace('_space_sep_', ' '))
         for r in recomendacao:
             if r.atividade==atividade:
                 r.delete()
@@ -243,7 +241,7 @@ def salvarRecomendacao(request, aluno):
     instrutor_recomendacao = Usuario.objects.filter(user=User.objects.get(username=username_instrutor_recomendacao))[0]
 
     # ----------Criando a recomendacao
-    classificacao_recomendacao = Classificacao(somanota=10, somapessoas=10)
+    classificacao_recomendacao = Classificacao(somanota=0.0, somapessoas=0)
     classificacao_recomendacao.save()
     recomendacao = Recomendacao(data=datetime.datetime.now(),
                                 classificacao=classificacao_recomendacao,
@@ -298,6 +296,27 @@ def completarRegrasAtividades(recomendacoes, lista_regras):
     return recomendacoes
 
 
+def avaliarRecomendacao(request, aluno_logado):
+
+    recomendacao_avaliada = request.GET.get('recomendacao_avaliada').replace('_space_sep_', ' ')
+    nome_atividade_avaliada, username_instrutor_recomendacao = recomendacao_avaliada.split('__')
+
+    recomendacao = None
+
+    for r in buscarRecomendacoesAceitas(aluno_logado):
+        if r.atividade.nome == nome_atividade_avaliada:
+            recomendacao = r
+
+    valor_avaliacao = request.GET.get('valor_avaliacao')
+
+    # Salva o valor da avaliacao
+    try:
+        recomendacao.classificacao.somanota = valor_avaliacao
+        recomendacao.classificacao.save()
+    except:
+        print('Nao encontrou a recomendacao')
+
+
 def buscarRecomendacoesAceitas(aluno):
     recomendacoes = Recomendacao.objects.filter(aluno=aluno)
     return recomendacoes
@@ -313,8 +332,8 @@ def buscar_recomendacoes(request):
     # Pega a lista de regras
     lista_regras = Regra.objects.all()
     recomendacoes_aceitas = buscarRecomendacoesAceitas(aluno_logado)
+    lista_recomendacoes_aceitas = [ (r.atividade.nome, {'regras': r.regras.all()}, str(r.classificacao.somanota).replace(',', '.')) for r in recomendacoes_aceitas ]
 
-    lista_recomendacoes_aceitas = [ (r.atividade.nome, {'regras': r.regras.all()}) for r in recomendacoes_aceitas ]
     if 'buscar_recomendacoes' in request.POST:
         recomendacoes_compativeis = buscarRecomendacoesCompativeis(lista_regras, caracteristicas_aluno, recomendacoes_aceitas)
         recomendacoes_compativeis = calculoPontuacaoRecomendacoes(preferencias_aluno, recomendacoes_compativeis)
@@ -327,9 +346,11 @@ def buscar_recomendacoes(request):
     elif 'remover' in request.POST:
         removeRecomendacao(aluno_logado,request.POST['remover'])
         return redirect('/aluno/buscar-recomendacoes')
-    elif request.method == 'GET' and request.GET.get('click',0):
+    elif request.method == 'GET' and request.GET.get('funcao') == 'aceitarRecomendacao':
         data = salvarRecomendacao(request, aluno_logado)
         return JsonResponse(data)
+    elif request.method == 'GET' and request.GET.get('funcao') == 'avaliarRecomendacao':
+        avaliarRecomendacao(request, aluno_logado)
 
     return render(request, 'buscar_recomendacoes.html', {'aluno': aluno, 'cadastro_completo': aluno_logado.cadastro_completo, 'recomendacoes_aceitas': lista_recomendacoes_aceitas})
 
