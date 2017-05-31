@@ -9,7 +9,7 @@ from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
 from django.contrib.auth.decorators import login_required
-from usuario.models import Usuario
+from aluno.models import Recomendacao
 from .forms import *
 import uuid
 
@@ -376,8 +376,14 @@ def fale_conosco(request):
 @login_required(login_url="/usuario/login/")
 def amigos(request):
 	current_user = Usuario.objects.get(user=request.user)
-	amigos = current_user.seguindo.all()
-	return render(request, 'amigos.html', { 'amigos': amigos })
+	seguindo = current_user.seguindo.all()
+	seguindo_dict = {}
+	for s in seguindo:
+		seguindo_dict[s] = Recomendacao.objects.filter(aluno=s)
+
+	print(seguindo_dict)
+
+	return render(request, 'amigos.html', { 'recomendacoes': seguindo_dict })
 
 @login_required(login_url="/usuario/login/")
 def seguir(request, uid):	

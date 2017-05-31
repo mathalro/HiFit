@@ -62,7 +62,7 @@
 	            <div class="container">
 	                <h2>{% if perfil_aluno %}Aluno: {% else %}Instrutor: {% endif %}{{ usuario.user.username }}</h2>
 		            <ul class="list-inline details align-middle">
-	              		<li><a href="/usuario/seguir/{{ usuario.user.id }}" class="btn btn-primary align-middle">Seguir</a></li>
+	              		<li><a href="/usuario/follow/{{ usuario.user.id }}" class="btn btn-primary align-middle">Seguir</a></li>
 	              		<li><a href="#" class="btn btn-danger align-middle">Avaliar</a></li>
 	              		<li>{% if not perfil_aluno %}<a href="#" class="btn btn-success">Associar-se</a>{% endif %}</li>
 	            	</ul>
