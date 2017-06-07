@@ -415,7 +415,6 @@ def associar(request, uid):
 
 @login_required(login_url="/usuario/login/")
 def deixar_de_associar(request, uid):	
-	current_user = Usuario.objects.get(user=request.user)
-	print(uid)
+	current_user = Usuario.objects.get(user=request.user)	
 	current_user.associado.remove(uid)
 	return redirect('/usuario/amigos')
