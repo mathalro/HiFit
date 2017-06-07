@@ -28,6 +28,10 @@ urlpatterns = [
     url(r'^recuperar/', recuperar),
     url(r'^alterar-senha/', alterar_senha),
     url(r'^amigos/', amigos),
-    url(r'^follow/(?P<uid>\w+)/', seguir),
-    url(r'^unfollow/(?P<uid>\w+)/', deixar_de_seguir),
+
+    url(r'^seguir/(?P<uid>\w+)/', seguir),
+    url(r'^dseguir/(?P<uid>\w+)/', deixar_de_seguir),
+
+    url(r'^associar/(?P<uid>\w+)/', associar),
+    url(r'^dassociar/(?P<uid>\w+)/', deixar_de_associar),
 ]

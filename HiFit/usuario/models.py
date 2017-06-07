@@ -37,7 +37,8 @@ class Usuario(models.Model):
     descricao = models.TextField(null=True)
     auth_id = models.CharField(max_length=32, null=True)
     situacao = models.IntegerField(null=True)    
-    seguindo = models.ManyToManyField('Usuario', related_name='seguidores', blank=True)    
+    seguindo = models.ManyToManyField('Usuario', related_name='seguidores', blank=True)
+    associado = models.ManyToManyField('Usuario', related_name='associados', blank=True)
     cadastro_completo = models.IntegerField(default=1)
 
     def isAluno(self):

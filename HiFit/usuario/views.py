@@ -42,10 +42,18 @@ def perfil(request):
 				usuario_perfil = Usuario.objects.get(user=user)
 				aluno = usuario.isAluno()
 				perfil_aluno = usuario_perfil.isAluno()
-
+				
 				#Atribuir o valor de seguindo comparando se está ou não na lista de seguidos.
-				seguindo = 1
+				if usuario.seguindo.filter(user=usuario_perfil.user):					
+					seguindo = True
+				else:
+					seguindo = False
 
+				if usuario.associado.filter(user=usuario_perfil.user):
+					associado = True
+				else:
+					associado = False
+								
 				# pega posts do usuario dono do perfil com base na privacidade
 				if usuario_perfil == usuario or seguindo:
 					posts = Post.objects.filter(usuario=usuario_perfil).order_by('-id')
@@ -60,7 +68,7 @@ def perfil(request):
 				except:
 					posts_pagina = paginator.page(1)
 
-				return render(request, 'perfil.html', {'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_pagina, 'perfil_aluno': perfil_aluno})
+				return render(request, 'perfil.html', { 'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_pagina, 'perfil_aluno': perfil_aluno, 'seguiu': seguindo, 'associou': associado })
 			except:
 				messages.warning(request, "Usuário não encontrado. ")
 				return redirect('/')
@@ -377,23 +385,37 @@ def fale_conosco(request):
 def amigos(request):
 	current_user = Usuario.objects.get(user=request.user)
 	seguindo = current_user.seguindo.all()
-	seguindo_dict = {}
-	for s in seguindo:
-		seguindo_dict[s] = Recomendacao.objects.filter(aluno=s)
+	associado = current_user.associado.all()
 
-	print(seguindo_dict)
-
-	return render(request, 'amigos.html', { 'recomendacoes': seguindo_dict })
+	return render(request, 'amigos.html', { 'seguindo': seguindo, 'associado': associado })
 
 @login_required(login_url="/usuario/login/")
 def seguir(request, uid):	
 	current_user = Usuario.objects.get(user=request.user)	
-	user = Usuario.objects.get(user=uid)
+	user = Usuario.objects.get(user=uid)	
 	current_user.seguindo.add(user)
 	return redirect('/usuario/amigos')
 
 @login_required(login_url="/usuario/login/")
 def deixar_de_seguir(request, uid):	
+	current_user = Usuario.objects.get(user=request.user)	
+	for user in current_user.seguindo.all():
+		if str(user.id) == str(uid):			
+			current_user.seguindo.remove(uid)
+			break
+	
+	return redirect('/usuario/amigos')
+
+@login_required(login_url="/usuario/login/")
+def associar(request, uid):
 	current_user = Usuario.objects.get(user=request.user)
-	current_user.seguindo.remove(uid)
+	user = Usuario.objects.get(user=uid)
+	current_user.associado.add(user)
+	return redirect('/usuario/amigos')
+
+@login_required(login_url="/usuario/login/")
+def deixar_de_associar(request, uid):	
+	current_user = Usuario.objects.get(user=request.user)
+	print(uid)
+	current_user.associado.remove(uid)
 	return redirect('/usuario/amigos')
