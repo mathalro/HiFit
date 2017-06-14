@@ -20,4 +20,5 @@ urlpatterns = [
     url(r'^gerenciar/', gerenciamento_aluno),
     url(r'^historico_recomendacoes/',historico_recomendacoes),
     url(r'^buscar-recomendacoes/', buscar_recomendacoes),
+    url(r'^chat/', chat),
 ]

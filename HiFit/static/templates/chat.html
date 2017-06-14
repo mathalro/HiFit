@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% load separator to_string %}
+
+{% block title %}Configurações{% endblock %}
+
+{% block content %}
+<section class="content-header">
+    <h1>Chat</h1>
+</section>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel-group" role="tablist">
+            <div class="panel panel-default">
+                <div class="panel-heading clearfix">
+                    <h4 class="panel-title pull-left">Seus amigos</h4>
+                </div>
+                <div class="panel-body" style="height: 380px; overflow-y: scroll;">
+                    {% for amigo in amigos %}
+                        <div class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="col-xs-6">
+                                            <img src="http://propose-sprl.be/img/placeholder/blogpost-placeholder-60x60.png"></img>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <a href="#">{{ amigo.nome }}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="panel-group" role="tablist">
+            <div class="panel panel-default">
+                <div class="panel-heading clearfix">
+                    <h4 class="panel-title pull-left">Seus amigos</h4>
+                </div>
+                <div class="panel-body" style="height: 330px; overflow-y: scroll;">
+                    afd
+                </div>
+                <div class="panel-footer xxx">
+                    <input type="text" size="78">
+                    <button class="btn btn-primary icon-save">Enviar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock content %}
