@@ -18,7 +18,7 @@
 
 		.post-container .post-dados {
 			padding-bottom: 10px;
-			padding-right: 10px;
+			padding-right: 25px;
 		}
 
 		.post-container p, h4, a {
@@ -78,6 +78,16 @@
     </div>
 
 	<hr class="hr-black">
+	{% if dono %}
+	<div class="container">
+		<form method="POST" action="/usuario/perfil/">{% csrf_token %}
+	        {{postForm}}
+			<br>
+			<input class="btn btn-primary" type="submit" value="Submeter" />
+		</form>
+		<br>
+	</div>
+	{% endif %}
 	{% for p in posts %}
 		<div class="post-container">
 			<div class="post-content">
@@ -88,7 +98,7 @@
 				</div>
 				<p>{{ p.conteudo }}</p>
 				<div class="row">
-					<div class="col-md-12 col-md-offset-11 post-dados">
+					<div class="text-right post-dados">
 						<a href="#">
 							<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
 						</a>
@@ -96,6 +106,9 @@
 							<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 						{% else %}
 							<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+						{% endif %}
+						{% if dono %}
+							<a href="#" class="glyphicon glyphicon-trash" type= id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao" class="btn btn-danger" type="submit" onclick="setModalExcluirCaracteristica('{{ p.id }}')"></a>
 						{% endif %}
 					</div>
 				</div>
@@ -119,5 +132,34 @@
 	        {% endif %}
 	    </span>
 	</div>
+
+	<div id="modal-confirma-exclusao" class="modal fade" role="dialog">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	            <form action="/usuario/perfil/" method="POST">{% csrf_token %}
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	                    <h4 class="modal-title">Confirmação de exclusão de postagem</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <p>Deseja realmente excluir a sua postagem?</p>
+	                </div>
+	                <div class="modal-footer">
+	                    <div class="pull-left">
+                    		<button type="submit" name="excluir" id="excluir" class="btn btn-success" value="">Confirmar</button>
+	                    </div>
+	                    <div class="pull-right">
+	                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+	                    </div>
+	                </div>
+	            </form>
+	        </div>
+	    </div>
+	</div>  
+
+{% endblock %}
+
+{% block js %}
+	<script src='/static/js/regras.js'></script>
 {% endblock %}
 

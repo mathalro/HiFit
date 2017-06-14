@@ -9,6 +9,7 @@
 		</div>
 		<form method="post" action="/usuario/login/">
 			{% csrf_token %}
+			<input type="text" name="proximo" value="{{ proximo }}" hidden>
 			<label></label>
 			<input type="text" name="username" class="form-control" placeholder="Nome de usuário">
 			<label></label>

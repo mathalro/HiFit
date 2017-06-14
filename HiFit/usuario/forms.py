@@ -8,6 +8,11 @@ TIPO_CHOICES = (
     ('Feedback', 'Feedback do sistema')
 )
 
+TIPO_POST = (
+    (0, 'Publico'),
+    (1, 'Privado'),
+)
+
 DATE_INPUT_FORMATS = ('%d-%m-%Y')
 
 TIPO_USUARIO = (
@@ -16,6 +21,11 @@ TIPO_USUARIO = (
 )
 
 today = datetime.datetime.strptime(str(datetime.date.today()), '%Y-%m-%d').strftime('%d/%m/%Y')
+
+class PostagemForm(forms.Form):
+    post = forms.CharField(widget=forms.Textarea(attrs={'class' : 'form-control', 'style': 'width: 98.5%', 'placeholder': "Escreva uma postagem...", 'rows': 3}))    
+    tipo = forms.ChoiceField(required=True, choices=TIPO_POST, widget=forms.Select(attrs={'class' : 'form-control', 'style': 'width: 90px'}))
+
 
 class FaleConoscoForm(forms.Form):
     tipo = forms.ChoiceField(required=True, choices = TIPO_CHOICES)

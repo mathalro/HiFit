@@ -33,7 +33,29 @@ def handle_error(request):
 
 @login_required(login_url="/usuario/login/")
 def perfil(request):
+	postForm = PostagemForm()
 	usuario = Usuario.objects.get(user=request.user)
+
+	if request.method == 'POST':
+		if 'excluir' in request.POST:
+			post = Post.objects.get(id=request.POST['excluir'])
+			post.delete()
+			return redirect('/usuario/perfil')
+
+		postForm = PostagemForm(request.POST)
+		if postForm.is_valid():
+			classificacao = Classificacao(somanota=0, somapessoas=0)
+			classificacao.save()
+			new_post = Post(conteudo=postForm.cleaned_data.get('post'), usuario=usuario, classificacao=classificacao, privacidade=postForm.cleaned_data.get('tipo'))
+			new_post.save()
+			messages.warning(request, "Post Criado")
+		else:
+			messages.warning(request, "Erro no post")
+
+		return redirect('/usuario/perfil/')
+
+
+	dono = False
 	if request.method == 'GET':
 		try:
 			perfil_dono = request.GET['usuario']
@@ -47,7 +69,9 @@ def perfil(request):
 				seguindo = 1
 
 				# pega posts do usuario dono do perfil com base na privacidade
-				if usuario_perfil == usuario or seguindo:
+				if usuario_perfil == usuario:
+					dono = True
+				if seguindo or dono:
 					posts = Post.objects.filter(usuario=usuario_perfil).order_by('-id')
 				elif	 (not seguindo):
 					posts = Post.objects.filter(usuario=usuario_perfil).filter(privacidade=0).order_by('-id')	
@@ -60,7 +84,7 @@ def perfil(request):
 				except:
 					posts_pagina = paginator.page(1)
 
-				return render(request, 'perfil.html', {'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_pagina, 'perfil_aluno': perfil_aluno})
+				return render(request, 'perfil.html', {'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_pagina, 'perfil_aluno': perfil_aluno, 'postForm': postForm, 'dono': dono})
 			except:
 				messages.warning(request, "Usuário não encontrado. ")
 				return redirect('/')
@@ -81,7 +105,7 @@ def estatisticas(request):
 			inicial = estatisticasDados.cleaned_data.get('inicial')
 			final = estatisticasDados.cleaned_data.get('final')
 			if inicial <= final:
-				#atividades recomendadas
+					#atividades recomendadas
 				recomendadas = {'Basquete', 'Vôlei', 'Natação', 'Futebol'}
 				#atividades aceitas no periodo
 				aceitas = {'Natação', 'Corrida'}
@@ -115,8 +139,13 @@ def estatisticas(request):
 
 
 def login(request):
+	try:
+		proximo = request.GET['next']
+	except:
+		proximo = "/"
+
 	if request.user.is_authenticated:
-		return redirect("/")
+		return redirect(proximo)
 	
 	if request.method == 'POST':
 		username = request.POST['username']
@@ -130,12 +159,12 @@ def login(request):
 				return redirect("/usuario/login")
 			else:
 				auth_login(request, user)
-				return redirect("/")
+				return redirect(request.POST['proximo'])
 		else:
 			messages.warning(request, "Usuário e/ou senha incorretos. ")
 			return redirect('/usuario/login')
 
-	return render(request, 'login.html',{})
+	return render(request, 'login.html',{'proximo': proximo})
 
 
 def confirmar(request):
