@@ -48,7 +48,6 @@ def perfil(request):
 			classificacao.save()
 			new_post = Post(conteudo=postForm.cleaned_data.get('post'), usuario=usuario, classificacao=classificacao, privacidade=postForm.cleaned_data.get('tipo'))
 			new_post.save()
-			messages.warning(request, "Post Criado")
 		else:
 			messages.warning(request, "Erro no post")
 
