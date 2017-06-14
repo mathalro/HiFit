@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Linha do Tempo{% endblock %}
+
+{% block titulo %}Bem vindo {{nome_usuario}}{% endblock %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-lg-4 col-md-4"> 
+			<h4>Tópicos em alta</h4>
+			<div class="panel panel-primary">
+				teste
+			</div>
+		</div>
+		<div class="col-lg-8 col-md-8" style="padding-left:20px; border-left: 1px solid #ccc;">
+			<h4>Linha do tempo</h4>
+			{% for post in linha_tempo%}
+				<div class="panel panel-primary">
+					<h5><strong>{{post.usuario}}</strong></h5>
+					{{post.conteudo}}	
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+{% endblock %}

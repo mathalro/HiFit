@@ -9,7 +9,7 @@ from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
 from django.contrib.auth.decorators import login_required
-from usuario.models import Usuario
+from usuario.models import Usuario, Post
 from .forms import *
 import uuid
 
@@ -20,10 +20,14 @@ import re
 def home(request):
 	if request.user.is_authenticated:
 		usuario = Usuario.objects.get(user=request.user)
+		linha_tempo = Post.objects.filter(usuario=usuario).order_by('-id')
+		topicos_alta = Post.objects.filter(usuario=usuario).order_by('-id')
 		context = {
-			'aluno' : usuario.isAluno()
+			'aluno' 	   : usuario.isAluno(),
+			'nome_usuario' : usuario.user.username,
+			'linha_tempo'  : linha_tempo,
 		}
-		return render(request, 'base.html',context)
+		return render(request, 'visualizar_postagens.html',context)
 	return render(request, 'base.html')
 
 def handle_error(request):
