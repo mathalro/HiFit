@@ -38,6 +38,7 @@ class tipoCaracteristica(IntEnum):
     PESO = 2
     DOENCA = 3
     DIFICULDADE_MOTORA = 4
+    IDADE = 5
     MALEFICIO = 6
     NAO_HA = 10
 

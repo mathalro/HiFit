@@ -273,6 +273,7 @@ def existeRegra(dono, atividade, restricao, beneficio, maleficio):
 @login_required
 def relatorios(request):
     instrutor_logado = Usuario.objects.get(user=request.user)
+    context = {}
     if request.method == 'POST':
         dt_inicial = request.POST['dt-inicial-relatorios']
         dt_final = request.POST['dt-final-relatorios']

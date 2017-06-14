@@ -18,7 +18,7 @@ class gerenciamentoAlunoForm(forms.Form):
 
 class filtroPorDataRecomendacoes(forms.Form):
 	data_corte = forms.DateField(label="Período antes de:",
-								 widget=forms.DateInput(attrs={'class':'form-control datepicker','style' : 'width:100px;'}))
+								 widget=forms.DateInput(attrs={'class':'form-control','type' : 'date','style' : 'width:150px;'}))
 
 	def clean_data_corte(self):
 		data_corte = self.cleaned_data.get("data_corte")

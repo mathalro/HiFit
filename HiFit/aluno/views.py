@@ -385,14 +385,14 @@ def historico_recomendacoes(request):
                     #armazena as recomendacoes feitas aquele aluno
                     for recomendacao in Recomendacao.objects.filter(aluno=aluno):
                         recomendacoes.append(recomendacao)
-            recomendacoes = sorted(recomendacoes, key=getKeyInstrutor)
             recomendacoes = sorted(recomendacoes, key=getKeyData, reverse=True)
+            recomendacoes = sorted(recomendacoes, key=getKeyInstrutor, reverse=True)
         else:
             #requisição para filtrar por data, ainda mantém a ordenação pela classificação do instrutor.
             filtro_data = filtroPorDataRecomendacoes(request.POST)
             if filtro_data.is_valid():
                 data_corte = filtro_data.cleaned_data.get("data_corte")
-                recomendacoes = Recomendacao.objects.filter(data__lte=data_corte).order_by('-instrutor__classificacao__somapessoas','-data',)
+                recomendacoes = Recomendacao.objects.filter(data__lte=data_corte).order_by('-data','-instrutor__classificacao__somapessoas',)
             else:
                 messages.warning(request,"Data inválida: data informada é futura, informe novamente.")
     else:   
