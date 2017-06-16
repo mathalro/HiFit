@@ -412,12 +412,3 @@ def getKeyData(recomendacao):
     return recomendacao.data
 def getKeyInstrutor(recomendacao):
     return recomendacao.instrutor.classificacao.somapessoas
-
-
-@login_required(login_url="/usuario/login/")
-def chat(request):
-
-    current_user = Usuario.objects.get(user=request.user)
-    amigos = current_user.seguindo.all()
-
-    return render(request, 'chat.html', {'current_user': current_user, 'amigos': amigos})

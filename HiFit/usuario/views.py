@@ -4,14 +4,16 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Usuario, Classificacao, Post
-from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO
+from .models import Usuario, Classificacao, Post, Mensagem
+from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO, MES_STRING
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
 from django.contrib.auth.decorators import login_required
 from aluno.models import Recomendacao
 from .forms import *
 import uuid
+from django.db.models import Q
+from django.http import JsonResponse
 
 MIN_SIZE_PASS = 5
 
@@ -435,3 +437,41 @@ def deixar_de_associar(request, uid):
     current_user = Usuario.objects.get(user=request.user)
     current_user.associado.remove(uid)
     return redirect('/usuario/amigos')
+
+
+def prioridadeConversa(amigos, uid):
+
+    amigo_selecionado = None
+    for index, a in enumerate(amigos):
+        if a.nome == uid:
+            amigo_selecionado = amigos.pop(index)
+            amigos.insert(0, amigo_selecionado)
+            break
+    return amigo_selecionado, amigos
+
+
+@login_required(login_url="/usuario/login/")
+def chat(request, uid=None):
+
+    current_user = Usuario.objects.get(user=request.user)
+    amigos = [ u for u in current_user.seguindo.all() ] + [ a for a in current_user.associado.all() ]
+    mensagens = None
+    amigo_selecionado = None
+
+    if uid:
+        amigo_selecionado, amigos = prioridadeConversa(amigos, uid)
+        mensagens = Mensagem.objects.all().filter(Q(remetente=current_user.id, destinatario=amigo_selecionado.id) | Q(remetente=amigo_selecionado.id, destinatario=current_user.id)).order_by('data').all()
+
+    if 'acao' in request.GET:
+        if request.GET['acao']:
+            mensagem = Mensagem(conteudo=request.GET['conteudo'], data=datetime.datetime.now(), remetente=current_user, destinatario=amigo_selecionado)
+            mensagem.save()
+            data = {'conteudo': request.GET['conteudo'], 'data': mensagem.data.strftime('%d de '+MES_STRING[str(mensagem.data.month)]+' de %Y às %H:%M')}
+            return JsonResponse(data)
+
+    context = {'current_user': current_user,
+              'amigo_selecionado': amigo_selecionado,
+              'amigos': amigos,
+              'mensagens': mensagens}
+
+    return render(request, 'chat.html', context)

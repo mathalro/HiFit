@@ -4,6 +4,7 @@ from utils.tipos import TIPO, TIPOS_IDENTIFICACAO
 # from aluno.models import *
 
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Atividade(models.Model):
@@ -80,7 +81,7 @@ class Denuncia(models.Model):
 
 class Mensagem(models.Model):
     conteudo = models.TextField(max_length=140)
-    data = models.DateField(auto_now_add=True)
+    data = models.DateTimeField()
     remetente = models.ForeignKey(Usuario, related_name='remetente')  # Field name made lowercase.
     destinatario = models.ForeignKey(Usuario, related_name='destinatario')  # Field name made lowercase.    
 

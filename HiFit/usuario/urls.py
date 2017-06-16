@@ -34,4 +34,7 @@ urlpatterns = [
 
     url(r'^associar/(?P<uid>\w+)/', associar),
     url(r'^dassociar/(?P<uid>\w+)/', deixar_de_associar),
+
+    url(r'^chat/$', chat),
+    url(r'^chat/(?P<uid>\w+)/$', chat),
 ]
