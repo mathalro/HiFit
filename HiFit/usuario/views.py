@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Usuario, Classificacao, Post, Mensagem
+from .models import Usuario, Classificacao, Post, Mensagem, MensagensExcluidas
 from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO, MES_STRING
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
@@ -410,6 +410,9 @@ def seguir(request, uid):
     current_user = Usuario.objects.get(user=request.user)
     user = Usuario.objects.get(user=uid)
     current_user.seguindo.add(user)
+    if not MensagensExcluidas.objects.filter(remetente=current_user, destinatario=user).exists():
+        registro = MensagensExcluidas(remetente=current_user, destinatario=user)
+        registro.save()
     return redirect('/usuario/amigos')
 
 
@@ -429,6 +432,9 @@ def associar(request, uid):
     current_user = Usuario.objects.get(user=request.user)
     user = Usuario.objects.get(user=uid)
     current_user.associado.add(user)
+    if not MensagensExcluidas.objects.filter(remetente=current_user, destinatario=user).exists():
+        registro = MensagensExcluidas(remetente=current_user, destinatario=user)
+        registro.save()
     return redirect('/usuario/amigos')
 
 
@@ -460,14 +466,36 @@ def chat(request, uid=None):
 
     if uid:
         amigo_selecionado, amigos = prioridadeConversa(amigos, uid)
-        mensagens = Mensagem.objects.all().filter(Q(remetente=current_user.id, destinatario=amigo_selecionado.id) | Q(remetente=amigo_selecionado.id, destinatario=current_user.id)).order_by('data').all()
+
+        try:
+            msg_excluida = MensagensExcluidas.objects.get(remetente=current_user, destinatario=amigo_selecionado).ultima_msg_excluida
+        except:
+            registro = MensagensExcluidas(remetente=current_user, destinatario=amigo_selecionado)
+            registro.save()
+            msg_excluida = 0
+
+        mensagens = Mensagem.objects.all().filter(id__gt=msg_excluida).filter(Q(remetente=current_user.id, destinatario=amigo_selecionado.id) | Q(remetente=amigo_selecionado.id, destinatario=current_user.id)).order_by('data').all()
 
     if 'acao' in request.GET:
         if request.GET['acao']:
+            if mensagens:
+                primeira_mensagem = False
+            else:
+                primeira_mensagem = True
             mensagem = Mensagem(conteudo=request.GET['conteudo'], data=datetime.datetime.now(), remetente=current_user, destinatario=amigo_selecionado)
             mensagem.save()
-            data = {'conteudo': request.GET['conteudo'], 'data': mensagem.data.strftime('%d de '+MES_STRING[str(mensagem.data.month)]+' de %Y às %H:%M')}
+            data = {'conteudo': request.GET['conteudo'],
+                    'data': mensagem.data.strftime('%d de '+MES_STRING[str(mensagem.data.month)]+' de %Y às %H:%M'),
+                    'primeira_mensagem': primeira_mensagem}
             return JsonResponse(data)
+
+    if 'excluir' in request.POST:
+        ultima_mensagem = Mensagem.objects.all().filter(Q(remetente=current_user.id, destinatario=amigo_selecionado.id) | Q(remetente=amigo_selecionado.id, destinatario=current_user.id)).order_by('data').last()
+        registro = MensagensExcluidas.objects.get(remetente=current_user, destinatario=amigo_selecionado)
+        registro.ultima_msg_excluida = ultima_mensagem.id
+        registro.save()
+        messages.success(request, "Conversa excluída com sucesso.")
+        mensagens = None
 
     context = {'current_user': current_user,
               'amigo_selecionado': amigo_selecionado,

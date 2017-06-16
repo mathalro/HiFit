@@ -138,3 +138,7 @@ img {
 .panel-body-amigos {
     padding: 5px;
 }
+
+.panel-heading-height {
+    height: 40px;
+}
