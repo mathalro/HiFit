@@ -20,8 +20,6 @@ class Classificacao(models.Model):
         return str("Nota: " + str(self.somanota) + " Total: " + str(self.somapessoas))
 
 
-
-
 class Usuario(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tipo_usuario = models.IntegerField()  # Field name made lowercase.
@@ -59,10 +57,7 @@ class Post(models.Model):
 class Comentario(models.Model):
     conteudo = models.TextField(max_length=140)
     data = models.DateField(auto_now=False, auto_now_add=True)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)  # Field name made lowercase.
-
-    def __str__(self):
-        return str(self.data + ': ' +self.conteudo)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')  # Field name made lowercase.
 
 
 class Denuncia(models.Model):

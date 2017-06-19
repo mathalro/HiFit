@@ -25,8 +25,26 @@
 			padding: 10px 10px 10px 10px;
 		}
 
+		.comment-container {
+			padding: 5px 5px 5px 5px;
+		}
+
+		.comment-container p {
+			padding: 5px 5px 5px 5px;			
+			margin: 0;
+		}
+
+		.comment-container textarea {
+			padding: 5px 0px 0px 5px;			
+			margin: 0;
+		}
+
 		.hr-black {
 			border-color: black;
+		}
+
+		.hr-gray2 {
+			border-color: #aaa;
 		}
 
 		.hr-gray {
@@ -78,6 +96,7 @@
     </div>
 
 	<hr class="hr-black">
+
 	{% if dono %}
 	<div class="container">
 		<form method="POST" action="/usuario/perfil/">{% csrf_token %}
@@ -87,9 +106,12 @@
 		</form>
 		<br>
 	</div>
+	<hr class="hr-black">
 	{% endif %}
+
+
 	{% for p in posts %}
-		<div class="post-container">
+		<div class="post-container" id="post-conteudo">
 			<div class="post-content">
 				
 				<div class="row">
@@ -108,10 +130,25 @@
 							<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
 						{% endif %}
 						{% if dono %}
-							<a href="#" class="glyphicon glyphicon-trash" type= id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao" class="btn btn-danger" type="submit" onclick="setModalExcluirCaracteristica('{{ p.id }}')"></a>
+							<a href="#" class="glyphicon glyphicon-trash" id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao" class="btn btn-danger" type="submit" onclick="setModalExcluirCaracteristica('{{ p.id }}')"></a>
+							<a href="#" class="glyphicon glyphicon-pencil" id="botaoEdita" data-toggle="modal" data-target="#modal-edicao" class="btn btn-danger" type="submit" onclick="setModalEditaPost('{{ p.id }}', '{{ p.conteudo }}', '{{ p.privacidade }}')"></a>
 						{% endif %}
 					</div>
 				</div>
+			</div>
+			<hr class="hr-gray2 non-margin">
+			<div class="comment-container">
+				{% for c in p.comments.all %}
+					<p><b>Em {{ c.data }}</b>			
+					{% if dono %}
+						<a href="#" class="glyphicon glyphicon-trash pull-right" id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao-comentario" class="btn btn-danger" type="submit" onclick="setModalExcluirComentario('{{ c.id }}')"></a>
+					{% endif %}</p>
+					<p>{{ c.conteudo }}</p>
+				{% endfor %}
+				{% if p.comments.all %}
+					<hr class="hr-gray2">
+				{% endif %}
+				<textarea class="form-control form-comentario" type="textarea" id="{{p.id}}" onkeypress="onKeyDown(event.keyCode, {{p.id}});" rows="1" placeholder="Escreva um comentário..." style="resize: none;"></textarea>
 			</div>
 		</div>
 	{% endfor %}
@@ -149,7 +186,7 @@
                     		<button type="submit" name="excluir" id="excluir" class="btn btn-success" value="">Confirmar</button>
 	                    </div>
 	                    <div class="pull-right">
-	                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+	                        <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
 	                    </div>
 	                </div>
 	            </form>
@@ -157,9 +194,78 @@
 	    </div>
 	</div>  
 
+	<div id="modal-confirma-exclusao-comentario" class="modal fade" role="dialog">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	            <form action="/usuario/perfil/" method="POST">{% csrf_token %}
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+	                    <h4 class="modal-title">Confirmação de exclusão de comentário</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <p>Deseja realmente excluir o comentario?</p>
+	                </div>
+	                <div class="modal-footer">
+	                    <div class="pull-left">
+                    		<button type="submit" name="excluirComentario" id="excluirComentario" class="btn btn-success" value="">Confirmar</button>
+	                    </div>
+	                    <div class="pull-right">
+	                        <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+	                    </div>
+	                </div>
+	            </form>
+	        </div>
+	    </div>
+	</div> 
+
+	<!-- Modal edicao -->
+	<div id="modal-edicao" class="modal fade" role="dialog">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal">&times;</button>
+	                <h4 class="modal-title">Edição de Post</h4>
+	            </div>
+	            <div class="modal-body">
+	                <form action="/usuario/perfil/" method="POST" id="form-edit">
+	                    {% csrf_token %}
+	                    <label for="sel_edit_atividade">Conteudo</label>
+	                    <textarea id="edita-conteudo" name="conteudo" rows="3" class="form-control"></textarea>
+	                    <label for="id_tipo">Tipo:</label><select class="form-control" id="edita-privacidade" name="tipo" style="width: 90px" required>
+							<option value="0">Publico</option>
+							<option value="1">Privado</option>
+						</select>
+	                    <hr><button type="submit" name="atualiza-post" id="atualiza-post" class="btn btn-primary">Salvar</button>
+	                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+	                </form>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
 {% endblock %}
 
 {% block js %}
 	<script src='/static/js/regras.js'></script>
+
+	<script>
+		function onKeyDown(e, id) {
+			if (e == 13) {
+				$.ajax({
+					type: 'POST',
+					url: '/usuario/perfil/',
+					data: {
+						'csrfmiddlewaretoken': '{{ csrf_token }}',
+						'comentario': 'comentario',
+						'conteudo': $('#'+id).val(),
+						'id': id
+					}
+				});
+				$('#'+id).val('');
+				location.reload();
+    		}
+    	};
+	</script>
 {% endblock %}
+
 

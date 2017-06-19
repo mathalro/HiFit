@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Usuario, Classificacao, Post
+from .models import Usuario, Classificacao, Post, Comentario
 from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
@@ -37,9 +37,27 @@ def perfil(request):
 	usuario = Usuario.objects.get(user=request.user)
 
 	if request.method == 'POST':
+		
+		if 'comentario' in request.POST:
+			post = Post.objects.get(id=request.POST['id'])
+			comentario = Comentario(conteudo=request.POST['conteudo'], post=post)
+			comentario.save()
+
 		if 'excluir' in request.POST:
 			post = Post.objects.get(id=request.POST['excluir'])
 			post.delete()
+			return redirect('/usuario/perfil')
+
+		if 'excluirComentario' in request.POST:
+			comentario = Comentario.objects.get(id=request.POST['excluirComentario'])
+			comentario.delete()
+			return redirect('/usuario/perfil')
+
+		if 'atualiza-post' in request.POST:
+			post = Post.objects.get(id=request.POST['atualiza-post'])
+			post.conteudo = request.POST['conteudo']
+			post.privacidade = request.POST['tipo']
+			post.save()
 			return redirect('/usuario/perfil')
 
 		postForm = PostagemForm(request.POST)

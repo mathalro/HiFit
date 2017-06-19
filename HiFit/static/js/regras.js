@@ -52,3 +52,13 @@ function setModalExcluir(id) {
 function setModalExcluirCaracteristica(id) {
     document.getElementById("excluir").value = id;
 }
+
+function setModalExcluirComentario(id) {
+    document.getElementById("excluirComentario").value = id;
+}
+
+function setModalEditaPost(id, conteudo, privacidade) {
+    document.getElementById("edita-conteudo").value = conteudo;
+    document.getElementById("edita-privacidade").value = privacidade;
+    document.getElementById("atualiza-post").value = id;
+}
