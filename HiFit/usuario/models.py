@@ -57,6 +57,7 @@ class Post(models.Model):
 class Comentario(models.Model):
     conteudo = models.TextField(max_length=140)
     data = models.DateField(auto_now=False, auto_now_add=True)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='comments')  # Field name made lowercase.
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')  # Field name made lowercase.
 
 

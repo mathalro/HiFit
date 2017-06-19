@@ -18,7 +18,6 @@
 
 		.post-container .post-dados {
 			padding-bottom: 10px;
-			padding-right: 25px;
 		}
 
 		.post-container p, h4, a {
@@ -30,7 +29,12 @@
 		}
 
 		.comment-container p {
-			padding: 5px 5px 5px 5px;			
+			padding: 5px 0px 5px 5px;			
+			margin: 0;
+		}
+
+		.comment-container p a {
+			padding: 0px 0px 0px 0px;			
 			margin: 0;
 		}
 
@@ -53,6 +57,7 @@
 
 		.non-margin {
 			margin-top: 0;
+			margin-bottom: 0;	
 		} 
 
  	    .details li {
@@ -79,11 +84,13 @@
 	        <div class="col-md-9">
 	            <div class="container">
 	                <h2>{% if perfil_aluno %}Aluno: {% else %}Instrutor: {% endif %}{{ usuario.user.username }}</h2>
-		            <ul class="list-inline details align-middle">
-	              		<li><a href="#" class="btn btn-primary align-middle">Seguir</a></li>
-	              		<li><a href="#" class="btn btn-danger align-middle">Avaliar</a></li>
-	              		<li>{% if not perfil_aluno %}<a href="#" class="btn btn-success">Associar-se</a>{% endif %}</li>
-	            	</ul>
+		            {% if not dono %}
+			            <ul class="list-inline details align-middle">
+		              		<li><a href="#" class="btn btn-primary align-middle">Seguir</a></li>
+		              		<li><a href="#" class="btn btn-danger align-middle">Avaliar</a></li>
+		              		<li>{% if not perfil_aluno %}<a href="#" class="btn btn-success">Associar-se</a>{% endif %}</li>
+		            	</ul>
+		            {% endif %}
 	            </div>
 	            <hr class="non-margin">
 	            {% if not perfil_aluno %}
@@ -100,9 +107,11 @@
 	{% if dono %}
 	<div class="container">
 		<form method="POST" action="/usuario/perfil/">{% csrf_token %}
-	        {{postForm}}
-			<br>
-			<input class="btn btn-primary" type="submit" value="Submeter" />
+	        {{ postForm.post }}
+	        <div class="form-inline">
+	        	{{ postForm.tipo }} 
+	        	<input class="btn btn-primary" type="submit" value="Publicar" />
+			</div>
 		</form>
 		<br>
 	</div>
@@ -119,36 +128,38 @@
 					<div class="col-md-8"><p class="pull-right">{{ p.data }}</p></div>
 				</div>
 				<p>{{ p.conteudo }}</p>
-				<div class="row">
-					<div class="text-right post-dados">
-						<a href="#">
-							<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-						</a>
-						{% if p.privacidade != 0 %}
-							<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-						{% else %}
-							<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
-						{% endif %}
+					<div class="post-dados text-right">
 						{% if dono %}
-							<a href="#" class="glyphicon glyphicon-trash" id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao" class="btn btn-danger" type="submit" onclick="setModalExcluirCaracteristica('{{ p.id }}')"></a>
-							<a href="#" class="glyphicon glyphicon-pencil" id="botaoEdita" data-toggle="modal" data-target="#modal-edicao" class="btn btn-danger" type="submit" onclick="setModalEditaPost('{{ p.id }}', '{{ p.conteudo }}', '{{ p.privacidade }}')"></a>
+							<span><a href="#" class="glyphicon glyphicon-pencil" id="botaoEdita" data-toggle="modal" data-target="#modal-edicao" class="btn btn-danger" type="submit" onclick="setModalEditaPost('{{ p.id }}', '{{ p.conteudo }}', '{{ p.privacidade }}')"></a></span>
+							<span><a href="#" class="glyphicon glyphicon-trash text-danger" id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao" class="btn btn-danger" type="submit" onclick="setModalExcluirCaracteristica('{{ p.id }}')"></a></span>
 						{% endif %}
 					</div>
-				</div>
 			</div>
 			<hr class="hr-gray2 non-margin">
+			<a href="#">
+				<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+			</a>
+			{% if p.privacidade != 0 %}
+				<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+			{% else %}
+				<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+			{% endif %}	
+
 			<div class="comment-container">
-				{% for c in p.comments.all %}
-					<p><b>Em {{ c.data }}</b>			
+				{% if p.comments.all %}
+					<hr class="hr-gray2 non-margin">
+				{% endif %}
+				{% for c in p.comments.all reversed %}
+					<p style="font-size: 0.9em;"><a href="/usuario/perfil/?usuario={{ c.usuario.user.username }}">{{ c.usuario.nome }}</a> - {{ c.data }}			
 					{% if dono %}
-						<a href="#" class="glyphicon glyphicon-trash pull-right" id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao-comentario" class="btn btn-danger" type="submit" onclick="setModalExcluirComentario('{{ c.id }}')"></a>
+						<a href="#" class="glyphicon glyphicon-trash pull-right btn-xs" id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao-comentario" class="btn btn-danger" type="submit" onclick="setModalExcluirComentario('{{ c.id }}')"></a>
 					{% endif %}</p>
-					<p>{{ c.conteudo }}</p>
+					<p style="color: #111">{{ c.conteudo }}</p>
 				{% endfor %}
 				{% if p.comments.all %}
 					<hr class="hr-gray2">
 				{% endif %}
-				<textarea class="form-control form-comentario" type="textarea" id="{{p.id}}" onkeypress="onKeyDown(event.keyCode, {{p.id}});" rows="1" placeholder="Escreva um comentário..." style="resize: none;"></textarea>
+				<textarea class="form-control form-comentario" type="textarea" id="{{p.id}}" onkeypress="onKeyDown(event.keyCode, event.shiftKey, {{p.id}});" rows="1" placeholder="Escreva um comentário..." style="resize: none;"></textarea>
 			</div>
 		</div>
 	{% endfor %}
@@ -229,9 +240,8 @@
 	            <div class="modal-body">
 	                <form action="/usuario/perfil/" method="POST" id="form-edit">
 	                    {% csrf_token %}
-	                    <label for="sel_edit_atividade">Conteudo</label>
-	                    <textarea id="edita-conteudo" name="conteudo" rows="3" class="form-control"></textarea>
-	                    <label for="id_tipo">Tipo:</label><select class="form-control" id="edita-privacidade" name="tipo" style="width: 90px" required>
+	                    <textarea id="edita-conteudo" name="conteudo" rows="3" class="form-control" style="margin-bottom: 10px;"></textarea>
+	                    <select class="form-control" id="edita-privacidade" name="tipo" style="width: 90px" required>
 							<option value="0">Publico</option>
 							<option value="1">Privado</option>
 						</select>
@@ -249,7 +259,7 @@
 	<script src='/static/js/regras.js'></script>
 
 	<script>
-		function onKeyDown(e, id) {
+		function onKeyDown(e, s, id) {
 			if (e == 13) {
 				$.ajax({
 					type: 'POST',

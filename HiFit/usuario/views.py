@@ -40,7 +40,7 @@ def perfil(request):
 		
 		if 'comentario' in request.POST:
 			post = Post.objects.get(id=request.POST['id'])
-			comentario = Comentario(conteudo=request.POST['conteudo'], post=post)
+			comentario = Comentario(conteudo=request.POST['conteudo'], post=post, usuario=usuario)
 			comentario.save()
 
 		if 'excluir' in request.POST:
