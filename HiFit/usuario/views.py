@@ -9,7 +9,7 @@ from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
 from django.contrib.auth.decorators import login_required
-from usuario.models import Usuario
+from aluno.models import Recomendacao
 from .forms import *
 import uuid
 
@@ -64,10 +64,18 @@ def perfil(request):
 				usuario_perfil = Usuario.objects.get(user=user)
 				aluno = usuario.isAluno()
 				perfil_aluno = usuario_perfil.isAluno()
-
+				
 				#Atribuir o valor de seguindo comparando se está ou não na lista de seguidos.
-				seguindo = 1
+				if usuario.seguindo.filter(user=usuario_perfil.user):					
+					seguindo = True
+				else:
+					seguindo = False
 
+				if usuario.associado.filter(user=usuario_perfil.user):
+					associado = True
+				else:
+					associado = False
+								
 				# pega posts do usuario dono do perfil com base na privacidade
 				if usuario_perfil == usuario:
 					dono = True
@@ -84,7 +92,7 @@ def perfil(request):
 				except:
 					posts_pagina = paginator.page(1)
 
-				return render(request, 'perfil.html', {'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_pagina, 'perfil_aluno': perfil_aluno, 'postForm': postForm, 'dono': dono})
+				return render(request, 'perfil.html', {'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_pagina, 'perfil_aluno': perfil_aluno, 'seguiu': seguindo, 'associou': associado , 'postForm': postForm, 'dono': dono})
 			except:
 				messages.warning(request, "Usuário não encontrado. ")
 				return redirect('/')
@@ -96,7 +104,8 @@ def perfil(request):
 def estatisticas(request):
 	estatisticasDados = EstatisticasForm()
 	usuario = Usuario.objects.get(user=request.user)
-	associados = {usuario}
+	user2 = User.objects.get(username="instrutor_1")
+	associados = {usuario, Usuario.objects.get(user=user2)}
 	aluno = usuario.isAluno()
 	if request.method == 'POST':
 		estatisticasDados = EstatisticasForm(request.POST)
@@ -401,3 +410,41 @@ def fale_conosco(request):
     usuario_logado = Usuario.objects.get(user=usuario)
     aluno = usuario_logado.isAluno()
     return render(request, 'fale_conosco.html', {'form': form, 'aluno': aluno})
+
+@login_required(login_url="/usuario/login/")
+def amigos(request):
+	current_user = Usuario.objects.get(user=request.user)
+	seguindo = current_user.seguindo.all()
+	associado = current_user.associado.all()
+
+	return render(request, 'amigos.html', { 'seguindo': seguindo, 'associado': associado })
+
+@login_required(login_url="/usuario/login/")
+def seguir(request, uid):	
+	current_user = Usuario.objects.get(user=request.user)	
+	user = Usuario.objects.get(user=uid)	
+	current_user.seguindo.add(user)
+	return redirect('/usuario/amigos')
+
+@login_required(login_url="/usuario/login/")
+def deixar_de_seguir(request, uid):	
+	current_user = Usuario.objects.get(user=request.user)	
+	for user in current_user.seguindo.all():
+		if str(user.id) == str(uid):			
+			current_user.seguindo.remove(uid)
+			break
+	
+	return redirect('/usuario/amigos')
+
+@login_required(login_url="/usuario/login/")
+def associar(request, uid):
+	current_user = Usuario.objects.get(user=request.user)
+	user = Usuario.objects.get(user=uid)
+	current_user.associado.add(user)
+	return redirect('/usuario/amigos')
+
+@login_required(login_url="/usuario/login/")
+def deixar_de_associar(request, uid):	
+	current_user = Usuario.objects.get(user=request.user)	
+	current_user.associado.remove(uid)
+	return redirect('/usuario/amigos')
