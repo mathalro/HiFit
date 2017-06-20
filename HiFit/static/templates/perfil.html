@@ -124,7 +124,7 @@
 			<div class="post-content">
 				
 				<div class="row">
-					<div class="col-md-4 nopadding"><p><b>{{ usuario }}</b></p></li></div>
+					<div class="col-md-4 nopadding"><p><b>{{ p.usuario.nome }}</b></p></li></div>
 					<div class="col-md-8"><p class="pull-right">{{ p.data }}</p></div>
 				</div>
 				<p>{{ p.conteudo }}</p>
@@ -245,7 +245,9 @@
 							<option value="0">Publico</option>
 							<option value="1">Privado</option>
 						</select>
-	                    <hr><button type="submit" name="atualiza-post" id="atualiza-post" class="btn btn-primary">Salvar</button>
+						<hr>
+						<p>Deseja salvar a edição? </p>
+	                    <button type="submit" name="atualiza-post" id="atualiza-post" class="btn btn-primary">Salvar</button>
 	                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
 	                </form>
 	            </div>

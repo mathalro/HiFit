@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block css %}
+	<style>
+		.post-container {
+			margin-bottom: 30px;
+			background-color: #eee;
+			border-style: solid;
+			border-width: 1px;
+			border-radius: 6px;
+			border-color: #aaa;
+		}
+
+		.post-container .post-usuario {
+			padding: 10px;
+		}
+
+		.post-container .post-dados {
+			padding-bottom: 10px;
+		}
+
+		.post-container p, h4, a {
+			padding: 10px 10px 10px 10px;
+		}
+
+		.comment-container {
+			padding: 5px 5px 5px 5px;
+		}
+
+		.comment-container p {
+			padding: 5px 0px 5px 5px;			
+			margin: 0;
+		}
+
+		.comment-container p a {
+			padding: 0px 0px 0px 0px;			
+			margin: 0;
+		}
+
+		.comment-container textarea {
+			padding: 5px 0px 0px 5px;			
+			margin: 0;
+		}
+
+		.hr-black {
+			border-color: black;
+		}
+
+		.hr-gray2 {
+			border-color: #aaa;
+		}
+
+		.hr-gray {
+			border-color: #ccc;
+		}
+
+		.non-margin {
+			margin-top: 0;
+			margin-bottom: 0;	
+		} 
+
+ 	    .details li {
+	    	list-style: none;
+	    	padding-left: none;
+	    }
+
+	    li {
+	        margin-bottom:10px;
+	    }
+	</style>
+{% endblock %}
+
+{% block title %}Linha do Tempo{% endblock %}
+
+{% block titulo %}Bem vindo {{nome_usuario}}{% endblock %}
+
+{% block content %}
+	<div class="row">
+		<div class="col-lg-4 col-md-4"> 
+			<h4>Tópicos em alta</h4>
+			<div class="panel panel-primary">
+				teste
+			</div>
+		</div>
+		<div class="col-lg-8 col-md-8" style="padding-left:20px; border-left: 1px solid #ccc;">
+			<h4>Linha do tempo</h4>
+			{% for p in posts %}
+				<div class="post-container" id="post-conteudo">
+					<div class="post-content">						
+						<div class="row">
+							<div class="col-md-4 nopadding"><p><b>{{ p.usuario.nome }}</b></p></li></div>
+							<div class="col-md-8"><p class="pull-right">{{ p.data }}</p></div>
+						</div>
+						<p>{{ p.conteudo }}</p>
+					</div>
+					<hr class="hr-gray2 non-margin">
+					<a href="#">
+						<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+					</a>
+					{% if p.privacidade != 0 %}
+						<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+					{% else %}
+						<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+					{% endif %}	
+
+					<div class="comment-container">
+						{% if p.comments.all %}
+							<hr class="hr-gray2 non-margin">
+						{% endif %}
+						{% for c in p.comments.all reversed %}
+							<p style="font-size: 0.9em;"><a href="/usuario/perfil/?usuario={{ c.usuario.user.username }}">{{ c.usuario.nome }}</a> - {{ c.data }}</p>
+							<p style="color: #111">{{ c.conteudo }}</p>
+						{% endfor %}
+						{% if p.comments.all %}
+							<hr class="hr-gray2">
+						{% endif %}
+						<textarea class="form-control form-comentario" type="textarea" id="{{p.id}}" onkeypress="onKeyDown(event.keyCode, event.shiftKey, {{p.id}});" rows="1" placeholder="Escreva um comentário..." style="resize: none;"></textarea>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+{% endblock %}
+
+{% block js %}
+	<script src='/static/js/regras.js'></script>
+
+	<script>
+		function onKeyDown(e, s, id) {
+			if (e == 13) {
+				$.ajax({
+					type: 'POST',
+					url: '/usuario/perfil/',
+					data: {
+						'csrfmiddlewaretoken': '{{ csrf_token }}',
+						'comentario': 'comentario',
+						'conteudo': $('#'+id).val(),
+						'id': id
+					}
+				});
+				$('#'+id).val('');
+				location.reload();
+    		}
+    	};
+	</script>
+{% endblock %}

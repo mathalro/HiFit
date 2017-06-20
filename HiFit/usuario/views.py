@@ -17,6 +17,43 @@ MIN_SIZE_PASS = 5
 
 import re
 
+
+@login_required(login_url="/usuario/login/")
+def visualizar_postagens(request):
+	usuario = Usuario.objects.get(user=request.user)
+
+	if request.method == 'POST':
+		
+		if 'comentario' in request.POST:
+			post = Post.objects.get(id=request.POST['id'])
+			comentario = Comentario(conteudo=request.POST['conteudo'], post=post, usuario=usuario)
+			comentario.save()
+
+		return redirect('/usuario/perfil/')
+
+	if request.method == 'GET':
+		aluno = usuario.isAluno()
+		#Atribuir o valor de seguindo comparando se está ou não na lista de seguidos.
+		seguindo = 1
+
+		# pega posts que não são do usuario e ele pode visualizar
+		posts = Post.objects.none()	
+		post = Post.objects.all()	
+		for p in post:
+			if p.usuario != usuario:
+				posts = posts | Post.objects.filter(id=p.id)
+		paginator = Paginator(posts, 3)
+
+		try:
+			page = int(request.GET['page'])
+			posts_pagina = paginator.page(page)
+		except:
+			posts_pagina = paginator.page(1)
+
+		return render(request, 'visualizar_postagens.html', {'aluno': aluno, 'posts': posts_pagina})
+		
+
+
 def home(request):
 	if request.user.is_authenticated:
 		usuario = Usuario.objects.get(user=request.user)
