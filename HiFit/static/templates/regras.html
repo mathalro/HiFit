@@ -68,8 +68,6 @@
                         <option>{{ maleficio }}</option>
                         {% endfor %}
                     </select>
-                    <label for="in_cad_pontuacao">Pontuação: *</label>
-                    <input type="text" class="form-control" id="in_cad_pontuacao" name="in_cad_pontuacao" required>
                     <button type="submit" name="salvarRegra" id="salvarRegra" class="btn btn-default pull-right">Salvar</button>
                 </form>
             </div>
@@ -86,7 +84,6 @@
                         <th>Restrição</th>
                         <th>Benefício</th>
                         <th>Malefício</th>
-                        <th>Pontuação</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -96,7 +93,6 @@
                         <td>{{ regra.restricao }}</td>
                         <td>{{ regra.beneficio }}</td>
                         <td>{{ regra.maleficio }}</td>
-                        <td>{{ regra.pontuacao }}</td>
                         <td style="display:none;">{{ regra.id }}</td>
                         <td>
                             <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao" id="btn-edit-regra" onclick="setModalEditar(this)">Editar</button>
@@ -119,7 +115,6 @@
                     <th>Restrição</th>
                     <th>Benefício</th>
                     <th>Malefício</th>
-                    <th>Pontuação</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -129,7 +124,6 @@
                     <td>{{ regra.restricao }}</td>
                     <td>{{ regra.beneficio }}</td>
                     <td>{{ regra.maleficio }}</td>
-                    <td>{{ regra.pontuacao }}</td>
                     <td style="display:none;">{{ regra.id }}</td>
                     <td>
                         {% if not regra.solicitante %}
@@ -155,7 +149,6 @@
                         <th>Restrição</th>
                         <th>Benefício</th>
                         <th>Malefício</th>
-                        <th>Pontuação</th>
                         <th>Solicitante</th>
                     </tr>
                     </thead>
@@ -166,7 +159,6 @@
                         <td>{{ solicitacao.restricao }}</td>
                         <td>{{ solicitacao.beneficio }}</td>
                         <td>{{ solicitacao.maleficio }}</td>
-                        <td>{{ solicitacao.pontuacao }}</td>
                         <td style="display:none;">{{ solicitacao.id }}</td>
                         <td>{{ solicitacao.solicitante }}</td>
                         <td>
@@ -225,8 +217,6 @@
                         <option>{{ maleficio }}</option>
                         {% endfor %}
                     </select>
-                    <label for="in_edit_pontuacao">Pontuação: *</label>
-                    <input type="text" class="form-control" id="in_edit_pontuacao" name="in_edit_pontuacao" required>
                     <input type="hidden"  type="text" class="form-control" id="in_edit_id" name="in_edit_id">
                     <hr><button type="submit" name="atualizarRegra" id="atualizarRegra" class="btn btn-default">Salvar</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>

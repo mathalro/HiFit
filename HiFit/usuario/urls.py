@@ -23,9 +23,15 @@ urlpatterns = [
     url(r'^gerenciar/', gerenciar),
     url(r'^confirmar/$', confirmar),
     url(r'^perfil/$', perfil),
-    url(r'^higorburro/$', visualizar_postagens),
     url(r'^estatisticas/$', estatisticas),
     url(r'^valida-token-senha/$', valida_token_senha),
     url(r'^recuperar/', recuperar),
     url(r'^alterar-senha/', alterar_senha),
+    url(r'^amigos/', amigos),
+
+    url(r'^seguir/(?P<uid>\w+)/', seguir),
+    url(r'^dseguir/(?P<uid>\w+)/', deixar_de_seguir),
+
+    url(r'^associar/(?P<uid>\w+)/', associar),
+    url(r'^dassociar/(?P<uid>\w+)/', deixar_de_associar),
 ]

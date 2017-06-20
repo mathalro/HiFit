@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Amigos{% endblock %}
+
+{% block content %}
+<section class="content-header">
+    <h1>Amigos</h1>
+</section>
+<section class="container-fluid">
+    <section class="row">
+        <section class="col-md-6">
+            <h3>Associado</h3>
+            {% for assoc in associado %}
+                <section class="panel panel-default">
+                    <section class="panel-body">
+                        <section class="col-md-2">
+                            <img src="http://propose-sprl.be/img/placeholder/blogpost-placeholder-60x60.png"></img>
+                        </section>
+                        <section class="col-md-7">
+                            <a href="/usuario/perfil/?usuario={{ assoc.user }}" class="seguindo_user_nome">{{ assoc.nome }}</a><br /><br />Instrutor
+                        </section>
+                        <section class="col-md-3 text-right">
+                            <a href="/usuario/dassociar/{{ assoc.id }}" class="btn btn-danger btn-sm">De-associar</a>
+                        </section>
+                    </section>
+                </section>
+            {% endfor %}
+        </section>
+        <section class="col-md-6">
+            <h3>Seguindo</h3>
+            {% for seg in seguindo %}
+                <section class="panel panel-default">
+                    <section class="panel-body">
+                        <section class="col-md-2">
+                            <img src="http://propose-sprl.be/img/placeholder/blogpost-placeholder-60x60.png"></img>
+                        </section>
+                        <section class="col-md-7">
+                            <a href="/usuario/perfil/?usuario={{ seg.user }}" class="seguindo_user_nome">{{ seg.nome }}</a><br /><br />Amigo
+                        </section>
+                        <section class="col-md-3 text-right">
+                            <a href="/usuario/dseguir/{{ seg.id }}" class="btn btn-danger btn-sm">Deixar de seguir</a>
+                        </section>
+                    </section>
+                </section>
+            {% endfor %}
+        </section>
+    </section>
+</section>
+{% endblock %}

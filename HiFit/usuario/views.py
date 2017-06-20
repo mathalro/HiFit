@@ -9,7 +9,7 @@ from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
 from django.contrib.auth.decorators import login_required
-from usuario.models import Usuario
+from aluno.models import Recomendacao
 from .forms import *
 import uuid
 
@@ -18,50 +18,58 @@ MIN_SIZE_PASS = 5
 import re
 
 
+def avaliarPost(request):
+	postId = request.GET.get('post_avaliado')
+	print(postId)
+	post = Post.objects.get(id=postId)
+	valor_avaliacao = request.GET.get('valor_avaliacao')
+
+	# Salva o valor da avaliacao
+	try:
+		post.classificacao.somanota = post.classificacao.somanota + float(valor_avaliacao)
+		post.classificacao.somapessoas += 1
+		post.classificacao.nota = post.classificacao.somanota / float(post.classificacao.somapessoas)
+		post.classificacao.save()
+		post.save()
+	except:
+		print('Nao encontrou o post')
+
+
 @login_required(login_url="/usuario/login/")
-def visualizar_postagens(request):
-	usuario = Usuario.objects.get(user=request.user)
-
-	if request.method == 'POST':
-		
-		if 'comentario' in request.POST:
-			post = Post.objects.get(id=request.POST['id'])
-			comentario = Comentario(conteudo=request.POST['conteudo'], post=post, usuario=usuario)
-			comentario.save()
-
-		return redirect('/usuario/perfil/')
-
-	if request.method == 'GET':
-		aluno = usuario.isAluno()
-		#Atribuir o valor de seguindo comparando se está ou não na lista de seguidos.
-		seguindo = 1
-
-		# pega posts que não são do usuario e ele pode visualizar
-		posts = Post.objects.none()	
-		post = Post.objects.all()	
-		for p in post:
-			if p.usuario != usuario:
-				posts = posts | Post.objects.filter(id=p.id)
-		paginator = Paginator(posts, 3)
-
-		try:
-			page = int(request.GET['page'])
-			posts_pagina = paginator.page(page)
-		except:
-			posts_pagina = paginator.page(1)
-
-		return render(request, 'visualizar_postagens.html', {'aluno': aluno, 'posts': posts_pagina})
-		
-
-
 def home(request):
 	if request.user.is_authenticated:
 		usuario = Usuario.objects.get(user=request.user)
-		context = {
-			'aluno' : usuario.isAluno()
-		}
-		return render(request, 'base.html',context)
-	return render(request, 'base.html')
+
+		if request.method == 'POST':
+			
+			if 'comentario' in request.POST:
+				post = Post.objects.get(id=request.POST['id'])
+				comentario = Comentario(conteudo=request.POST['conteudo'], post=post, usuario=usuario)
+				comentario.save()
+
+			return redirect('/usuario/perfil/')
+
+		if request.method == 'GET':
+			if request.GET.get('funcao') == 'avaliarPost':
+				avaliarPost(request)
+			aluno = usuario.isAluno()
+			#Atribuir o valor de seguindo comparando se está ou não na lista de seguidos.
+			seguindo = 1
+
+			# pega posts que não são do usuario e ele pode visualizar
+			posts = Post.objects.none()	
+			for p in Post.objects.all():
+				if p.usuario != usuario and (usuario.seguindo.filter(user=p.usuario.user) or usuario.associado.filter(user=p.usuario.user)):				
+					posts = Post.objects.filter(id=p.id) | posts
+			paginator = Paginator(posts.order_by('-id'), 3)
+			try:
+				page = int(request.GET['page'])
+				posts_pagina = paginator.page(page)
+			except:
+				posts_pagina = paginator.page(1)
+
+			return render(request, 'visualizar_postagens.html', {'aluno': aluno, 'posts': posts_pagina})
+	return redirect('/')	
 
 def handle_error(request):
 	messages.warning(request,"Página não encontrada.")
@@ -80,8 +88,8 @@ def perfil(request):
 			comentario = Comentario(conteudo=request.POST['conteudo'], post=post, usuario=usuario)
 			comentario.save()
 
-		if 'excluir' in request.POST:
-			post = Post.objects.get(id=request.POST['excluir'])
+		if 'excluirPost' in request.POST:
+			post = Post.objects.get(id=request.POST['excluirPost'])
 			post.delete()
 			return redirect('/usuario/perfil')
 
@@ -99,7 +107,7 @@ def perfil(request):
 
 		postForm = PostagemForm(request.POST)
 		if postForm.is_valid():
-			classificacao = Classificacao(somanota=0, somapessoas=0)
+			classificacao = Classificacao(somanota=0, somapessoas=0, nota=0)
 			classificacao.save()
 			new_post = Post(conteudo=postForm.cleaned_data.get('post'), usuario=usuario, classificacao=classificacao, privacidade=postForm.cleaned_data.get('tipo'))
 			new_post.save()
@@ -118,14 +126,22 @@ def perfil(request):
 				usuario_perfil = Usuario.objects.get(user=user)
 				aluno = usuario.isAluno()
 				perfil_aluno = usuario_perfil.isAluno()
-
+				
 				#Atribuir o valor de seguindo comparando se está ou não na lista de seguidos.
-				seguindo = 1
+				if usuario.seguindo.filter(user=usuario_perfil.user):					
+					seguindo = True
+				else:
+					seguindo = False
 
+				if usuario.associado.filter(user=usuario_perfil.user):
+					associado = True
+				else:
+					associado = False
+								
 				# pega posts do usuario dono do perfil com base na privacidade
 				if usuario_perfil == usuario:
 					dono = True
-				if seguindo or dono:
+				if seguindo or dono or associado:
 					posts = Post.objects.filter(usuario=usuario_perfil).order_by('-id')
 				elif	 (not seguindo):
 					posts = Post.objects.filter(usuario=usuario_perfil).filter(privacidade=0).order_by('-id')	
@@ -138,7 +154,7 @@ def perfil(request):
 				except:
 					posts_pagina = paginator.page(1)
 
-				return render(request, 'perfil.html', {'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_pagina, 'perfil_aluno': perfil_aluno, 'postForm': postForm, 'dono': dono})
+				return render(request, 'perfil.html', {'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_pagina, 'perfil_aluno': perfil_aluno, 'seguiu': seguindo, 'associou': associado , 'postForm': postForm, 'dono': dono})
 			except:
 				messages.warning(request, "Usuário não encontrado. ")
 				return redirect('/')
@@ -150,7 +166,8 @@ def perfil(request):
 def estatisticas(request):
 	estatisticasDados = EstatisticasForm()
 	usuario = Usuario.objects.get(user=request.user)
-	associados = {usuario}
+	user2 = User.objects.get(username="instrutor_1")
+	associados = {usuario, Usuario.objects.get(user=user2)}
 	aluno = usuario.isAluno()
 	if request.method == 'POST':
 		estatisticasDados = EstatisticasForm(request.POST)
@@ -455,3 +472,41 @@ def fale_conosco(request):
     usuario_logado = Usuario.objects.get(user=usuario)
     aluno = usuario_logado.isAluno()
     return render(request, 'fale_conosco.html', {'form': form, 'aluno': aluno})
+
+@login_required(login_url="/usuario/login/")
+def amigos(request):
+	current_user = Usuario.objects.get(user=request.user)
+	seguindo = current_user.seguindo.all()
+	associado = current_user.associado.all()
+
+	return render(request, 'amigos.html', { 'seguindo': seguindo, 'associado': associado })
+
+@login_required(login_url="/usuario/login/")
+def seguir(request, uid):	
+	current_user = Usuario.objects.get(user=request.user)	
+	user = Usuario.objects.get(user=uid)	
+	current_user.seguindo.add(user)
+	return redirect('/usuario/amigos')
+
+@login_required(login_url="/usuario/login/")
+def deixar_de_seguir(request, uid):	
+	current_user = Usuario.objects.get(user=request.user)	
+	for user in current_user.seguindo.all():
+		if str(user.id) == str(uid):			
+			current_user.seguindo.remove(uid)
+			break
+	
+	return redirect('/usuario/amigos')
+
+@login_required(login_url="/usuario/login/")
+def associar(request, uid):
+	current_user = Usuario.objects.get(user=request.user)
+	user = Usuario.objects.get(user=uid)
+	current_user.associado.add(user)
+	return redirect('/usuario/amigos')
+
+@login_required(login_url="/usuario/login/")
+def deixar_de_associar(request, uid):	
+	current_user = Usuario.objects.get(user=request.user)	
+	current_user.associado.remove(uid)
+	return redirect('/usuario/amigos')

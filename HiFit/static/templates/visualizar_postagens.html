@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
 {% block css %}
+	
+    <link rel="stylesheet" href="/static/bootstrap-star-rating/css/star-rating.css">	
+	
 	<style>
 		.post-container {
 			margin-bottom: 30px;
@@ -94,9 +97,13 @@
 						<p>{{ p.conteudo }}</p>
 					</div>
 					<hr class="hr-gray2 non-margin">
-					<a href="#">
-						<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-					</a>
+					<input id="{{ p.id }}"
+                           value="{{ p.classificacao.nota }}"
+                           class="rating"
+                           min=0
+                           max=5
+                           step=0.5
+                           data-size="xs">
 					{% if p.privacidade != 0 %}
 						<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
 					{% else %}
@@ -107,7 +114,7 @@
 						{% if p.comments.all %}
 							<hr class="hr-gray2 non-margin">
 						{% endif %}
-						{% for c in p.comments.all reversed %}
+						{% for c in p.comments.all %}
 							<p style="font-size: 0.9em;"><a href="/usuario/perfil/?usuario={{ c.usuario.user.username }}">{{ c.usuario.nome }}</a> - {{ c.data }}</p>
 							<p style="color: #111">{{ c.conteudo }}</p>
 						{% endfor %}
@@ -118,12 +125,30 @@
 					</div>
 				</div>
 			{% endfor %}
+			<div class="pagination">
+			    <span class="step-links">
+			        {% if posts.has_previous %}
+			            <a href="/?page={{ posts.previous_page_number }}"><span class="glyphicon glyphicon-backward" aria-hidden="true"></span></a>
+			        {% endif %}
+
+			        <span class="current">
+			            {% if posts %}
+			            	Página {{ posts.number }} de {{ posts.paginator.num_pages }}.
+			            {% endif %}
+			        </span>
+
+			        {% if posts.has_next %}
+			            <a href="/?page={{ posts.next_page_number }}"><span class="glyphicon glyphicon-forward" aria-hidden="true"></span></a>
+			        {% endif %}
+			    </span>
+			</div>
+
 		</div>
 	</div>
 {% endblock %}
 
 {% block js %}
-	<script src='/static/js/regras.js'></script>
+	<script src='/static/js/posts.js'></script>
 
 	<script>
 		function onKeyDown(e, s, id) {
@@ -143,4 +168,19 @@
     		}
     	};
 	</script>
+
+	<script>
+	    $(document).ready(function() {
+	        $('.rating').on('rating.change', function(event, value, caption) {
+	            avaliarPost($(this).attr("id"), value);
+	        });
+	        $('.rating').on('rating.clear', function(event) {
+	            avaliarPost($(this).attr("id"), 0.0);
+	        });
+	    });
+	</script>
+
+
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src='/static/bootstrap-star-rating/js/star-rating.js'></script>
 {% endblock %}

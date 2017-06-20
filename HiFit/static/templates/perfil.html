@@ -84,13 +84,22 @@
 	        <div class="col-md-9">
 	            <div class="container">
 	                <h2>{% if perfil_aluno %}Aluno: {% else %}Instrutor: {% endif %}{{ usuario.user.username }}</h2>
-		            {% if not dono %}
-			            <ul class="list-inline details align-middle">
-		              		<li><a href="#" class="btn btn-primary align-middle">Seguir</a></li>
-		              		<li><a href="#" class="btn btn-danger align-middle">Avaliar</a></li>
-		              		<li>{% if not perfil_aluno %}<a href="#" class="btn btn-success">Associar-se</a>{% endif %}</li>
-		            	</ul>
-		            {% endif %}
+		            <ul class="list-inline details align-middle">
+	              		{% if perfil_aluno %}
+							{% if seguiu %}
+								<li><a href="/usuario/dseguir/{{ usuario.id }}" class="btn btn-warning align-middle">Deixar de seguir</a></li>								
+							{% else %}
+								<li><a href="/usuario/seguir/{{ usuario.user.id }}" class="btn btn-primary align-middle">Seguir</a></li>
+							{% endif %}
+						{% else %}
+							{% if associou %}
+								<li><a href="/usuario/dassociar/{{ usuario.id }}" class="btn btn-warning align-middle">De-associar</a></li>								
+							{% else %}
+								<li><a href="/usuario/associar/{{ usuario.user.id }}" class="btn btn-success">Associar-se</a></li>
+							{% endif %}							
+						{% endif %}
+	              		<li><a href="#" class="btn btn-danger align-middle">Avaliar</a></li>	              		
+	            	</ul>
 	            </div>
 	            <hr class="non-margin">
 	            {% if not perfil_aluno %}
@@ -131,7 +140,8 @@
 					<div class="post-dados text-right">
 						{% if dono %}
 							<span><a href="#" class="glyphicon glyphicon-pencil" id="botaoEdita" data-toggle="modal" data-target="#modal-edicao" class="btn btn-danger" type="submit" onclick="setModalEditaPost('{{ p.id }}', '{{ p.conteudo }}', '{{ p.privacidade }}')"></a></span>
-							<span><a href="#" class="glyphicon glyphicon-trash text-danger" id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao" class="btn btn-danger" type="submit" onclick="setModalExcluirCaracteristica('{{ p.id }}')"></a></span>
+							
+							<span><a href="#" class="glyphicon glyphicon-trash text-danger" id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao-post" class="btn btn-danger" type="submit" onclick="setModalExcluirPost('{{ p.id }}')"></a></span>
 						{% endif %}
 					</div>
 			</div>
@@ -149,7 +159,7 @@
 				{% if p.comments.all %}
 					<hr class="hr-gray2 non-margin">
 				{% endif %}
-				{% for c in p.comments.all reversed %}
+				{% for c in p.comments.all %}
 					<p style="font-size: 0.9em;"><a href="/usuario/perfil/?usuario={{ c.usuario.user.username }}">{{ c.usuario.nome }}</a> - {{ c.data }}			
 					{% if dono %}
 						<a href="#" class="glyphicon glyphicon-trash pull-right btn-xs" id="botaoExclusao" data-toggle="modal" data-target="#modal-confirma-exclusao-comentario" class="btn btn-danger" type="submit" onclick="setModalExcluirComentario('{{ c.id }}')"></a>
@@ -181,7 +191,7 @@
 	    </span>
 	</div>
 
-	<div id="modal-confirma-exclusao" class="modal fade" role="dialog">
+	<div id="modal-confirma-exclusao-post" class="modal fade" role="dialog">
 	    <div class="modal-dialog">
 	        <div class="modal-content">
 	            <form action="/usuario/perfil/" method="POST">{% csrf_token %}
@@ -194,7 +204,7 @@
 	                </div>
 	                <div class="modal-footer">
 	                    <div class="pull-left">
-                    		<button type="submit" name="excluir" id="excluir" class="btn btn-success" value="">Confirmar</button>
+                    		<button type="submit" name="excluirPost" id="excluirPost" class="btn btn-success" value="">Confirmar</button>
 	                    </div>
 	                    <div class="pull-right">
 	                        <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
@@ -258,7 +268,7 @@
 {% endblock %}
 
 {% block js %}
-	<script src='/static/js/regras.js'></script>
+	<script src='/static/js/posts.js'></script>
 
 	<script>
 		function onKeyDown(e, s, id) {

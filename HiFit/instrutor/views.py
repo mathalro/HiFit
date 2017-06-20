@@ -102,6 +102,7 @@ def regras(request):
 
     # Reaproveitando algumas partes do codigo para cadastro e edicao
     if (request.method == 'POST'):
+
         # ----- Salvar regra
         if ("salvarRegra" in request.POST):
             # Le os campos
@@ -109,13 +110,12 @@ def regras(request):
             restricao = request.POST['sel_cad_restricao']
             beneficio = request.POST['sel_cad_beneficio']
             maleficio = request.POST['sel_cad_maleficio']
-            pontuacao = request.POST['in_cad_pontuacao']
 
             # Pega os objetos referentes a cada campo
             atividade = Atividade.objects.get_or_create(nome=atividade)[0]
             if (restricao == ""):
                 restricao = None
-            elif (restricao != maleficio):
+            else:
                 restricao = Caracteristica.objects.get_or_create(descricao=restricao)[0]
 
             if (beneficio == ""):
@@ -126,10 +126,6 @@ def regras(request):
             if (maleficio == ""):
                 maleficio = None
             else:
-                # Caso maleficio e restricao sejam 'Nao ha'
-                if str(maleficio) == restricao:
-                    restricao = maleficio
-
                 maleficio = Caracteristica.objects.get_or_create(descricao=maleficio)[0]
 
             # Verifica se a regra ja existe
@@ -141,7 +137,6 @@ def regras(request):
                                   restricao=restricao,
                                   beneficio=beneficio,
                                   maleficio=maleficio,
-                                  pontuacao=pontuacao,
                                   dono=Usuario.objects.get(user=usuario_logado.user))
                 # Salva o obj no banco de dados
                 regra_obj.save()
@@ -154,34 +149,24 @@ def regras(request):
             restricao = request.POST['sel_edit_restricao']
             beneficio = request.POST['sel_edit_beneficio']
             maleficio = request.POST['sel_edit_maleficio']
-            pontuacao = request.POST['in_edit_pontuacao']
             regra_id  = request.POST['in_edit_id']
-
+            print(regra_id)
             # Pega os objetos referentes a cada campo
             atividade = Atividade.objects.get_or_create(nome=atividade)[0]
             if (restricao == ""):
                 restricao = None
             else:
-                if restricao in CaracteristicaQualitativa.DOENCA:
-                    restricao_valor = ValorCaracteristica.DOENCA.value
-                    restricao_tipo = tipoCaracteristica.DOENCA.value
-                else:
-                    restricao_valor = ValorCaracteristica.DIFICULDADE_MOTORA.value
-                    restricao_tipo = tipoCaracteristica.DIFICULDADE_MOTORA.value
-                restricao = Caracteristica.objects.get_or_create(descricao=restricao,
-                                                                 valor=restricao_valor, tipo=restricao_tipo)[0]
+                restricao = Caracteristica.objects.get_or_create(descricao=restricao)[0]
+
             if (beneficio == ""):
                 beneficio = None
             else:
-                beneficio = Caracteristica.objects.get_or_create(descricao=beneficio,
-                                                                 valor=ValorCaracteristica.PREFERENCIA.value,
-                                                                 tipo=tipoCaracteristica.PREFERENCIA.value)[0]
+                beneficio = Caracteristica.objects.get_or_create(descricao=beneficio)[0]
+
             if (maleficio == ""):
                 maleficio = None
             else:
-                maleficio = Caracteristica.objects.get_or_create(descricao=maleficio,
-                                                                 valor=ValorCaracteristica.MALEFICIO.value,
-                                                                 tipo=tipoCaracteristica.MALEFICIO.value)[0]
+                maleficio = Caracteristica.objects.get_or_create(descricao=maleficio)[0]
 
             # Verifica se a regra ja existe
             if (existeRegra(Usuario.objects.get(user=usuario_logado.user), atividade, restricao, beneficio, maleficio)):
@@ -196,9 +181,10 @@ def regras(request):
                     regra_anterior.restricao=restricao
                     regra_anterior.beneficio=beneficio
                     regra_anterior.maleficio=maleficio
-                    regra_anterior.pontuacao=pontuacao
-                    regra_anterior.save(update_fields=['atividade', 'restricao', 'beneficio', 'maleficio', 'pontuacao'])
+                    regra_anterior.save(update_fields=['atividade', 'restricao', 'beneficio', 'maleficio'])
                     messages.success(request, msg_regra_atualizada)
+
+        # ---------- Excluir regra
         elif("excluirRegra" in request.POST):
             regra_id = request.POST['excluirRegra']
             regra = Regra.objects.get(id=regra_id)
@@ -207,6 +193,8 @@ def regras(request):
                 messages.success(request, msg_regra_excluida)
             else:
                 messages.warning(request, msg_regra_nao_existe)
+
+        # ---------- Aceitar Solicitacao
         elif ("aceitarSolicitacao" in request.POST):
             regra_id = request.POST['aceitarSolicitacao']
             regra = Regra.objects.get(id=regra_id)
@@ -222,6 +210,7 @@ def regras(request):
             else:
                 messages.warning(request, msg_regra_nao_existe)
 
+        # ---------- Recusar Solicitacao
         elif ("recusarSolicitacao" in request.POST):
             regra_id = request.POST['recusarSolicitacao']
             regra = Regra.objects.get(id=regra_id)

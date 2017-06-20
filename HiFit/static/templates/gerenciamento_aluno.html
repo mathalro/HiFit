@@ -30,12 +30,9 @@
                         <label for="select_field_doenca">Preferência:</label>
                         <select class="form-control" id="select_field_preferencia" name="select_field_preferencia">
                             <option disabled selected value> -- Selecione uma opção -- </option>
-                            <option>Correção da postura</option>
-                            <option>Ganho de massa muscular</option>
-                            <option>Melhor condicionamento físico</option>
-                            <option>Melhor flexibilidade</option>
-                            <option>Melhor respiração</option>
-                            <option>Perda de peso</option>
+                            {% for p in opcoes_preferencia %}
+                                <option>{{ p }}</option>
+                            {% endfor %}
                         </select>
                     </div>
 

@@ -13,9 +13,9 @@ class Atividade(models.Model):
         return self.nome
 
 class Classificacao(models.Model):
-    somanota = models.IntegerField()  # Field name made lowercase.
+    somanota = models.FloatField(blank=True,null=True)  # Field name made lowercase.
     somapessoas = models.IntegerField(blank=True,null=True)  # Field name made lowercase.
-
+    nota = models.FloatField(blank=True,null=True)  # Field name made lowercase.
     def __str__(self):
         return str("Nota: " + str(self.somanota) + " Total: " + str(self.somapessoas))
 
@@ -30,11 +30,14 @@ class Usuario(models.Model):
     tipo_identificacao = models.CharField(max_length=5, choices=TIPOS_IDENTIFICACAO, default="CRM")
     identificacao = models.CharField(max_length=45, null=True)
     profissao = models.ForeignKey('instrutor.Profissao', on_delete=models.CASCADE, related_name='usuarios', null=True)  # Field name made lowercase.
-    caracteristicas = models.ManyToManyField('aluno.Caracteristica',blank=True, null=True)
+    caracteristicas = models.ManyToManyField('aluno.Caracteristica',blank=True)
     nome = models.CharField(max_length=100, null=True)
     descricao = models.TextField(null=True)
     auth_id = models.CharField(max_length=32, null=True)
-    situacao = models.IntegerField(null=True)
+    situacao = models.IntegerField(null=True)    
+    seguindo = models.ManyToManyField('Usuario', related_name='seguidores', blank=True)
+    associado = models.ManyToManyField('Usuario', related_name='associados', blank=True)
+    cadastro_completo = models.IntegerField(default=1)
 
     def isAluno(self):
         return self.tipo_usuario == TIPO['ALUNO']
