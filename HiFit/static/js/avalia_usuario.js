@@ -1,10 +1,10 @@
 //Tratamento do botão para quando o usuário avaliar uma recomendacao
-function avaliarRecomendacao(recomendacao_avaliada, valor_avaliacao) {
+function avaliarUsuario(usuario, valor_avaliacao) {
     $.ajax({
-        url: '/usuario/perfil',
+        url: '/usuario/perfil/'.concat('?usuario=').concat(usuario).concat('&page=1'),
         method: 'POST', // or another (GET), whatever you need
         data: {
-            recomendacao_avaliada: recomendacao_avaliada,
+            usuario: usuario,
             valor_avaliacao: valor_avaliacao,
             funcao: "avaliarRecomendacao"
         }

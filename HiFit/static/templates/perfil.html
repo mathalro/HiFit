@@ -65,8 +65,16 @@
 	                <h2>{% if perfil_aluno %}Aluno: {% else %}Instrutor: {% endif %}{{ usuario.user.username }}</h2>
 		            <ul class="list-inline details align-middle">
 	              		{% if perfil_aluno %}
-							{% if seguiu %}
-								<li><a href="/usuario/dseguir/{{ usuario.id }}" class="btn btn-warning align-middle">Deixar de seguir</a></li>
+	              			{% if aluno %}
+								{% if seguiu %}
+									<li><a href="/usuario/dseguir/{{ usuario.id }}" class="btn btn-warning align-middle">Deixar de seguir</a></li>
+								{% else %}
+									<li><a href="/usuario/seguir/{{ usuario.user.id }}" class="btn btn-primary align-middle">Seguir</a></li>
+								{% endif %}
+							{% elif not aluno and meu_aluno %}
+								<label for="input-7-xs" class="control-label">Avaliação atual</label>
+								<input id="display_only" name="input-3" value="{{perfil_avaliacao}}" class="rating-loading">
+								<label for="input-7-xs" class="control-label">Avalie este aluno</label>
 								<input id={{usuario.id}}
                                        value="0"
                                        class="rating"
@@ -74,18 +82,27 @@
                                        max=5
                                        step=0.5
                                        data-size="xs">
-                                <br>								
-							{% else %}
-								<li><a href="/usuario/seguir/{{ usuario.user.id }}" class="btn btn-primary align-middle">Seguir</a></li>
+                                <br>
 							{% endif %}
 						{% else %}
 							{% if associou %}
-								<li><a href="/usuario/dassociar/{{ usuario.id }}" class="btn btn-warning align-middle">De-associar</a></li>								
+								<li><a href="/usuario/dassociar/{{ usuario.id }}" class="btn btn-warning align-middle">De-associar</a></li>
+								<br>
+								<label for="input-7-xs" class="control-label">Avaliação atual</label>
+								<input id="display_only" name="input-3" value="{{perfil_avaliacao}}" class="rating-loading">
+								<label for="input-7-xs" class="control-label">Avalie este instrutor</label>
+								<input id={{usuario.id}}
+                                       value="0"
+                                       class="rating"
+                                       min=0
+                                       max=5
+                                       step=0.5
+                                       data-size="xs">
+                                <br>
 							{% else %}
 								<li><a href="/usuario/associar/{{ usuario.user.id }}" class="btn btn-success">Associar-se</a></li>
 							{% endif %}							
-						{% endif %}
-	              		<li><a href="#" class="btn btn-danger align-middle">Avaliar</a></li>	              		
+						{% endif %}	              		
 	            	</ul>
 	            </div>
 	            <hr class="non-margin">
@@ -143,11 +160,12 @@
 
 	<script>
     $(document).ready(function() {
+        $('#display_only').rating({displayOnly: true});
         $('.rating').on('rating.change', function(event, value, caption) {
-            avaliarRecomendacao($(this).attr("id"), {{usuario.user.username}},value);
+            avaliarUsuario($(this).attr("id"), {{usuario.user.username}},value);
         });
         $('.rating').on('rating.clear', function(event) {
-            avaliarRecomendacao($(this).attr("id"), {{usuario.user.username}}, 0.0);
+            avaliarUsuario($(this).attr("id"), {{usuario.user.username}}, 0.0);
         });
     });
 </script>
