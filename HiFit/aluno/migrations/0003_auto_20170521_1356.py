@@ -14,10 +14,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='recomendacao',
-            name='usuario',
-        ),
         migrations.AddField(
             model_name='recomendacao',
             name='aluno',

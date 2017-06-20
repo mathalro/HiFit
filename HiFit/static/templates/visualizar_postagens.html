@@ -8,9 +8,12 @@
 	<div class="row">
 		<div class="col-lg-4 col-md-4"> 
 			<h4>Tópicos em alta</h4>
-			<div class="panel panel-primary">
-				teste
-			</div>
+			{% for post in topicos_alta%}
+				<div class="panel panel-primary">
+					<h5><strong>{{post.usuario}}</strong></h5>
+					{{post.conteudo|slice:":20"}}...	
+				</div>
+			{% endfor %}
 		</div>
 		<div class="col-lg-8 col-md-8" style="padding-left:20px; border-left: 1px solid #ccc;">
 			<h4>Linha do tempo</h4>
