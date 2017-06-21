@@ -159,18 +159,22 @@
 	</div>
 
 	<script>
-    $(document).ready(function() {
-        $('#display_only').rating({displayOnly: true});
-        $('.rating').on('rating.change', function(event, value, caption) {
-            avaliarUsuario($(this).attr("id"), {{usuario.user.username}},value);
-        });
-        $('.rating').on('rating.clear', function(event) {
-            avaliarUsuario($(this).attr("id"), {{usuario.user.username}}, 0.0);
-        });
-    });
-</script>
+	    $(document).ready(function() {
+	        $('#display_only').rating({displayOnly: true, step : 0.5});
+	        $('.rating').on('rating.change', function(event, value, caption) {
+	            avaliarUsuario("{{usuario.user.username}}",value);
+	        });
+	        $('.rating').on('rating.clear', function(event) {
+	            avaliarUsuario("{{usuario.user.username}}", 0.0);
+	        });
+	    });
+	    $( document ).ajaxComplete(function(r) {
+		  $("body").html(r.responseText);
+		});
+	</script>
 {% endblock %}
 
 {% block js %}
 	<script src='/static/bootstrap-star-rating/js/star-rating.js'></script>
+	<script src='/static/js/avalia_usuario.js'></script>
 {% endblock %}

@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from usuario.models import Usuario, Post, AvaliacaoUsuario
 from aluno.models import Recomendacao
 from .forms import *
+from django.http import JsonResponse
 import uuid
 
 MIN_SIZE_PASS = 5
@@ -52,57 +53,78 @@ def handle_error(request):
 def perfil(request):
 	usuario = Usuario.objects.get(user=request.user)
 	if request.method == 'GET':
-		try:
-			perfil_dono = request.GET['usuario']
+		if 'avaliarUsuario' in request.GET:
+			avaliarUsuario(request)
+			data = {
+				'valor' : request.GET['nota'].replace(",",".") 
+			}
+			return JsonResponse(data)
+		else:	
 			try:
-				meu_aluno = False
-				user = User.objects.get(username=perfil_dono)
-				usuario_perfil = Usuario.objects.get(user=user)
-				aluno = usuario.isAluno()
-				perfil_aluno = usuario_perfil.isAluno()
-				perfil_avaliacao = resgatar_avaliacao(usuario_perfil)
-
-				#Atribuir o valor de seguindo comparando se está ou não na lista de seguidos.
-				if usuario.seguindo.filter(user=usuario_perfil.user):					
-					seguindo = True
-				else:
-					seguindo = False
-
-				if usuario.associado.filter(user=usuario_perfil.user):
-					associado = True
-				else:
-					associado = False
-
-				#verifica se o perfil de aluno que o instrutor está acessando está associado a ele
-				if not aluno and perfil_aluno:
-					if usuario_perfil.associado.filter(user=usuario.user):
-						meu_aluno = True
-					else:
-						meu_aluno = False
-
-				# pega posts do usuario dono do perfil com base na privacidade
-				if usuario_perfil == usuario or seguindo:
-					posts = Post.objects.filter(usuario=usuario_perfil).order_by('-id')
-				elif	 (not seguindo):
-					posts = Post.objects.filter(usuario=usuario_perfil).filter(privacidade=0).order_by('-id')	
-
-				paginator = Paginator(posts, 3)
-
+				perfil_dono = request.GET['usuario']
 				try:
-					page = int(request.GET['page'])
-					posts_pagina = paginator.page(page)
+					meu_aluno = False
+					user = User.objects.get(username=perfil_dono)
+					usuario_perfil = Usuario.objects.get(user=user)
+					aluno = usuario.isAluno()
+					perfil_aluno = usuario_perfil.isAluno()
+					perfil_avaliacao = resgatarAvaliacao(usuario_perfil)
+
+					#Atribuir o valor de seguindo comparando se está ou não na lista de seguidos.
+					if usuario.seguindo.filter(user=usuario_perfil.user):					
+						seguindo = True
+					else:
+						seguindo = False
+
+					if usuario.associado.filter(user=usuario_perfil.user):
+						associado = True
+					else:
+						associado = False
+
+					#verifica se o perfil de aluno que o instrutor está acessando está associado a ele
+					if not aluno and perfil_aluno:
+						if usuario_perfil.associado.filter(user=usuario.user):
+							meu_aluno = True
+						else:
+							meu_aluno = False
+
+					# pega posts do usuario dono do perfil com base na privacidade
+					if usuario_perfil == usuario or seguindo:
+						posts = Post.objects.filter(usuario=usuario_perfil).order_by('-id')
+					elif	 (not seguindo):
+						posts = Post.objects.filter(usuario=usuario_perfil).filter(privacidade=0).order_by('-id')	
+
+					paginator = Paginator(posts, 3)
+
+					try:
+						page = int(request.GET['page'])
+						posts_pagina = paginator.page(page)
+					except:
+						posts_pagina = paginator.page(1)
+
+					return render(request, 'perfil.html', { 'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_pagina, 'perfil_aluno': perfil_aluno, 'seguiu': seguindo, 'associou': associado, 'meu_aluno' : meu_aluno, 'perfil_avaliacao' : str(perfil_avaliacao).replace(",",".") })
 				except:
-					posts_pagina = paginator.page(1)
-
-				return render(request, 'perfil.html', { 'usuario': usuario_perfil , 'aluno': aluno, 'posts': posts_pagina, 'perfil_aluno': perfil_aluno, 'seguiu': seguindo, 'associou': associado, 'meu_aluno' : meu_aluno, 'perfil_avaliacao' : perfil_avaliacao })
+					messages.warning(request, "Usuário não encontrado. ")
+					return redirect('/')
 			except:
-				messages.warning(request, "Usuário não encontrado. ")
-				return redirect('/')
-		except:
-			return redirect('/usuario/perfil?usuario='+usuario.user.username+'&page=1')
+				return redirect('/usuario/perfil?usuario='+usuario.user.username+'&page=1')
 
 
-def resgatar_avaliacao(usuario):
+
+def avaliarUsuario(request):
+	avaliacao = AvaliacaoUsuario.objects.filter(avaliador=Usuario.objects.get(user__username=request.user), dono_avaliacao=Usuario.objects.get(user__username=request.GET['avaliado']))
+	if avaliacao:
+		avaliacao = avaliacao[0]
+		avaliacao.nota = float(request.GET['nota'])
+		avaliacao.save()
+	else:
+		avaliacaoUsuario = AvaliacaoUsuario()
+		avaliacaoUsuario.dono_avaliacao = Usuario.objects.get(user__username=request.GET['avaliado'])
+		avaliacaoUsuario.avaliador = Usuario.objects.get(user__username=request.user)
+		avaliacaoUsuario.nota = float(request.GET['nota'])
+		avaliacaoUsuario.save()
+
+def resgatarAvaliacao(usuario):
 	avaliacoes = AvaliacaoUsuario.objects.filter(dono_avaliacao=usuario)
 	total = 0
 	if avaliacoes:
@@ -110,6 +132,10 @@ def resgatar_avaliacao(usuario):
 			total += avaliacao.nota
 
 		final = total/len(avaliacoes)
+		if final - int(final) > 0.5:
+			final = int(final) + 1
+		elif final - int(final) < 0.5:
+			final = int(final)
 		return final
 	else:
 		return total
