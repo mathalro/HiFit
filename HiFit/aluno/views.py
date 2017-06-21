@@ -340,6 +340,12 @@ def buscar_recomendacoes(request):
         recomendacoes_compativeis = calculoAvaliacaoInstrutores(recomendacoes_compativeis)
         RecomendacaoAluno.recomendacoes = recomendacoes_compativeis
         lista_recomendacoes_aluno = geraRankingRecomendacoes(recomendacoes_compativeis, numRecomendacoes)
+        aluno_logado.recomendadas = ""
+        for i in lista_recomendacoes_aluno:
+            aluno_logado.recomendadas += str(i[0]) + "|"
+        aluno_logado.recomendadas=aluno_logado.recomendadas[:-1]
+        aluno_logado.save()
+
         if not lista_recomendacoes_aluno:
             messages.warning(request,"Você já se cadastrou em todas as atividades.")
         return render(request, 'buscar_recomendacoes.html', {'lista_recomendacoes_aluno': lista_recomendacoes_aluno, 'aluno': aluno, 'cadastro_completo': aluno_logado.cadastro_completo, 'recomendacoes_aceitas': lista_recomendacoes_aceitas})

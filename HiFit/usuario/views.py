@@ -5,11 +5,12 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Usuario, Classificacao, Post, Mensagem, MensagensExcluidas
-from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO, MES_STRING
+from utils.tipos import *
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
 from django.contrib.auth.decorators import login_required
-from aluno.models import Recomendacao
+from aluno.models import Recomendacao 
+from instrutor.models import Regra
 from .forms import *
 import uuid
 from django.db.models import Q
@@ -87,23 +88,66 @@ def estatisticas(request):
     estatisticasDados = EstatisticasForm()
     usuario = Usuario.objects.get(user=request.user)
     user2 = User.objects.get(username="instrutor_1")
-    associados = {usuario, Usuario.objects.get(user=user2)}
+    associados = []
+    for u in Usuario.objects.all():
+        if u.isAluno() and (u.associado.filter(user = usuario.user) or usuario.seguindo.filter(user = u.user) or u.user == usuario.user):
+            associados.append(u)
     aluno = usuario.isAluno()
     if request.method == 'POST':
         estatisticasDados = EstatisticasForm(request.POST)
-        estatisticas_dono = Usuario.objects.get(user=User.objects.get(username=request.POST['usuario']))
+        estatisticas_dono = Usuario.objects.get(id=request.POST['usuario'])
+        lista_caracteristicas = [{'descricao': c.descricao, 'valor': c.valor, 'tipo': c.tipo} for c in
+                             estatisticas_dono.caracteristicas.all()]        
+        lista_preferencias = [l['descricao'] for l in lista_caracteristicas if tipoCaracteristica.PREFERENCIA.value == l['tipo']]
         if estatisticasDados.is_valid():
             inicial = estatisticasDados.cleaned_data.get('inicial')
             final = estatisticasDados.cleaned_data.get('final')
             if inicial <= final:
+                recomendadas = []
+                aceitas = []
+                impacto = []
+                popularidade = []
+                num_atividades = 0
+                for r in Recomendacao.objects.all():
+                    num_atividades+=1;
+                for r in estatisticas_dono.recomendacoes_aluno.all():
+                    if inicial <= r.data and final >= r.data:
+                        percentual = 0
+                        recomendar = True
+                        for regra in r.regras.all():
+                            if regra.restricao in estatisticas_dono.caracteristicas.all():
+                                recomendar = False
+                        if recomendar:
+                            recomendadas.append(r.atividade.nome)
+                        aceitas.append(r.atividade.nome)
+                        soma = 0
+                        for b in r.regras.all():
+                            if b.beneficio.descricao in lista_preferencias:
+                                soma += 1
+                        percentual = 100*(soma / float(len(lista_preferencias)))
+                        impacto.append((r.atividade.nome,int(percentual)))
+                        soma = 0
+                        percentual = 0
+                        for a in Recomendacao.objects.all():
+                            if r.atividade.nome == a.atividade.nome:
+                                soma += 1
+                        percentual = 100*(soma / float(num_atividades))
+                        popularidade.append((r.atividade.nome,int(percentual)))
+                    impacto.sort(key=lambda tup:-tup[1])
+                    popularidade.sort(key=lambda tup:-tup[1])
                 # atividades recomendadas
-                recomendadas = {'Basquete', 'Vôlei', 'Natação', 'Futebol'}
                 # atividades aceitas no periodo
-                aceitas = {'Natação', 'Corrida'}
                 # impacto das atividades aceitas no periodo
-                impacto = {'Natação 37%', 'Corrida 11%'}
-                # popularidades atividades no periodo
-                popularidade = {'Natação 49%', 'Corrida 35%'}
+                for a in estatisticas_dono.recomendadas.split('|'):
+                    recomendar = True
+                    if a in recomendadas:
+                        recomendar = False
+                    for r in Regra.objects.all():
+                         if r.atividade.nome == a and r.restricao in estatisticas_dono.caracteristicas.all():
+                            recomendar = False
+                    if recomendar and len(a) > 0:
+                        recomendadas.append(a)
+                            
 
                 context = {
                     'post': True,

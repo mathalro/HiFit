@@ -41,7 +41,7 @@ class Usuario(models.Model):
     seguindo = models.ManyToManyField('Usuario', related_name='seguidores', blank=True)
     associado = models.ManyToManyField('Usuario', related_name='associados', blank=True)
     cadastro_completo = models.IntegerField(default=1)
-
+    recomendadas = models.CharField(max_length=500, default="")
     def isAluno(self):
         return self.tipo_usuario == TIPO['ALUNO']
 

@@ -14,7 +14,7 @@
 					<label>Usuario</label>
 					<select name="usuario" class="form-control">
 					{% for p in associados %}
-						<option value="{{p.user.username}}"">{{p.nome}}</option>
+						<option value="{{p.id}}"">{{p.nome}}</option>
 					{% endfor %}
 					</select>
 				</div>	
@@ -59,12 +59,12 @@
 			  <tr>
 			    <td><ul>
 					{% for p in impacto %}
-						<li><label>{{ p }}</label><br></li>
+						<li><label>{{ p.0 }} {{ p.1 }}%</label><br></li>
 					{% endfor %}
 			    </ul></td>
 			    <td><ul>
 					{% for p in popularidade %}
-						<li><label>{{ p }}</label><br></li>
+						<li><label>{{ p.0 }} {{ p.1 }}%</label><br></li>
 					{% endfor %}
 			    </ul></td>
 			  </tr>
