@@ -55,10 +55,6 @@ def perfil(request):
 	if request.method == 'GET':
 		if 'avaliarUsuario' in request.GET:
 			avaliarUsuario(request)
-			data = {
-				'valor' : request.GET['nota'].replace(",",".") 
-			}
-			return JsonResponse(data)
 		else:	
 			try:
 				perfil_dono = request.GET['usuario']
