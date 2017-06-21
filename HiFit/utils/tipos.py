@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import enum
 
 from enum import IntEnum
@@ -18,6 +20,22 @@ TIPOS_IDENTIFICACAO = (
     ('CREFITO', 'CREFITO'),
     ('CREF', 'CREF'),
 )
+
+
+MES_STRING = {
+    '1': 'Janeiro',
+    '2': 'Fevereiro',
+    '3': 'Março',
+    '4': 'Abril',
+    '5': 'Maio',
+    '6': 'Junho',
+    '7': 'Julho',
+    '8': 'Agosto',
+    '9': 'Setembro',
+    '10': 'Outubro',
+    '11': 'Novembro',
+    '12': 'Dezembro'
+}
 
 
 class CaracteristicaQualitativa():

@@ -4,8 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Usuario, Classificacao, Post, Comentario
-from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO
+from .models import Usuario, Classificacao, Post, Comentario, Mensagem, MensagensExcluidas
+from utils.tipos import TIPO, PALAVRAS_BAIXO_CALAO, MES_STRING
 from django.core.mail import send_mail
 from usuario.forms import FaleConoscoForm
 from django.contrib.auth.decorators import login_required
@@ -14,11 +14,12 @@ from aluno.models import Recomendacao
 from .forms import *
 from django.http import JsonResponse
 import uuid
+from django.db.models import Q
+from django.http import JsonResponse
 
 MIN_SIZE_PASS = 5
 
 import re
-
 
 def avaliarPost(request):
 	print("Teste")
@@ -86,9 +87,10 @@ def busca_topicos_em_alta(usuario_atual):
 	else:
 		return topicos_alta[:5]
 
+
 def handle_error(request):
-	messages.warning(request,"Página não encontrada.")
-	return redirect('/')
+    messages.warning(request, "Página não encontrada.")
+    return redirect('/')
 
 
 @login_required(login_url="/usuario/login/")
@@ -214,6 +216,7 @@ def avaliarUsuario(request):
 		avaliacaoUsuario.nota = float(request.GET['nota'])
 		avaliacaoUsuario.save()
 
+
 def resgatarAvaliacao(usuario):
 	avaliacoes = AvaliacaoUsuario.objects.filter(dono_avaliacao=usuario)
 	total = 0
@@ -304,27 +307,27 @@ def login(request):
 			return redirect('/usuario/login')
 
 	return render(request, 'login.html',{'proximo': proximo})
-
+	
 
 def confirmar(request):
-	if request.user.is_authenticated:
-		return redirect("/")
+    if request.user.is_authenticated:
+        return redirect("/")
 
-	try:
-		usuario = Usuario.objects.get(auth_id=request.GET['auth'])
-	except:
-		usuario = None
-		messages.warning(request, "Codigo de autenticação inválido. ")	
+    try:
+        usuario = Usuario.objects.get(auth_id=request.GET['auth'])
+    except:
+        usuario = None
+        messages.warning(request, "Codigo de autenticação inválido. ")
 
-	if usuario is not None:
-		if usuario.situacao == 0:
-			usuario.situacao = 1
-			usuario.save()
-			messages.warning(request, "Usuario ativado com sucesso. ")
-		else:
-			messages.warning(request, "Usuario já está ativo. ")
-	
-	return redirect('/usuario/login')
+    if usuario is not None:
+        if usuario.situacao == 0:
+            usuario.situacao = 1
+            usuario.save()
+            messages.warning(request, "Usuario ativado com sucesso. ")
+        else:
+            messages.warning(request, "Usuario já está ativo. ")
+
+    return redirect('/usuario/login')
 
 
 @login_required(login_url="/usuario/login/")
@@ -334,186 +337,186 @@ def logout(request):
 
 
 def recuperar(request):
-	if request.user.is_authenticated:
-		return redirect("/")
+    if request.user.is_authenticated:
+        return redirect("/")
 
-	if request.method == 'POST':
-		try:
-			user = User.objects.get(email = request.POST['email'])
-		except:
-			user = None
-			messages.warning(request, "Email não cadastrado. ")
-			return redirect('/usuario/recuperar')
+    if request.method == 'POST':
+        try:
+            user = User.objects.get(email=request.POST['email'])
+        except:
+            user = None
+            messages.warning(request, "Email não cadastrado. ")
+            return redirect('/usuario/recuperar')
 
-		if user is not None:
-			usuario = Usuario.objects.get(user=user)
-			auth_id = uuid.uuid4().hex
-			usuario.auth_id = auth_id
-			usuario.situacao = 2
-			usuario.save()
-			send_mail('Recuperação de senha', \
-						"Solicitação de alteração de senha.\n\
+        if user is not None:
+            usuario = Usuario.objects.get(user=user)
+            auth_id = uuid.uuid4().hex
+            usuario.auth_id = auth_id
+            usuario.situacao = 2
+            usuario.save()
+            send_mail('Recuperação de senha', \
+                      "Solicitação de alteração de senha.\n\
 						Usuário: " + user.username + "\n\
 						Link de recuperação: http://localhost:8000/usuario/valida-token-senha?auth=" + auth_id + "\n\n\
 						Atenciosamente,\n\
 						Equipe HIFIT.\n\n\
 						Email automatico, não responda.", \
-						'hifites@gmail.com', [user.email])
-			messages.warning(request, "Email de recuperação enviado. ")
+                      'hifites@gmail.com', [user.email])
+            messages.warning(request, "Email de recuperação enviado. ")
 
-			return redirect('/usuario/recuperar')
+            return redirect('/usuario/recuperar')
 
-	return render(request, 'recuperar.html', {})
+    return render(request, 'recuperar.html', {})
 
 
 def alterar_senha(request):
-	if request.method == 'POST':
-		user = User.objects.get(username=request.POST['username'])
-		password = request.POST['password']
-		if len(password) < MIN_SIZE_PASS:
-			messages.warning(request, "Senha muito pequena. ")
-			return render(request, 'alterar-senha.html', {'username': user.username})
+    if request.method == 'POST':
+        user = User.objects.get(username=request.POST['username'])
+        password = request.POST['password']
+        if len(password) < MIN_SIZE_PASS:
+            messages.warning(request, "Senha muito pequena. ")
+            return render(request, 'alterar-senha.html', {'username': user.username})
 
-		user.set_password(password)
-		user.save()
-		usuario = Usuario.objects.get(user = user)
-		usuario.situacao = 1
-		usuario.save()
-		user = authenticate(username=user.username, password=password)
-		auth_login(request, user)
-		messages.warning(request, "Senha alterada com sucesso. ")
-		return redirect('/usuario/login/')
+        user.set_password(password)
+        user.save()
+        usuario = Usuario.objects.get(user=user)
+        usuario.situacao = 1
+        usuario.save()
+        user = authenticate(username=user.username, password=password)
+        auth_login(request, user)
+        messages.warning(request, "Senha alterada com sucesso. ")
+        return redirect('/usuario/login/')
 
-	return render(request, 'alterar-senha.html', {})
+    return render(request, 'alterar-senha.html', {})
 
 
 def valida_token_senha(request):
-	if request.user.is_authenticated:
-		return redirect("/")
+    if request.user.is_authenticated:
+        return redirect("/")
 
-	try:
-		usuario = Usuario.objects.get(auth_id=request.GET['auth'])
-	except:
-		usuario = None
-		messages.warning(request, "Codigo de recuperação inválido. ")	
-		return redirect ('/usuario/recuperar')
+    try:
+        usuario = Usuario.objects.get(auth_id=request.GET['auth'])
+    except:
+        usuario = None
+        messages.warning(request, "Codigo de recuperação inválido. ")
+        return redirect('/usuario/recuperar')
 
-	if usuario is not None:
-		if usuario.situacao != 2:
-			messages.warning(request, "Link de recuperação já foi utilizado. ")
-			return redirect ('/usuario/recuperar')
-		else:		
-			return render(request, 'alterar-senha.html', {'username': usuario.user.username})
+    if usuario is not None:
+        if usuario.situacao != 2:
+            messages.warning(request, "Link de recuperação já foi utilizado. ")
+            return redirect('/usuario/recuperar')
+        else:
+            return render(request, 'alterar-senha.html', {'username': usuario.user.username})
 
 
 def cadastro(request):
-	if request.user.is_authenticated:
-		return redirect("/")
+    if request.user.is_authenticated:
+        return redirect("/")
 
+    cadastroDados = CadastroForm()
+    if request.method == 'POST':
+        cadastroDados = CadastroForm(request.POST)
+        if cadastroDados.is_valid():
+            user_type = request.POST['user_type']
+            name = request.POST['name']
+            email = request.POST['email']
+            username = request.POST['username']
+            password = request.POST['password']
+            phone = cadastroDados.cleaned_data.get('phone')
+            data = cadastroDados.cleaned_data.get('data')
 
-	cadastroDados = CadastroForm()
-	if request.method == 'POST':
-		cadastroDados = CadastroForm(request.POST)
-		if cadastroDados.is_valid():
-			user_type = request.POST['user_type']
-			name = request.POST['name']
-			email = request.POST['email']
-			username = request.POST['username']
-			password = request.POST['password']
-			phone = cadastroDados.cleaned_data.get('phone')
-			data = cadastroDados.cleaned_data.get('data')
-			
-			#Verificar formato e entre 1900 e dia atual
-			allright = True
+            # Verificar formato e entre 1900 e dia atual
+            allright = True
 
-			#Testa existencia de usuario com mesmo username
-			try:
-				user = User.objects.get(username=username)
-			except User.DoesNotExist:
-				user = None
-			if user is not None:
-				messages.warning(request, "Usuário já cadastrado. ")
-				allright = False
+            # Testa existencia de usuario com mesmo username
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                user = None
+            if user is not None:
+                messages.warning(request, "Usuário já cadastrado. ")
+                allright = False
 
-			#Testa existencia de usuario com mesmo email
-			try:
-				user = User.objects.get(email=email)
-			except User.DoesNotExist:
-				user = None
-			if user is not None:
-				messages.warning(request, "Email já cadastrado. ")
-				allright = False
-			
-			#Testa se a senha possui tamanho minimo
-			if len(password) < MIN_SIZE_PASS:
-				messages.warning(request, "Senha muito pequena. ")
-				allright = False	
-			if not allright:
-				return redirect('/usuario/cadastro')
-			
-			auth_id = uuid.uuid4().hex
+            # Testa existencia de usuario com mesmo email
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                user = None
+            if user is not None:
+                messages.warning(request, "Email já cadastrado. ")
+                allright = False
 
-			user = User.objects.create_user(username, email, password)
-			new_user = Usuario(user=user, tipo_usuario=int(user_type), datanascimento=data, telefone=phone, nome=name, auth_id=auth_id, situacao=0)
-			new_user.save()
-			send_mail('Confirmacao', \
-						"Parabéns! Seu cadastro foi realizado com sucesso!\n\
+            # Testa se a senha possui tamanho minimo
+            if len(password) < MIN_SIZE_PASS:
+                messages.warning(request, "Senha muito pequena. ")
+                allright = False
+            if not allright:
+                return redirect('/usuario/cadastro')
+
+            auth_id = uuid.uuid4().hex
+
+            user = User.objects.create_user(username, email, password)
+            new_user = Usuario(user=user, tipo_usuario=int(user_type), datanascimento=data, telefone=phone, nome=name,
+                               auth_id=auth_id, situacao=0)
+            new_user.save()
+            send_mail('Confirmacao', \
+                      "Parabéns! Seu cadastro foi realizado com sucesso!\n\
 						Usuário: " + username + "\n\
 						Link de ativação: http://localhost:8000/usuario/confirmar?auth=" + auth_id + "\n\n\
 						Atenciosamente,\n\
 						Equipe HIFIT.\n\n\
 						Email automatico, não responda.", \
-						'hifites@gmail.com', [email])
-			messages.success(request, "Cadastro realizado com sucesso. Acesse seu email para confirmação.")
-			
-			return redirect('/usuario/login')
+                      'hifites@gmail.com', [email])
+            messages.success(request, "Cadastro realizado com sucesso. Acesse seu email para confirmação.")
 
-	return render(request, 'cadastro.html',{'cadastroDados': cadastroDados} )
+            return redirect('/usuario/login')
+
+    return render(request, 'cadastro.html', {'cadastroDados': cadastroDados})
+
 
 @login_required(login_url="/usuario/login/")
 def gerenciar(request):
-	current_user = Usuario.objects.get(user=request.user)
-	name = current_user.nome
-	phone = current_user.telefone
-	data = current_user.datanascimento
-	aluno = current_user.isAluno()
-	if 'excluir' in request.POST:
-		auth_logout(request)
-		user = User.objects.get(username=current_user.user.username)
-		user.delete()
-		current_user.delete()
-		return redirect('/usuario/login')
+    current_user = Usuario.objects.get(user=request.user)
+    name = current_user.nome
+    phone = current_user.telefone
+    data = current_user.datanascimento
+    aluno = current_user.isAluno()
+    if 'excluir' in request.POST:
+        auth_logout(request)
+        user = User.objects.get(username=current_user.user.username)
+        user.delete()
+        current_user.delete()
+        return redirect('/usuario/login')
 
-	if 'alterar-senha' in request.POST:
-		return render(request, 'alterar-senha.html', {'username': current_user.user.username, 'aluno': aluno})	
+    if 'alterar-senha' in request.POST:
+        return render(request, 'alterar-senha.html', {'username': current_user.user.username, 'aluno': aluno})
 
-	if request.method == 'POST':
-		user2 = authenticate(username = current_user.user.username, password = request.POST['password'])
-		if user2 is not None:
-			editarDados = EditarForm(request.POST)
-			if editarDados.has_error('phone'):
-				phone = current_user.telefone
-				messages.warning(request, "Telefone deve estar no formado (99)99999-9999")
-			else:
-				phone = editarDados.cleaned_data.get('phone')
-			if editarDados.has_error('data'):
-				data = current_user.datanascimento
-				messages.warning(request, "Data deve estar no formado DD/MM/AAAA e ao menos ano 1900")
-			else:
-				data = editarDados.cleaned_data.get('data')				
-			name = name if request.POST['name'] is None else request.POST['name'] 
-			current_user.nome = name
-			current_user.telefone = phone
-			current_user.datanascimento = data
-			current_user.save(update_fields=['nome', 'telefone', 'datanascimento'])
-			messages.success(request, "Edição realizado com sucesso. Logue no sistema.")
-		else:
-			messages.warning(request, "Senha inválida.")
-		return redirect('/usuario/gerenciar')
-	
+    if request.method == 'POST':
+        user2 = authenticate(username=current_user.user.username, password=request.POST['password'])
+        if user2 is not None:
+            editarDados = EditarForm(request.POST)
+            if editarDados.has_error('phone'):
+                phone = current_user.telefone
+                messages.warning(request, "Telefone deve estar no formado (99)99999-9999")
+            else:
+                phone = editarDados.cleaned_data.get('phone')
+            if editarDados.has_error('data'):
+                data = current_user.datanascimento
+                messages.warning(request, "Data deve estar no formado DD/MM/AAAA e ao menos ano 1900")
+            else:
+                data = editarDados.cleaned_data.get('data')
+            name = name if request.POST['name'] is None else request.POST['name']
+            current_user.nome = name
+            current_user.telefone = phone
+            current_user.datanascimento = data
+            current_user.save(update_fields=['nome', 'telefone', 'datanascimento'])
+            messages.success(request, "Edição realizado com sucesso. Logue no sistema.")
+        else:
+            messages.warning(request, "Senha inválida.")
+        return redirect('/usuario/gerenciar')
 
-	editarDados = EditarForm()
-	return render(request, 'gerenciar.html',{'user': current_user, 'editarDados': editarDados, 'aluno': aluno})
+    editarDados = EditarForm()
+    return render(request, 'gerenciar.html', {'user': current_user, 'editarDados': editarDados, 'aluno': aluno})
 
 
 @login_required(login_url="/usuario/login/")
@@ -523,11 +526,12 @@ def fale_conosco(request):
         if form.is_valid():
             # Verifica existencia de palavras de baixo calao no texo
             for palavra in PALAVRAS_BAIXO_CALAO:
-                if re.search(palavra, form.cleaned_data['assunto'].lower()) or re.search(palavra, form.cleaned_data['conteudo'].lower()):
+                if re.search(palavra, form.cleaned_data['assunto'].lower()) or re.search(palavra, form.cleaned_data[
+                    'conteudo'].lower()):
                     messages.warning(request, 'Não se pode enviar mensagem contendo palavra(s) de baixo calão.')
                     return redirect('/fale-conosco')
             send_mail(form.cleaned_data['tipo'] + ' - ' + form.cleaned_data['assunto'], form.cleaned_data['conteudo'],
-            'hifites@gmail.com', ['hifites@gmail.com'])
+                      'hifites@gmail.com', ['hifites@gmail.com'])
             messages.success(request, "Sua mensagem foi enviada com sucesso.")
 
             return redirect('/fale-conosco')
@@ -541,40 +545,111 @@ def fale_conosco(request):
     aluno = usuario_logado.isAluno()
     return render(request, 'fale_conosco.html', {'form': form, 'aluno': aluno})
 
+
 @login_required(login_url="/usuario/login/")
 def amigos(request):
-	current_user = Usuario.objects.get(user=request.user)
-	seguindo = current_user.seguindo.all()
-	associado = current_user.associado.all()
+    current_user = Usuario.objects.get(user=request.user)
+    seguindo = current_user.seguindo.all()
+    associado = current_user.associado.all()
 
-	return render(request, 'amigos.html', { 'seguindo': seguindo, 'associado': associado })
+    return render(request, 'amigos.html', {'seguindo': seguindo, 'associado': associado})
 
-@login_required(login_url="/usuario/login/")
-def seguir(request, uid):	
-	current_user = Usuario.objects.get(user=request.user)	
-	user = Usuario.objects.get(user=uid)	
-	current_user.seguindo.add(user)
-	return redirect('/usuario/amigos')
 
 @login_required(login_url="/usuario/login/")
-def deixar_de_seguir(request, uid):	
-	current_user = Usuario.objects.get(user=request.user)	
-	for user in current_user.seguindo.all():
-		if str(user.id) == str(uid):			
-			current_user.seguindo.remove(uid)
-			break
-	
-	return redirect('/usuario/amigos')
+def seguir(request, uid):
+    current_user = Usuario.objects.get(user=request.user)
+    user = Usuario.objects.get(user=uid)
+    current_user.seguindo.add(user)
+    if not MensagensExcluidas.objects.filter(remetente=current_user, destinatario=user).exists():
+        registro = MensagensExcluidas(remetente=current_user, destinatario=user)
+        registro.save()
+    return redirect('/usuario/amigos')
+
+
+@login_required(login_url="/usuario/login/")
+def deixar_de_seguir(request, uid):
+    current_user = Usuario.objects.get(user=request.user)
+    for user in current_user.seguindo.all():
+        if str(user.id) == str(uid):
+            current_user.seguindo.remove(uid)
+            break
+
+    return redirect('/usuario/amigos')
+
 
 @login_required(login_url="/usuario/login/")
 def associar(request, uid):
-	current_user = Usuario.objects.get(user=request.user)
-	user = Usuario.objects.get(user=uid)
-	current_user.associado.add(user)
-	return redirect('/usuario/amigos')
+    current_user = Usuario.objects.get(user=request.user)
+    user = Usuario.objects.get(user=uid)
+    current_user.associado.add(user)
+    if not MensagensExcluidas.objects.filter(remetente=current_user, destinatario=user).exists():
+        registro = MensagensExcluidas(remetente=current_user, destinatario=user)
+        registro.save()
+    return redirect('/usuario/amigos')
+
 
 @login_required(login_url="/usuario/login/")
-def deixar_de_associar(request, uid):	
-	current_user = Usuario.objects.get(user=request.user)	
-	current_user.associado.remove(uid)
-	return redirect('/usuario/amigos')
+def deixar_de_associar(request, uid):
+    current_user = Usuario.objects.get(user=request.user)
+    current_user.associado.remove(uid)
+    return redirect('/usuario/amigos')
+
+
+def prioridadeConversa(amigos, uid):
+
+    amigo_selecionado = None
+    for index, a in enumerate(amigos):
+        if a.nome == uid:
+            amigo_selecionado = amigos.pop(index)
+            amigos.insert(0, amigo_selecionado)
+            break
+    return amigo_selecionado, amigos
+
+
+@login_required(login_url="/usuario/login/")
+def chat(request, uid=None):
+
+    current_user = Usuario.objects.get(user=request.user)
+    amigos = [ u for u in current_user.seguindo.all() ] + [ a for a in current_user.associado.all() ]
+    mensagens = None
+    amigo_selecionado = None
+
+    if uid:
+        amigo_selecionado, amigos = prioridadeConversa(amigos, uid)
+
+        try:
+            msg_excluida = MensagensExcluidas.objects.get(remetente=current_user, destinatario=amigo_selecionado).ultima_msg_excluida
+        except:
+            registro = MensagensExcluidas(remetente=current_user, destinatario=amigo_selecionado)
+            registro.save()
+            msg_excluida = 0
+
+        mensagens = Mensagem.objects.all().filter(id__gt=msg_excluida).filter(Q(remetente=current_user.id, destinatario=amigo_selecionado.id) | Q(remetente=amigo_selecionado.id, destinatario=current_user.id)).order_by('data').all()
+
+    if 'acao' in request.GET:
+        if request.GET['acao']:
+            if mensagens:
+                primeira_mensagem = False
+            else:
+                primeira_mensagem = True
+            mensagem = Mensagem(conteudo=request.GET['conteudo'], data=datetime.datetime.now(), remetente=current_user, destinatario=amigo_selecionado)
+            mensagem.save()
+            data = {'conteudo': request.GET['conteudo'],
+                    'data': mensagem.data.strftime('%d de '+MES_STRING[str(mensagem.data.month)]+' de %Y às %H:%M'),
+                    'primeira_mensagem': primeira_mensagem}
+            return JsonResponse(data)
+
+    if 'excluir' in request.POST:
+        ultima_mensagem = Mensagem.objects.all().filter(Q(remetente=current_user.id, destinatario=amigo_selecionado.id) | Q(remetente=amigo_selecionado.id, destinatario=current_user.id)).order_by('data').last()
+        registro = MensagensExcluidas.objects.get(remetente=current_user, destinatario=amigo_selecionado)
+        registro.ultima_msg_excluida = ultima_mensagem.id
+        registro.save()
+        messages.success(request, "Conversa excluída com sucesso.")
+        mensagens = None
+
+    context = {'current_user': current_user,
+              'amigo_selecionado': amigo_selecionado,
+              'amigos': amigos,
+              'mensagens': mensagens}
+
+    return render(request, 'chat.html', context)
