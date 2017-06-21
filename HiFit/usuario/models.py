@@ -46,6 +46,13 @@ class Usuario(models.Model):
     def __str__(self):
         return str(self.nome)
 
+class AvaliacaoUsuario(models.Model):
+    dono_avaliacao = models.ForeignKey(Usuario, related_name="dono",on_delete=models.CASCADE)
+    avaliador = models.ForeignKey(Usuario, related_name="avaliador",on_delete=models.CASCADE)
+    nota = models.FloatField()
+
+    def __str__(self):
+        return "Dono: " + str(self.dono_avaliacao) + " - Avaliador: " + str(self.avaliador)
 
 class Post(models.Model):
     conteudo = models.TextField(max_length=500)
