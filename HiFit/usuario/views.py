@@ -19,8 +19,8 @@ import re
 
 
 def avaliarPost(request):
+	print("Teste")
 	postId = request.GET.get('post_avaliado')
-	print(postId)
 	post = Post.objects.get(id=postId)
 	valor_avaliacao = request.GET.get('valor_avaliacao')
 
@@ -52,9 +52,8 @@ def home(request):
 		if request.method == 'GET':
 			if request.GET.get('funcao') == 'avaliarPost':
 				avaliarPost(request)
+
 			aluno = usuario.isAluno()
-			#Atribuir o valor de seguindo comparando se está ou não na lista de seguidos.
-			seguindo = 1
 
 			# pega posts que não são do usuario e ele pode visualizar
 			posts = Post.objects.none()	
@@ -69,6 +68,7 @@ def home(request):
 				posts_pagina = paginator.page(1)
 
 			return render(request, 'visualizar_postagens.html', {'aluno': aluno, 'posts': posts_pagina})
+
 	return redirect('/')	
 
 def handle_error(request):
@@ -83,8 +83,11 @@ def perfil(request):
 
 	if request.method == 'POST':
 		
+		print(request.POST)
+
 		if 'comentario' in request.POST:
 			post = Post.objects.get(id=request.POST['id'])
+			print(request.POST)
 			comentario = Comentario(conteudo=request.POST['conteudo'], post=post, usuario=usuario)
 			comentario.save()
 
@@ -107,7 +110,7 @@ def perfil(request):
 
 		postForm = PostagemForm(request.POST)
 		if postForm.is_valid():
-			classificacao = Classificacao(somanota=0, somapessoas=0, nota=0)
+			classificacao = Classificacao(somanota=0, somapessoas=0, nota=0.0)
 			classificacao.save()
 			new_post = Post(conteudo=postForm.cleaned_data.get('post'), usuario=usuario, classificacao=classificacao, privacidade=postForm.cleaned_data.get('tipo'))
 			new_post.save()
@@ -119,6 +122,8 @@ def perfil(request):
 
 	dono = False
 	if request.method == 'GET':
+		if request.GET.get('funcao') == 'avaliarPost':
+			avaliarPost(request)
 		try:
 			perfil_dono = request.GET['usuario']
 			try:

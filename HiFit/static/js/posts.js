@@ -22,4 +22,5 @@ function avaliarPost(id, valor_avaliacao) {
             funcao: "avaliarPost"
         }
     });
+    location.reload();
 }

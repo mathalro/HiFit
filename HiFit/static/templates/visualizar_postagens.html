@@ -19,7 +19,7 @@
 		}
 
 		.post-container .post-dados {
-			padding-bottom: 10px;
+			padding-left: 10px;
 		}
 
 		.post-container p, h4, a {
@@ -67,7 +67,7 @@
 	    	padding-left: none;
 	    }
 
-	    li {
+	    .post-container li {
 	        margin-bottom:10px;
 	    }
 	</style>
@@ -75,40 +75,45 @@
 
 {% block title %}Linha do Tempo{% endblock %}
 
-{% block titulo %}Bem vindo {{nome_usuario}}{% endblock %}
-
 {% block content %}
 	<div class="row">
 		<div class="col-lg-4 col-md-4"> 
-			<h4>Tópicos em alta</h4>
+			<h3>Tópicos em alta</h3>
 			<div class="panel panel-primary">
 				teste
 			</div>
 		</div>
 		<div class="col-lg-8 col-md-8" style="padding-left:20px; border-left: 1px solid #ccc;">
-			<h4>Linha do tempo</h4>
+			<h3>Linha do tempo</h3>
 			{% for p in posts %}
 				<div class="post-container" id="post-conteudo">
 					<div class="post-content">						
 						<div class="row">
-							<div class="col-md-4 nopadding"><p><b>{{ p.usuario.nome }}</b></p></li></div>
+							<div class="col-md-4 nopadding"><p><b><a style="padding-left: 0px" href="/usuario/perfil/?usuario={{ p.usuario.user.username }}">{{ p.usuario.nome }}</a></b></p></li></div>
 							<div class="col-md-8"><p class="pull-right">{{ p.data }}</p></div>
 						</div>
 						<p>{{ p.conteudo }}</p>
 					</div>
+					
 					<hr class="hr-gray2 non-margin">
-					<input id="{{ p.id }}"
-                           value="{{ p.classificacao.nota }}"
-                           class="rating"
-                           min=0
-                           max=5
-                           step=0.5
-                           data-size="xs">
-					{% if p.privacidade != 0 %}
-						<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-					{% else %}
-						<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
-					{% endif %}	
+					<div class="post-dados">
+						<table style="width: 100%">
+							<tr>
+								<td>
+									{% if p.privacidade != 0 %}
+										<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+									{% else %}
+										<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+									{% endif %}	
+								</td>
+								<td align="right" style="width: 83%;"><span><a href="#">Denunciar</a>| </span> <td>
+								<td align="right" style="padding-right: 5px">
+									<input id="{{ p.id }}" value="{{ p.classificacao.nota }}" class="rating" step=0.5 min=0 max=5 data-show-clear="false" 
+							   			   data-show-caption="false" data-size="xxs"/>
+								</td>
+							</tr>
+						</table>
+					</div>
 
 					<div class="comment-container">
 						{% if p.comments.all %}
@@ -121,7 +126,7 @@
 						{% if p.comments.all %}
 							<hr class="hr-gray2">
 						{% endif %}
-						<textarea class="form-control form-comentario" type="textarea" id="{{p.id}}" onkeypress="onKeyDown(event.keyCode, event.shiftKey, {{p.id}});" rows="1" placeholder="Escreva um comentário..." style="resize: none;"></textarea>
+						<textarea class="form-control form-comentario" type="textarea" id="{{p.id}}c" onkeypress="onKeyDown(event.keyCode, event.shiftKey, {{p.id}});" rows="1" placeholder="Escreva um comentário..." style="resize: none;"></textarea>
 					</div>
 				</div>
 			{% endfor %}
@@ -148,7 +153,6 @@
 {% endblock %}
 
 {% block js %}
-	<script src='/static/js/posts.js'></script>
 
 	<script>
 		function onKeyDown(e, s, id) {
@@ -159,11 +163,11 @@
 					data: {
 						'csrfmiddlewaretoken': '{{ csrf_token }}',
 						'comentario': 'comentario',
-						'conteudo': $('#'+id).val(),
+						'conteudo': $('#'+id+'c').val(),
 						'id': id
 					}
 				});
-				$('#'+id).val('');
+				$('#'+id+'c').val('');
 				location.reload();
     		}
     	};
@@ -174,13 +178,10 @@
 	        $('.rating').on('rating.change', function(event, value, caption) {
 	            avaliarPost($(this).attr("id"), value);
 	        });
-	        $('.rating').on('rating.clear', function(event) {
-	            avaliarPost($(this).attr("id"), 0.0);
-	        });
 	    });
 	</script>
 
-
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src='/static/bootstrap-star-rating/js/star-rating.js'></script>
+	<script src='/static/js/posts.js'></script>
 {% endblock %}

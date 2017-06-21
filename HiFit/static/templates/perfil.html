@@ -2,6 +2,8 @@
 
 
 {% block css %}
+	<link rel="stylesheet" href="/static/bootstrap-star-rating/css/star-rating.css">	
+
 	<style>
 		.post-container {
 			margin-bottom: 30px;
@@ -17,7 +19,7 @@
 		}
 
 		.post-container .post-dados {
-			padding-bottom: 10px;
+			padding-left: 10px;
 		}
 
 		.post-container p, h4, a {
@@ -65,9 +67,10 @@
 	    	padding-left: none;
 	    }
 
-	    li {
+	    .post-container li {
 	        margin-bottom:10px;
 	    }
+
 	</style>
 {% endblock %}
 
@@ -146,14 +149,24 @@
 					</div>
 			</div>
 			<hr class="hr-gray2 non-margin">
-			<a href="#">
-				<span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-			</a>
-			{% if p.privacidade != 0 %}
-				<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-			{% else %}
-				<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
-			{% endif %}	
+			<div class="post-dados">
+				<table style="width: 100%">
+					<tr>
+						<td>
+							{% if p.privacidade != 0 %}
+								<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+							{% else %}
+								<span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+							{% endif %}	
+						</td>
+						<td align="right" style="width: 88%;"><span><a href="#">Denunciar</a>| </span> <td>
+						<td align="right" style="padding-right: 5px">
+							<input id="{{ p.id }}" value="{{ p.classificacao.nota }}" class="rating" step=0.5 min=0 max=5 data-show-clear="false" 
+					   			   data-show-caption="false" data-size="xxs"/>
+						</td>
+					</tr>
+				</table>
+			</div>
 
 			<div class="comment-container">
 				{% if p.comments.all %}
@@ -169,7 +182,7 @@
 				{% if p.comments.all %}
 					<hr class="hr-gray2">
 				{% endif %}
-				<textarea class="form-control form-comentario" type="textarea" id="{{p.id}}" onkeypress="onKeyDown(event.keyCode, event.shiftKey, {{p.id}});" rows="1" placeholder="Escreva um comentário..." style="resize: none;"></textarea>
+				<textarea class="form-control form-comentario" type="textarea" id="{{p.id}}c" onkeypress="onKeyDown(event.keyCode, event.shiftKey, {{p.id}});" rows="1" placeholder="Escreva um comentário..." style="resize: none;"></textarea>
 			</div>
 		</div>
 	{% endfor %}
@@ -268,7 +281,6 @@
 {% endblock %}
 
 {% block js %}
-	<script src='/static/js/posts.js'></script>
 
 	<script>
 		function onKeyDown(e, s, id) {
@@ -279,15 +291,27 @@
 					data: {
 						'csrfmiddlewaretoken': '{{ csrf_token }}',
 						'comentario': 'comentario',
-						'conteudo': $('#'+id).val(),
+						'conteudo': $('#'+id+'c').val(),
 						'id': id
 					}
 				});
-				$('#'+id).val('');
+				$('#'+id+'c').val('');
 				location.reload();
     		}
     	};
 	</script>
+
+	<script>
+	    $(document).ready(function() {
+	        $('.rating').on('rating.change', function(event, value, caption) {
+	            avaliarPost($(this).attr("id"), value);
+	        });
+	    });
+	</script>
+
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src='/static/bootstrap-star-rating/js/star-rating.js'></script>
+	<script src='/static/js/posts.js'></script>
 {% endblock %}
 
 

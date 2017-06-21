@@ -16,6 +16,7 @@ class Classificacao(models.Model):
     somanota = models.FloatField(blank=True,null=True)  # Field name made lowercase.
     somapessoas = models.IntegerField(blank=True,null=True)  # Field name made lowercase.
     nota = models.FloatField(blank=True,null=True)  # Field name made lowercase.
+    
     def __str__(self):
         return str("Nota: " + str(self.somanota) + " Total: " + str(self.somapessoas))
 
