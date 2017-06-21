@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Recuperar Conta{% endblock %}
+
+{% block titulo %}<h1>Recuperar Conta</h1>{% endblock %}
+
+{% block content %}
+	<div class="col-md-4">
+		<form method="post" action="/usuario/recuperar/">
+			{% csrf_token %}
+			<label>Email</label>
+			<input type="text" name="email" class="form-control" placeholder="email">
+			<label></label>
+			<input type="submit" class="form-control btn btn-primary" value="Entrar">
+		</form>
+	</div>
+{% endblock %}

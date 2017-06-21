@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastro{% endblock %}
+
+{% block content %}
+	<section class="content-header">
+	    <h1>Cadastro de Usuário</h1>
+	</section>
+	<div class="col-md-12">
+		<form method="post" action="/usuario/cadastro/">
+			{% csrf_token %}
+			<div class="col-md-4">
+				<label>Tipo</label>
+				<select name="user_type" class="form-control">
+					<option value="1">Aluno</option>
+					<option value="2">Instrutor</option>
+				</select>
+				<label>Nome</label>
+				<input type="text" name="name" class="form-control" placeholder="Nome Completo" required>
+				<label>Email</label>
+				<input type="email" name="email" class="form-control" placeholder="usuario@email.com" required>
+				<label>Nome de usuário</label>
+				<input type="text" name="username" class="form-control" placeholder="Nome de usuário" required>
+				<label>Senha</label>
+				<input type="password" name="password" class="form-control" placeholder="********" required>
+				{{ cadastroDados }}
+				<label></label>
+				<input type="submit" class="form-control btn btn-primary" value="Próximo">
+			</div>	
+		</form>
+	</div>
+{% endblock %}

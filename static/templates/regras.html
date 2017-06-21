@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+
+{% block title %}Regras{% endblock %}
+
+
+{% block js %}
+    <script src='/static/js/regras.js'></script>
+    <script>
+        /*
+        $('#tab a').click(function(e) {
+          e.preventDefault();
+          $(this).tab('show');
+        });
+        // store the currently selected tab in the hash value
+        $("ul.nav-tabs > li > a").on("shown.bs.tab", function(e) {
+          var id = $(e.target).attr("href").substr(1);
+          window.location.hash = id;
+        });
+        // on load of the page: switch to the currently selected tab
+        var hash = window.location.hash;
+        $('#tab a[href="' + hash + '"]').tab('show');
+        */
+    </script>
+{% endblock js %}
+
+{% block content %}
+<section class="content">
+    <ul class="nav nav-tabs" id="tab">
+        <li class="active"><a data-toggle="tab" href="#menu-cadastro">Cadastro</a></li>
+        <li><a data-toggle="tab" href="#menu-minhas">Minhas Regras</a></li>
+        <li><a data-toggle="tab" href="#menu-outras">Outras Regras</a></li>
+        <li><a data-toggle="tab" href="#menu-solicitacoes">Minhas Solicitações</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="menu-cadastro" class="tab-pane fade in active">
+            <h3>Cadastro</h3>
+            <div class="form-group">
+                <form method="POST" id="form-cad" name="form-cad">
+                    {% csrf_token %}
+                    <label for="sel_cad_atividade">Atividade: *</label>
+                    <select class="form-control" id="sel_cad_atividade" name="sel_cad_atividade" required>
+                        <option disabled selected value> -- Selecione uma opção -- </option>
+                        {% for atividade in atividades %}
+                        <option>{{ atividade }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="sel_cad_restricao">Restrição:</label>
+                    <select class="form-control" id="sel_cad_restricao" name="sel_cad_restricao">
+                        <option selected value> -- Selecione uma opção -- </option>
+                        {% for restricao in restricoes %}
+                        <option>{{ restricao }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="sel_cad_beneficio">Benefício:</label>
+                    <select class="form-control" id="sel_cad_beneficio" name="sel_cad_beneficio">
+                        <option selected value> -- Selecione uma opção -- </option>
+                        {% for beneficio in beneficios %}
+                        <option>{{ beneficio }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="sel_cad_maleficio">Malefício:</label>
+                    <select class="form-control" id="sel_cad_maleficio" name="sel_cad_maleficio">
+                        <option selected value> -- Selecione uma opção -- </option>
+                        {% for maleficio in maleficios %}
+                        <option>{{ maleficio }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" name="salvarRegra" id="salvarRegra" class="btn btn-default pull-right">Salvar</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="menu-minhas" class="tab-pane fade">
+            <h3>Minhas Regras</h3>
+            <form method="POST" id="form-minhas">
+                {% csrf_token %}
+                <table class="table" id="table-edit-minhas">
+                    <thead>
+                    <tr>
+                        <th>Atividade</th>
+                        <th>Restrição</th>
+                        <th>Benefício</th>
+                        <th>Malefício</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for regra in minhas_regras %}
+                    <tr>
+                        <td>{{ regra.atividade }}</td>
+                        <td>{{ regra.restricao }}</td>
+                        <td>{{ regra.beneficio }}</td>
+                        <td>{{ regra.maleficio }}</td>
+                        <td style="display:none;">{{ regra.id }}</td>
+                        <td>
+                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-edicao" id="btn-edit-regra" onclick="setModalEditar(this)">Editar</button>
+
+                            <button type="button" class="btn btn-link" data-toggle="modal" data-target="#modal-confirma-exclusao" id="btn-excl-regra" onclick="setModalExcluir({{regra.id}})">Excluir</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+        <div id="menu-outras" class="tab-pane fade">
+            <h3>Outras Regras</h3>
+            <table class="table" id="table-edit-outras">
+                <thead>
+                <tr>
+                    <th>Atividade</th>
+                    <th>Restrição</th>
+                    <th>Benefício</th>
+                    <th>Malefício</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for regra in outras_regras %}
+                <tr>
+                    <td>{{ regra.atividade }}</td>
+                    <td>{{ regra.restricao }}</td>
+                    <td>{{ regra.beneficio }}</td>
+                    <td>{{ regra.maleficio }}</td>
+                    <td style="display:none;">{{ regra.id }}</td>
+                    <td>
+                        {% if not regra.solicitante %}
+                            <button id="{{regra.id}}" value="{{regra.id}}" type="button" class="btn btn-primary botaoSolicitacao" onclick="solicitarAlteracao({{regra.id}})" data-toggle="modal" data-target="#modal-info-solicitacao">Solicitar Permissão de Alteração</button>
+                        {% else %}
+                            <button class="btn btn-danger" disabled>Alteração já solicitada</button>
+                        {% endif %}    
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="menu-solicitacoes" class="tab-pane fade">
+            <h3>Minhas Solicitações</h3>
+            <form method="POST" id="form-solicitacoes">
+                {% csrf_token %}
+                <table class="table" id="table-minhas_solicitacoes">
+                    <thead>
+                    <tr>
+                        <th>Atividade</th>
+                        <th>Restrição</th>
+                        <th>Benefício</th>
+                        <th>Malefício</th>
+                        <th>Solicitante</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for solicitacao in solicitacoes %}
+                    <tr>
+                        <td>{{ solicitacao.atividade }}</td>
+                        <td>{{ solicitacao.restricao }}</td>
+                        <td>{{ solicitacao.beneficio }}</td>
+                        <td>{{ solicitacao.maleficio }}</td>
+                        <td style="display:none;">{{ solicitacao.id }}</td>
+                        <td>{{ solicitacao.solicitante }}</td>
+                        <td>
+                            <button type="submit" class="btn btn-link" id="aceitarSolicitacao" name="aceitarSolicitacao" value="{{solicitacao.id}}">Aceitar</button>
+                            <button type="submit" class="btn btn-link" id="recusarSolicitacao" name="recusarSolicitacao" value="{{solicitacao.id}}">Recusar</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+<!-- Modal edicao -->
+<div id="modal-edicao" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Edição de Regra</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/instrutor/regras/" method="POST" id="form-edit">
+                    {% csrf_token %}
+                    <label for="sel_edit_atividade">Atividade: *</label>
+                    <select class="form-control" id="sel_edit_atividade" name="sel_edit_atividade" required>
+                        <option disabled selected value> -- Selecione uma opção -- </option>
+                        {% for atividade in atividades %}
+                        <option>{{ atividade }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="sel_edit_restricao">Restrição:</label>
+                    <select class="form-control" id="sel_edit_restricao" name="sel_edit_restricao">
+                        <option selected value> -- Selecione uma opção -- </option>
+                        {% for restricao in restricoes %}
+                        <option>{{ restricao }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="sel_edit_beneficio">Benefício:</label>
+                    <select class="form-control" id="sel_edit_beneficio" name="sel_edit_beneficio">
+                        <option selected value> -- Selecione uma opção -- </option>
+                        {% for beneficio in beneficios %}
+                        <option>{{ beneficio }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="sel_edit_maleficio">Malefício:</label>
+                    <select class="form-control" id="sel_edit_maleficio" name="sel_edit_maleficio">
+                        <option selected value> -- Selecione uma opção -- </option>
+                        {% for maleficio in maleficios %}
+                        <option>{{ maleficio }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="hidden"  type="text" class="form-control" id="in_edit_id" name="in_edit_id">
+                    <hr><button type="submit" name="atualizarRegra" id="atualizarRegra" class="btn btn-default">Salvar</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal informacoes de solicitacao -->
+<div id="modal-info-solicitacao" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Informações de solicitação de alteração</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    A partir desta solicitação, se o instrutor proprietário desta regra não responder em menos de 2 meses, a regra será pertecente ao solicitante. Portanto aguarde a resposta do dono desta regra.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>        
+
+
+
+
+
+
+
+<!-- Modal confirmar exclusao -->
+<div id="modal-confirma-exclusao" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Informações de solicitação de alteração</h4>
+            </div>
+
+            <form action="/instrutor/regras/" method="POST" id="form-edit">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>Deseja realmente excluir esta regra?</p>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-left">
+                        <button type="submit" name="excluirRegra" id="excluirRegra" class="btn btn-success" value="">Confirmar</button>
+                    </div>
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>        
+{% endblock content %}

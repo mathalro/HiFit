@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Alterar senha{% endblock %}
+
+{% block titulo %}<h1>Alterar senha</h1>{% endblock %}
+
+{% block content %}
+	<div class="col-md-4">
+		<form method="post" action="/usuario/alterar-senha/">
+			{% csrf_token %}
+			<label>Usuário</label>
+			<input type="text" name="username" class="form-control" value="{{ username }}" readonly="">
+			<label>Nova Senha</label>
+			<input type="password" name="password" class="form-control" placeholder="******">
+			<label></label>
+			<input type="submit" class="form-control btn btn-primary" value="Salvar">
+		</form>
+	</div>
+{% endblock %}
