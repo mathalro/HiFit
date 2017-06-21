@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load l10n %}
 
 
 {% block css %}
@@ -161,8 +162,10 @@
 						</td>
 						<td align="right" style="width: 88%;"><span><a href="#">Denunciar</a>| </span> <td>
 						<td align="right" style="padding-right: 5px">
-							<input id="{{ p.id }}" value="{{ p.classificacao.nota }}" class="rating" step=0.5 min=0 max=5 data-show-clear="false" 
-					   			   data-show-caption="false" data-size="xxs"/>
+							{% localize off %}
+								<input id="{{ p.id }}" value="{{ p.classificacao.nota }}" class="rating" step=0.5 min=0 max=5 data-show-clear="false" 
+						   			   data-show-caption="false" data-size="xxs"/>
+							{% endlocalize %}
 						</td>
 					</tr>
 				</table>

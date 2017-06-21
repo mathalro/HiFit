@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load l10n %}
 
 {% block css %}
 	
@@ -108,8 +109,10 @@
 								</td>
 								<td align="right" style="width: 83%;"><span><a href="#">Denunciar</a>| </span> <td>
 								<td align="right" style="padding-right: 5px">
+									{% localize off %}
 									<input id="{{ p.id }}" value="{{ p.classificacao.nota }}" class="rating" step=0.5 min=0 max=5 data-show-clear="false" 
 							   			   data-show-caption="false" data-size="xxs"/>
+									{% endlocalize %}
 								</td>
 							</tr>
 						</table>
@@ -177,6 +180,7 @@
 	    $(document).ready(function() {
 	        $('.rating').on('rating.change', function(event, value, caption) {
 	            avaliarPost($(this).attr("id"), value);
+	            location.reload();
 	        });
 	    });
 	</script>
